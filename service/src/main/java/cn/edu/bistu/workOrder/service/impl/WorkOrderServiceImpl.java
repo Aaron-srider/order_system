@@ -1,9 +1,7 @@
 package cn.edu.bistu.workOrder.service.impl;
 
-import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.config.ContextPathConfiguration;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
@@ -15,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -48,7 +44,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
             if (!StringUtils.isEmpty(attachmentName)) {
                 String url = contextPathConfiguration.getUrl() +
                         attachmentDownloadApi +
-                        "/" + attachmentName;
+                        "/" + workOrder.getId();
                 log.debug(url);
                 workOrder.setAttachmentUrl(url);
             }

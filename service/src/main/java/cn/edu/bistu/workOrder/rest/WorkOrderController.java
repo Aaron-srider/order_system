@@ -10,7 +10,10 @@ import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.Approval;
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.model.entity.WorkOrderHistory;
+import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
+import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +39,9 @@ public class WorkOrderController {
 
     @Autowired
     WorkOrderService workOrderService;
+
+    @Autowired
+    WorkOrderHistoryService workOrderHistorService;
 
     @Autowired
     ValidationWrapper globalValidator;
@@ -69,6 +75,39 @@ public class WorkOrderController {
         return Result.ok(resultMap);
     }
 
+
+    /**
+     * 返回分页的历史工单列表，支持名称模糊搜索
+     * 入参：size(10)，current(1)，title(NULL)
+     *
+     * @return
+     */
+    @PostMapping("/workOrder/history")
+    public Result history(@RequestBody WorkOrderHistoryVo workOrderHistoryVo, HttpServletRequest req) {
+        MapService userInfo = (MapService) req.getAttribute("userInfo");
+        Long id = userInfo.getVal("id", Long.class);
+        workOrderHistoryVo.setInitiatorId(id);
+
+        IPage<WorkOrderHistoryVo> result = workOrderHistorService.listWorkOrderHistory(workOrderHistoryVo);
+
+        Map<String, Object> resultMap = BeanUtils.bean2Map(result,
+                new String[]{
+                        "serialVersionUID",
+                        "hitCount",
+                        "optimizeCountSql",
+                        "orders",
+                        "isSearchCount"
+                });
+
+        List<WorkOrderHistoryVo> list = (List<WorkOrderHistoryVo>) resultMap.get("records");
+
+        if(!list.isEmpty()) {
+            log.debug(((List<WorkOrderHistoryVo>) resultMap.get("records")).get(0).getCreateTime().toString());
+        }
+
+        return Result.ok(resultMap);
+    }
+
     /**
      * 根据工单号返回工单附件
      * 入参：工单号(路径传参)
@@ -87,7 +126,6 @@ public class WorkOrderController {
         if (attachmentBytes == null) {
             throw new AttachmentNotExistsException();
         }
-
 
         //获取附件的MIME类型
         String mimeType = MimeTypeUtils.getType(workOrder.getAttachmentName());
@@ -134,6 +172,7 @@ public class WorkOrderController {
 
     /**
      * 提交工单接口，保存工单信息，同时工单被流转到第一个审批节点
+     *
      * @return
      */
     @PostMapping("/workOrder/submission")
@@ -187,5 +226,7 @@ public class WorkOrderController {
 
         return Result.ok();
     }
+
+
 
 }

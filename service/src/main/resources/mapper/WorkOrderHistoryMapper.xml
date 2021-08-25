@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper">
+
+
+    <select id="workOrderHistoryPages" resultType="cn.edu.bistu.model.vo.WorkOrderHistoryVo">
+        select
+            wo.id,
+            flow_id,
+            wo.create_time,
+            wo.last_modified_time,
+            status,
+            content,
+            title,
+            u.student_id ,
+            u.job_id ,
+            f.name flow_name,
+            u.name initiator_name,
+            wo.attachment_name
+        from work_order_history wo
+            left join user u on wo.initiator_id = u.id
+            left join flow f on wo.flow_id = f.id
+        <where>
+            wo.deleted = 0 and f.deleted = 0 and u.deleted = 0
+            and wo.initiator_id = #{workOrderHistoryVo.initiatorId}
+            <if test="workOrderHistoryVo.title!=null and workOrderHistoryVo.title!=''">
+                and wo.title like '%' #{workOrderHistoryVo.title} '%'
+            </if>
+        </where>
+
+    </select>
+
+</mapper>
