@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class WorkOrderVo extends WorkOrder{
 
+
+
     String studentId;
     String jobId;
     String initiatorName;

@@ -34,5 +34,7 @@ public class WorkOrder extends BaseEntity{
     @NotNull
     private String content;
 
+    Long flowNodeId;
+
 
 }
