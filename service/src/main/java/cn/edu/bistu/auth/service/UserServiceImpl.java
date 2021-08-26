@@ -1,10 +1,10 @@
-package cn.edu.bistu.auth.service.impl;
+package cn.edu.bistu.auth.service;
 
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.auth.service.UserService;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.entity.User;
+import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.UserInfoChecker;
 import cn.edu.bistu.model.vo.UserVo;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

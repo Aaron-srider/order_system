@@ -1,7 +1,6 @@
 package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.common.config.ContextPathConfiguration;
-import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
@@ -45,7 +44,7 @@ public class WorkOrderHistoryServiceImpl extends ServiceImpl<WorkOrderHistoryMap
             if (!StringUtils.isEmpty(attachmentName)) {
                 String url = contextPathConfiguration.getUrl() +
                         attachmentDownloadApi +
-                        "/" + attachmentName;
+                        "/" + workOrderHistoryVo.getId();
                 log.debug(url);
                 workOrderHistory.setAttachmentUrl(url);
             }

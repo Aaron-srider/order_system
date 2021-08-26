@@ -1,7 +1,7 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.auth.exception.AttachmentNotExistsException;
+import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ValidationWrapper;
@@ -10,7 +10,6 @@ import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.Approval;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;

@@ -1,9 +1,8 @@
 package cn.edu.bistu.common.exception;
 
-import cn.edu.bistu.auth.exception.AttachmentNotExistsException;
+import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;

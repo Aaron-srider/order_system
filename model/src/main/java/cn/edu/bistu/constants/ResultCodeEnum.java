@@ -18,14 +18,20 @@ public enum ResultCodeEnum {
     USER_INFO_COMPLETED(106, "用户信息无需完善"),
     ATTACHMENT_NOT_EXISTS(107, "附件不存在"),
     FRONT_DATA_REDUNDANT(108, "前端数据冗余"),
+    AUTHENTICATION_FAIL(110, "用户认证失败"),
+    AUTHORIZATION_FAIL(111, "用户授权失败"),
 
     SUCCESS(200,"成功"),
     FAIL(201, "失败"),
     SERVICE_ERROR(202, "服务异常"),
     DATA_ERROR(204, "数据异常"),
 
-    SIGN_ERROR(300, "签名错误"),
-    SIGN_MISSING(301, "签名丢失"),
+    SIGN_ERROR(300, "签名认证错误"),
+    TOKEN_MISSING(301, "token丢失"),
+    SIGN_MISSING(302, "签名丢失"),
+    TOKEN_FORMAT_ERROR(303, "token格式错误"),
+    TOKEN_BODY_ERROR(304, "token体解压错误"),
+    TOKEN_ERROR(305, "token错误"),
 
     PAY_PASSWORD_ERROR(401, "支付密码错误"),
     REPEAT_ERROR(402, "重复提交"),

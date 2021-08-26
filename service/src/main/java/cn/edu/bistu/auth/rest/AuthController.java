@@ -3,9 +3,7 @@ package cn.edu.bistu.auth.rest;
 
 import cn.edu.bistu.auth.service.AuthService;
 import cn.edu.bistu.auth.service.UserService;
-import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.entity.User;
 import cn.edu.bistu.model.vo.UserVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.Map;
 
 @RestController
 @Slf4j
@@ -36,7 +32,7 @@ public class AuthController {
         JSONObject parse = JSON.parseObject(code);
         code = (String) parse.get("code");
 
-        Result result = authService.login(code);
+        Result result = authService.authentication(code);
         return result;
     }
 

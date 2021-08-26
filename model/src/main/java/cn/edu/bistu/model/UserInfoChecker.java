@@ -1,7 +1,6 @@
 package cn.edu.bistu.model;
 
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.model.entity.User;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.properties.RequiredUserInfoProperties;
 import lombok.Data;

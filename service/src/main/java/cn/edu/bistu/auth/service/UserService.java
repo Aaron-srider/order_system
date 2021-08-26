@@ -1,7 +1,7 @@
 package cn.edu.bistu.auth.service;
 
 import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.entity.User;
+import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.UserVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 

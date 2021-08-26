@@ -1,4 +1,4 @@
-package cn.edu.bistu.auth.exception;
+package cn.edu.bistu.workOrder.exception;
 
 
 public class AttachmentNotExistsException extends RuntimeException {

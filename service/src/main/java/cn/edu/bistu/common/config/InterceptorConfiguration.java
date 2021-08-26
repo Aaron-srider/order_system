@@ -1,6 +1,8 @@
 package cn.edu.bistu.common.config;
 
-import cn.edu.bistu.common.interceptor.TokenAuthInterceptor;
+import cn.edu.bistu.common.interceptor.AuthorizationInterceptor;
+import cn.edu.bistu.common.interceptor.LogInterceptor;
+import cn.edu.bistu.common.interceptor.AuthenticationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -21,12 +23,29 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        HandlerInterceptor tokenAuthInterceptor = getMyInterceptors(TokenAuthInterceptor.class);
-        registry.addInterceptor(tokenAuthInterceptor)
+
+        /**
+         * 打印来访日志
+         */
+        HandlerInterceptor logInterceptor = getMyInterceptors(LogInterceptor.class);
+        registry.addInterceptor(logInterceptor)
+        ;
+
+        //用户认证
+        HandlerInterceptor authenticationInterceptor = getMyInterceptors(AuthenticationInterceptor.class);
+        registry.addInterceptor(authenticationInterceptor)
                 .excludePathPatterns("/auth/login")
                 .excludePathPatterns("/auth/userInfoCompletion")
-                .excludePathPatterns("/workOrder/attachment/*")
-
         ;
+
+        //用户授权
+        HandlerInterceptor authorizationInterceptor = getMyInterceptors(AuthorizationInterceptor.class);
+        registry.addInterceptor(authorizationInterceptor)
+                .excludePathPatterns("/auth/login")
+                .excludePathPatterns("/auth/userInfoCompletion")
+        ;
+
     }
+
+
 }

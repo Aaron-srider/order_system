@@ -1,6 +1,6 @@
 package cn.edu.bistu.common;
 
-import cn.edu.bistu.model.entity.User;
+import cn.edu.bistu.model.entity.auth.User;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

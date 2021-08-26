@@ -1,6 +1,7 @@
-package cn.edu.bistu.model.entity;
+package cn.edu.bistu.model.entity.auth;
 
 import cn.edu.bistu.constants.Role;
+import cn.edu.bistu.model.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.Date;
  * 与数据库交互的对象
  */
 @Data
-public class User extends BaseEntity{
+public class User extends BaseEntity {
     @TableField("open_id")
     private String openId;
 

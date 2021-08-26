@@ -15,22 +15,22 @@ public class JwtHelper {
     /**
      * token的过期时间，Time接口中定义了一些关于日期的常量
      */
-    private static long tokenExpiration = Time.WEEK.getValue();
+    private static long tokenExpiration;
 
 
     /**
      * 生成token所需的密钥
      */
-    private static String tokenSignKey = "111111";
+    private static String tokenSignKey;
 
 
-    public static long getTokenExpiration() {
-        return tokenExpiration;
-    }
-
-    public static String getTokenSignKey() {
-        return tokenSignKey;
-    }
+    //public static long getTokenExpiration() {
+    //    return tokenExpiration;
+    //}
+    //
+    //public static String getTokenSignKey() {
+    //    return tokenSignKey;
+    //}
 
     static {
         ResourceBundle resource = ResourceBundle.getBundle("token");//test为属性文件名，放在包com.mmq下，如果是放在src下，直接用test即可
@@ -62,10 +62,12 @@ public class JwtHelper {
      *
      * @param token token to be verified
      * @return the Jwt<Claims> from the specific token if signature checking passed
-     * @throws io.jsonwebtoken.SignatureException JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+     * @throws SignatureException JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
+     * @throws ExpiredJwtException token has expired.
      */
     public static Jws<Claims> verifySignature(String token) {
-        return Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);
+        return claimsJws;
     }
 
     /**
@@ -119,8 +121,6 @@ public class JwtHelper {
         Object claim = claims.get(claimName);
         return claim;
     }
-
-
 
 
     public static void main(String[] args) throws InterruptedException {

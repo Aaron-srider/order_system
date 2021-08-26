@@ -1,7 +1,6 @@
 package cn.edu.bistu.model.vo;
 
-import cn.edu.bistu.constants.Role;
-import cn.edu.bistu.model.entity.User;
+import cn.edu.bistu.model.entity.auth.User;
 import lombok.Data;
 
 
