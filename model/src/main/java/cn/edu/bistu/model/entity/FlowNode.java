@@ -24,4 +24,7 @@ public class FlowNode extends BaseEntity {
      * 下一个节点的Id
      */
     private Long nextId;
+
+
+
 }

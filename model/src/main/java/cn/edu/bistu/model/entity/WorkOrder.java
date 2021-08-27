@@ -36,5 +36,7 @@ public class WorkOrder extends BaseEntity{
 
     Long flowNodeId;
 
+    Integer isFinished;
+
 
 }

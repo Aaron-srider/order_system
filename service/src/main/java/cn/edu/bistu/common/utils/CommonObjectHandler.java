@@ -20,8 +20,9 @@ public class CommonObjectHandler implements MetaObjectHandler {
         metaObject.setValue("createTime", new Date());
         metaObject.setValue("deleted", 0);
 
-        setValue(metaObject,"isExamined", 0 );
-        setValue(metaObject,"status", 0 );
+        //setValue(metaObject,"isExamined", 0 );
+        //setValue(metaObject,"status", 0 );
+        //setValue(metaObject,"isFinished", 0 );
     }
 
     @Override

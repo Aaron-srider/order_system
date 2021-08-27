@@ -22,10 +22,8 @@ public class WorkOrderHistory extends BaseEntity{
     private byte[] attachment;
     private String attachmentName;
 
-
     @TableField(fill= FieldFill.INSERT)
     private Integer status;
-
 
     @NotNull
     private String content;

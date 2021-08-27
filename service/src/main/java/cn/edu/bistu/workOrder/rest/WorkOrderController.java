@@ -1,6 +1,8 @@
 package cn.edu.bistu.workOrder.rest;
 
-import cn.edu.bistu.approval.service.ApprovalRecordService;
+import cn.edu.bistu.approval.service.ApprovalService;
+import cn.edu.bistu.flow.service.FlowNodeService;
+import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.MapService;
@@ -8,7 +10,6 @@ import cn.edu.bistu.common.config.ValidationWrapper;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
@@ -34,13 +35,16 @@ import java.util.*;
 public class WorkOrderController {
 
     @Autowired
-    ApprovalRecordService approvalRecordService;
+    ApprovalService approvalRecordService;
 
     @Autowired
     WorkOrderService workOrderService;
 
     @Autowired
     WorkOrderHistoryService workOrderHistorService;
+
+    @Autowired
+    FlowNodeService flowNodeService;
 
     @Autowired
     ValidationWrapper globalValidator;
@@ -100,7 +104,7 @@ public class WorkOrderController {
 
         List<WorkOrderHistoryVo> list = (List<WorkOrderHistoryVo>) resultMap.get("records");
 
-        if(!list.isEmpty()) {
+        if (!list.isEmpty()) {
             log.debug(((List<WorkOrderHistoryVo>) resultMap.get("records")).get(0).getCreateTime().toString());
         }
 
@@ -211,14 +215,19 @@ public class WorkOrderController {
             globalValidator.setRequiredPropsNameNull();
         }
 
-        workOrderVo.setFlowNodeId(0L);
+
+        Long flowId = workOrderVo.getFlowId();
+        List<FlowNode> flowNodes = flowNodeService.getFlowNodeByFlowId(flowId);
+
+        workOrderVo.setFlowNodeId(flowNodes.get(0).getId());
+        workOrderVo.setStatus(0);
+        workOrderVo.setIsExamined(0);
+        workOrderVo.setIsFinished(0);
         workOrderService.save(workOrderVo);
         log.debug("workOrderVo id after saving:" + workOrderVo.getId());
 
         return Result.ok();
     }
-
-
 
 
 }

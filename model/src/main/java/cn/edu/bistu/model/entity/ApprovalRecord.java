@@ -1,6 +1,8 @@
 package cn.edu.bistu.model.entity;
 
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.util.Date;
@@ -11,6 +13,11 @@ import java.util.Date;
 @Data
 public class ApprovalRecord extends BaseEntity
 {
+
+    /**
+     * 审批操作，0通过，1不通过
+     */
+    private Integer operation;
 
     /**
      * 审批操作（无论是通过还是不通过）的时间戳
@@ -31,4 +38,10 @@ public class ApprovalRecord extends BaseEntity
      * 审批对应的节点id
      */
     private Long flowNodeId;
+
+
+    /**
+     * 审批对应的审批人id
+     */
+    private Long approverId;
 }
