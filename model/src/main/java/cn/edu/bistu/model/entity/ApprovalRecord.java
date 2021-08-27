@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -29,9 +30,11 @@ public class ApprovalRecord extends BaseEntity
      */
     private String comment;
 
+
     /**
      * 审批对应的工单id
      */
+    @NotNull
     private Long workOrderId;
 
     /**

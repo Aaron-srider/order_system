@@ -1,6 +1,8 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
+import cn.edu.bistu.common.exception.ParameterMissing;
+import cn.edu.bistu.common.exception.ParameterRedundent;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
@@ -182,49 +184,36 @@ public class WorkOrderController {
     public Result submitWorkOrder(@RequestBody WorkOrderVo workOrderVo,
                                   HttpServletRequest req) {
 
+
+        try {
+            globalValidator.setRequiredPropsName(new String[]{"flowId", "content", "title"});
+
+            globalValidator.checkParamIntegrity(workOrderVo);
+        } catch (ParameterMissing e) {
+            log.debug("missing props:" + e.getMissingParams());
+            return Result.build(e.getMissingParams(), ResultCodeEnum.FRONT_DATA_MISSING);
+        } catch (ParameterRedundent e) {
+            log.debug("missing props:" + e.getRedundentParams());
+            return Result.build(e.getRedundentParams(), ResultCodeEnum.FRONT_DATA_REDUNDANT);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } finally {
+            globalValidator.setPropsNameNull();
+        }
+
         MapService userInfo = (MapService) req.getAttribute("userInfo");
         Long id = userInfo.getVal("id", Long.class);
         workOrderVo.setInitiatorId(id);
 
-        try {
-            globalValidator.setRequiredPropsName(new String[]{"initiatorId", "flowId", "content", "title"});
-
-            Set<ConstraintViolation<WorkOrderVo>> set = globalValidator.validate(workOrderVo);
-
-            if (!set.isEmpty()) {
-                List<String> missingProps = new ArrayList<>();
-                for (ConstraintViolation<WorkOrderVo> constraintViolation : set) {
-                    String propName = constraintViolation.getPropertyPath().toString();
-                    missingProps.add(propName);
-
-                    log.debug(propName + ":" + constraintViolation.getMessage());
-                }
-
-                return Result.build(missingProps, ResultCodeEnum.FRONT_DATA_MISSING);
-            }
-
-            List<String> redundantParams = globalValidator.checkRedundantParam(workOrderVo);
-
-            if (!redundantParams.isEmpty()) {
-                return Result.build(redundantParams, ResultCodeEnum.FRONT_DATA_MISSING);
-            }
-
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } finally {
-            globalValidator.setRequiredPropsNameNull();
-        }
-
-
-        Long flowId = workOrderVo.getFlowId();
-        List<FlowNode> flowNodes = flowNodeService.getFlowNodeByFlowId(flowId);
-
-        workOrderVo.setFlowNodeId(flowNodes.get(0).getId());
-        workOrderVo.setStatus(0);
-        workOrderVo.setIsExamined(0);
-        workOrderVo.setIsFinished(0);
-        workOrderService.save(workOrderVo);
-        log.debug("workOrderVo id after saving:" + workOrderVo.getId());
+        //Long flowId = workOrderVo.getFlowId();
+        //List<FlowNode> flowNodes = flowNodeService.getFlowNodeByFlowId(flowId);
+        //
+        //workOrderVo.setFlowNodeId(flowNodes.get(0).getId());
+        //workOrderVo.setStatus(0);
+        //workOrderVo.setIsExamined(0);
+        //workOrderVo.setIsFinished(0);
+        //workOrderService.save(workOrderVo);
+        //log.debug("workOrderVo id after saving:" + workOrderVo.getId());
 
         return Result.ok();
     }

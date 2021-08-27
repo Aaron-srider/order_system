@@ -124,9 +124,44 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //保存审批记录
         approvalRecord.setOperation(0);
+        approvalRecord.setApprovalDatetime(new Date());
 
         approvalRecordMapper.insert(approvalRecord);
 
+    }
+
+    @Override
+    public void reject(ApprovalRecord approvalRecord) {
+
+        //更新工单状态
+        WorkOrder workOrder = workOrderService.getById(approvalRecord.getWorkOrderId());
+
+        approvalRecord.setFlowNodeId(workOrder.getFlowNodeId());
+
+        workOrder.setStatus(2);
+        workOrder.setIsFinished(1);
+        workOrder.setIsExamined(1);
+
+        workOrderService.updateById(workOrder);
+
+        log.debug("workOrder to be updated:" + workOrder);
+
+
+        //生成历史工单
+        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
+
+        BeanUtils.copyProperties(workOrder, workOrderHistory);
+
+        log.debug("workOrderHistory to be saved:" + workOrderHistory);
+
+        workOrderHistoryService.save(workOrderHistory);
+
+
+        //保存审批记录
+        approvalRecord.setOperation(1);
+        approvalRecord.setApprovalDatetime(new Date());
+
+        approvalRecordMapper.insert(approvalRecord);
     }
 
 }

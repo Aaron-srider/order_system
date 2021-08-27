@@ -17,4 +17,6 @@ public interface ApprovalService {
     void pass(ApprovalRecord approvalRecord, Long nextFlowId);
 
     void finish(ApprovalRecord approvalRecord);
+
+    void reject(ApprovalRecord approvalRecord);
 }

@@ -31,6 +31,7 @@ public class LogInterceptor implements HandlerInterceptor {
         String now = dateFormat.format(new Date());
         log.info("访问时间：" + now);
         log.info("访问接口：" + request.getRequestURI());
+        log.info("访问方式：" + request.getMethod());
         return true;
     }
 

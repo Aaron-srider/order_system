@@ -1,20 +1,25 @@
 package cn.edu.bistu.common.config;
 
 import cn.edu.bistu.common.BeanUtils;
+import cn.edu.bistu.common.exception.ParameterMissing;
+import cn.edu.bistu.common.exception.ParameterRedundent;
+import cn.edu.bistu.constants.ResultCodeEnum;
+import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.entity.ApprovalRecord;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
+@Slf4j
 public class ValidationWrapper {
 
-    String[] requiredPropsName;
+    String[] requiredPropsName = new String[0];
+    String[] optionalPropsName = new String[0];;
 
     Validator validator;
 
@@ -23,7 +28,30 @@ public class ValidationWrapper {
     }
 
 
-    public  List<String> checkRedundantParam(Object obj) throws IllegalAccessException {
+    public List<String> checkMissingParam(Object obj) throws IllegalAccessException {
+        List<String> missingParams = new ArrayList<>();
+        List<Field> fieldList = BeanUtils.getAllDeclaredFields(obj.getClass());
+        for (int i = 0; i < requiredPropsName.length; i++) {
+            String requiredName = requiredPropsName[i];
+            boolean missing = true;
+            for (Field field : fieldList) {
+                if (!BeanUtils.isFieldNull(obj, field)) {
+                    if (field.getName().equals(requiredName)) {
+                        missing = false;
+                        break;
+                    }
+                }
+            }
+            if (missing) {
+                missingParams.add(requiredName);
+            }
+        }
+
+        return missingParams;
+    }
+
+
+    public List<String> checkRedundantParam(Object obj) throws IllegalAccessException {
         List<Field> allDeclaredFields = BeanUtils.getAllDeclaredFields(obj.getClass());
         List<String> redundantParams = new ArrayList<>();
         for (Field field : allDeclaredFields) {
@@ -31,20 +59,51 @@ public class ValidationWrapper {
 
 
             if (!BeanUtils.isFieldNull(obj, field)) {
-                int flag = 0;
-                for (String requiredPropName : requiredPropsName) {
+                boolean is_required = false;
+                boolean is_optional = false;
+
+                for (int i = 0; i < requiredPropsName.length; i++) {
+                    String requiredPropName = requiredPropsName[i];
                     if (propName.equals(requiredPropName)) {
-                        flag = 1;
+                        is_required = true;
                         break;
                     }
                 }
-                if(flag == 0) {
+
+
+                if (!is_required) {
+
+                    for (int i = 0; i < optionalPropsName.length; i++) {
+                        String optionalPropName = optionalPropsName[i];
+                        if (propName.equals(optionalPropName)) {
+                            is_optional = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!(is_optional || is_required)) {
                     redundantParams.add(propName);
                 }
             }
         }
 
         return redundantParams;
+    }
+
+    public void checkParamIntegrity(Object object) throws IllegalAccessException {
+
+        List<String> missingParam = checkMissingParam(object);
+        if (!missingParam.isEmpty()) {
+            throw new ParameterMissing(missingParam);
+        }
+
+        List<String> redundantParams = this.checkRedundantParam(object);
+        if (!redundantParams.isEmpty()) {
+            throw new ParameterRedundent(redundantParams);
+            //return Result.build(redundantParams, ResultCodeEnum.FRONT_DATA_MISSING);
+        }
+
     }
 
     public <T> Set<ConstraintViolation<T>> validate(T object) {
@@ -64,8 +123,9 @@ public class ValidationWrapper {
         return result;
     }
 
-    public void setRequiredPropsNameNull() {
-        requiredPropsName = null;
+    public void setPropsNameNull() {
+        requiredPropsName = new String[0];
+        optionalPropsName = new String[0];
     }
 
 }
