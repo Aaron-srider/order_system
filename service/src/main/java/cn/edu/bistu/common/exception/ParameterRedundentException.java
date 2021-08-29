@@ -6,11 +6,11 @@ import java.util.List;
 
 
 @Data
-public class ParameterRedundent extends RuntimeException {
+public class ParameterRedundentException extends RuntimeException {
 
     List<String> redundentParams ;
 
-    public ParameterRedundent(List<String> redundentParams) {
+    public ParameterRedundentException(List<String> redundentParams) {
         this.redundentParams = redundentParams;
     }
 }

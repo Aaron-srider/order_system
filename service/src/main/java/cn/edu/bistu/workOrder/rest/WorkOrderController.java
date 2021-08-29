@@ -1,9 +1,10 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.exception.ParameterMissing;
-import cn.edu.bistu.common.exception.ParameterRedundent;
+import cn.edu.bistu.common.exception.ParameterMissingException;
+import cn.edu.bistu.common.exception.ParameterRedundentException;
 import cn.edu.bistu.flow.service.FlowNodeService;
+import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.common.BeanUtils;
@@ -17,6 +18,7 @@ import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -189,10 +190,10 @@ public class WorkOrderController {
             globalValidator.setRequiredPropsName(new String[]{"flowId", "content", "title"});
 
             globalValidator.checkParamIntegrity(workOrderVo);
-        } catch (ParameterMissing e) {
+        } catch (ParameterMissingException e) {
             log.debug("missing props:" + e.getMissingParams());
             return Result.build(e.getMissingParams(), ResultCodeEnum.FRONT_DATA_MISSING);
-        } catch (ParameterRedundent e) {
+        } catch (ParameterRedundentException e) {
             log.debug("missing props:" + e.getRedundentParams());
             return Result.build(e.getRedundentParams(), ResultCodeEnum.FRONT_DATA_REDUNDANT);
         } catch (IllegalAccessException e) {
@@ -205,18 +206,44 @@ public class WorkOrderController {
         Long id = userInfo.getVal("id", Long.class);
         workOrderVo.setInitiatorId(id);
 
-        //Long flowId = workOrderVo.getFlowId();
-        //List<FlowNode> flowNodes = flowNodeService.getFlowNodeByFlowId(flowId);
-        //
-        //workOrderVo.setFlowNodeId(flowNodes.get(0).getId());
-        //workOrderVo.setStatus(0);
-        //workOrderVo.setIsExamined(0);
-        //workOrderVo.setIsFinished(0);
-        //workOrderService.save(workOrderVo);
-        //log.debug("workOrderVo id after saving:" + workOrderVo.getId());
+        Long flowId = workOrderVo.getFlowId();
+        List<FlowNode> flowNodes = flowNodeService.getFlowNodeByFlowId(flowId);
+
+        workOrderVo.setFlowNodeId(flowNodes.get(0).getId());
+        workOrderVo.setStatus(0);
+        workOrderVo.setIsExamined(0);
+        workOrderVo.setIsFinished(0);
+        workOrderService.save(workOrderVo);
+        log.debug("workOrderVo id after saving:" + workOrderVo.getId());
 
         return Result.ok();
     }
 
+
+    /**
+     * 撤回工单
+     * @param json 撤回工单的id
+     * @param req
+     * @return 如果工单未被审批，或撤回者不是工单发起者，都返回错误代码；否则撤回成功
+     */
+    @PostMapping("/workOrder/revoke")
+    public Result revoke(@RequestBody String json,  HttpServletRequest req) {
+
+        MapService userInfo = (MapService) req.getAttribute("userInfo");
+        Long initiator = userInfo.getVal("id", Long.class);
+
+        JSONObject jsonObject = JSONObject.parseObject(json);
+
+        Long workOrderId = jsonObject.getLong("workOrderId");
+
+        if(workOrderId == null) {
+            log.debug("workOrderId missing");
+            return Result.build(null,ResultCodeEnum.FRONT_DATA_MISSING);
+        }
+
+        Result result = workOrderService.revoke(workOrderId, initiator);
+
+        return result;
+    }
 
 }

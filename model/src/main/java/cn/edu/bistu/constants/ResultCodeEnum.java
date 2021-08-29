@@ -20,6 +20,11 @@ public enum ResultCodeEnum {
     FRONT_DATA_REDUNDANT(108, "前端数据冗余"),
     AUTHENTICATION_FAIL(110, "用户认证失败"),
     AUTHORIZATION_FAIL(111, "用户授权失败"),
+    /**
+     * 初次用于鉴别工单撤回者与工单的发起者是否是同一个人
+     */
+    HAVE_NO_RIGHT(112, "无权进行此操作"),
+    WORKORDER_BEEN_EXAMINED(113, "此工单已经被审批过，无法撤销"),
 
     SUCCESS(200,"成功"),
     FAIL(201, "失败"),
@@ -48,7 +53,7 @@ public enum ResultCodeEnum {
 
     private String message;
 
-    private ResultCodeEnum(Integer code, String message) {
+    ResultCodeEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

@@ -1,8 +1,13 @@
 package cn.edu.bistu.workOrder.service.impl;
 
+import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.config.ContextPathConfiguration;
+import cn.edu.bistu.constants.ResultCodeEnum;
+import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderVo;
+import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -23,6 +28,9 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     @Value("${attachmentDownloadApi}")
     String attachmentDownloadApi;
+
+    @Autowired
+    WorkOrderHistoryMapper workOrderHistoryMapper;
 
     @Autowired
     ContextPathConfiguration contextPathConfiguration;
@@ -53,6 +61,32 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     }
 
+    @Override
+    public Result revoke(Long workOrderId, Long initiator) {
 
-    
+        WorkOrder workOrder = workOrderMapper.selectById(workOrderId);
+
+        if (!workOrder.getInitiatorId().equals(initiator)) {
+            log.debug("id " + initiator + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
+            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+        if (workOrder.getIsExamined().equals(1)) {
+            log.debug("workOrderId " + workOrderId + "：" + ResultCodeEnum.WORKORDER_BEEN_EXAMINED.toString());
+            return Result.build(null, ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
+        }
+
+        workOrder.setIsFinished(1);
+        workOrder.setStatus(3);
+
+        workOrderMapper.updateById(workOrder);
+
+        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
+        BeanUtils.copyProperties(workOrder, workOrderHistory);
+        workOrderHistoryMapper.insert(workOrderHistory);
+
+        return Result.ok();
+    }
+
+
 }

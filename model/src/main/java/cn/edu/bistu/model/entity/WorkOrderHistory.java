@@ -11,6 +11,11 @@ import java.util.Date;
 @Data
 public class WorkOrderHistory extends BaseEntity{
 
+    /**
+     * 记录工单结束前的位置
+     */
+    private Long flowNodeId;
+
     @NotNull
     private Long initiatorId;
     @NotNull

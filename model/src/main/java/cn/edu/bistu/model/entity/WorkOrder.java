@@ -12,6 +12,9 @@ import java.util.Date;
 public class WorkOrder extends BaseEntity{
 
 
+    /**
+     * 1表示已经审批过，0表示从未被审批
+     */
     @TableField(fill= FieldFill.INSERT)
     private Integer isExamined;
 

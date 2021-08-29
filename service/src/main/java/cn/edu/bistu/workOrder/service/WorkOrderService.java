@@ -1,5 +1,6 @@
 package cn.edu.bistu.workOrder.service;
 
+import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -10,4 +11,5 @@ public interface WorkOrderService extends IService<WorkOrder>{
     IPage<WorkOrderVo> listWorkOrder(WorkOrderVo workOrderVo);
 
 
+    Result revoke(Long workOrderId, Long initiator);
 }

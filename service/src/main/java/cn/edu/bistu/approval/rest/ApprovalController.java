@@ -3,15 +3,13 @@ package cn.edu.bistu.approval.rest;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ValidationWrapper;
-import cn.edu.bistu.common.exception.ParameterMissing;
-import cn.edu.bistu.common.exception.ParameterRedundent;
+import cn.edu.bistu.common.exception.ParameterMissingException;
+import cn.edu.bistu.common.exception.ParameterRedundentException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
-import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -78,10 +71,10 @@ public class ApprovalController {
             globalValidator.setRequiredPropsName(new String[]{"workOrderId"});
             globalValidator.setOptionalPropsName(new String[]{"comment"});
             globalValidator.checkParamIntegrity(approvalRecord);
-        } catch (ParameterMissing e) {
+        } catch (ParameterMissingException e) {
             log.debug("missing props:" + e.getMissingParams());
             return Result.build(e.getMissingParams(), ResultCodeEnum.FRONT_DATA_MISSING);
-        } catch (ParameterRedundent e) {
+        } catch (ParameterRedundentException e) {
             log.debug("missing props:" + e.getRedundentParams());
             return Result.build(e.getRedundentParams(), ResultCodeEnum.FRONT_DATA_REDUNDANT);
         } catch (IllegalAccessException e) {
@@ -99,6 +92,9 @@ public class ApprovalController {
 
         return Result.ok();
     }
+
+
+
 
 
 }

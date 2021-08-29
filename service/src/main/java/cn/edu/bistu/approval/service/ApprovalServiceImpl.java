@@ -102,7 +102,6 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         approvalRecord.setFlowNodeId(workOrder.getFlowNodeId());
 
-        workOrder.setFlowNodeId(null);
         workOrder.setStatus(1);
         workOrder.setIsFinished(1);
         workOrder.setIsExamined(1);
