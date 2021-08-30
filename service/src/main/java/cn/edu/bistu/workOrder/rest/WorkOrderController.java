@@ -246,4 +246,45 @@ public class WorkOrderController {
         return result;
     }
 
+    /**
+     * 查看工单详情
+     * @param json 查询工单的id
+     * @param req
+     * @return
+     */
+    @PostMapping("/workOrder/detail")
+    public Result detail(@RequestBody String json,  HttpServletRequest req) {
+
+        MapService userInfo = (MapService) req.getAttribute("userInfo");
+        Long visitorId = userInfo.getVal("id", Long.class);
+
+        JSONObject jsonObject = JSONObject.parseObject(json);
+
+        Long workOrderId = jsonObject.getLong("workOrderId");
+
+        if(workOrderId == null) {
+            log.debug("workOrderId missing");
+            return Result.build(null,ResultCodeEnum.FRONT_DATA_MISSING);
+        }
+
+        WorkOrder workOrder = workOrderService.getById(workOrderId);
+
+        if(workOrder==null) {
+            log.debug("workOrderId：" + ResultCodeEnum.WORKORDER_NOT_EXISTS.toString());
+            return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
+        }
+
+        if(!workOrder.getInitiatorId().equals(visitorId)) {
+            log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
+            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+
+        workOrder.setAttachment(null);
+
+        Result result = workOrderService.detail(workOrder);
+
+        return result;
+    }
+
 }

@@ -12,4 +12,6 @@ public interface WorkOrderService extends IService<WorkOrder>{
 
 
     Result revoke(Long workOrderId, Long initiator);
+
+    Result detail(WorkOrder workOrder);
 }

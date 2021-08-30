@@ -25,6 +25,7 @@ public enum ResultCodeEnum {
      */
     HAVE_NO_RIGHT(112, "无权进行此操作"),
     WORKORDER_BEEN_EXAMINED(113, "此工单已经被审批过，无法撤销"),
+    WORKORDER_NOT_EXISTS(114, "工单不存在"),
 
     SUCCESS(200,"成功"),
     FAIL(201, "失败"),

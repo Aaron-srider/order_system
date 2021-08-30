@@ -11,4 +11,6 @@ public interface UserMapper extends BaseMapper<User> {
     UserVo selectByOpenId(String openId);
 
     Integer updateUserById(UserVo userVo);
+
+    UserVo selectById(Long id);
 }

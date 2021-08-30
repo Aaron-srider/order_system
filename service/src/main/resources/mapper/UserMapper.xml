@@ -47,5 +47,31 @@
         where id=#{id}
 </update>
 
+<select id="selectById" resultType="cn.edu.bistu.model.vo.UserVo">
+    select
+        u.id,
+        student_id,
+        job_id,
+        u.role,
+        ma.name majorName,
+        u.create_time,
+        u.update_time,
+        col.name collegeName,
+        se.name secondaryDeptName,
+        cl.name className,
+        grade,
+        u.name,
+        avatar_url,
+        gender,
+        nick_name
+    from user u left join class cl on u.class_id=cl.id
+    left join college col on u.college_id=col.id
+    left join major ma on u.major_id=ma.id
+    left join secondary_dept se on u.secondary_dept_id=se.id
+    where u.id=#{id}
+    and deleted=0;
+</select>
+
+
 
 </mapper>

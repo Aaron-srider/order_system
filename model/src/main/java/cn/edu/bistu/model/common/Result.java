@@ -23,7 +23,7 @@ public class Result<T> {
 
     public Result(){}
 
-    public static <T> Result<T> build(T data) {
+    private static <T> Result<T> build(T data) {
         Result<T> result = new Result<T>();
         if (data != null)
             result.setData(data);
