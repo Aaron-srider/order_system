@@ -27,10 +27,10 @@ public enum ResultCodeEnum {
     WORKORDER_BEEN_EXAMINED(113, "此工单已经被审批过，无法撤销"),
     WORKORDER_NOT_EXISTS(114, "工单不存在"),
 
+
     SUCCESS(200,"成功"),
     FAIL(201, "失败"),
-    SERVICE_ERROR(202, "服务异常"),
-    DATA_ERROR(204, "数据异常"),
+
 
     SIGN_ERROR(300, "签名认证错误"),
     TOKEN_MISSING(301, "token丢失"),
@@ -39,14 +39,7 @@ public enum ResultCodeEnum {
     TOKEN_BODY_ERROR(304, "token体解压错误"),
     TOKEN_ERROR(305, "token错误"),
 
-    PAY_PASSWORD_ERROR(401, "支付密码错误"),
-    REPEAT_ERROR(402, "重复提交"),
-
-    INVEST_AMMOUNT_MORE_ERROR(501, "出借金额已经多余标的金额"),
-    RETURN_AMMOUNT_MORE_ERROR(502, "还款金额不正确"),
-    PROJECT_AMMOUNT_ERROR(503, "标的金额不一致"),
-
-
+    BACKEND_ERROR(500, "后端错误");
 
     ;
 
