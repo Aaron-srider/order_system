@@ -1,16 +1,15 @@
 package cn.edu.bistu.common.exception;
 
+import cn.edu.bistu.constants.ResultCodeEnum;
 import lombok.Data;
 
 import java.util.List;
 
 
 @Data
-public class ParameterRedundentException extends RuntimeException {
+public class ParameterRedundentException extends ResultCodeException {
 
-    List<String> redundentParams ;
-
-    public ParameterRedundentException(List<String> redundentParams) {
-        this.redundentParams = redundentParams;
+    public ParameterRedundentException(Object exceptionInfo, ResultCodeEnum code) {
+        super(exceptionInfo, code);
     }
 }
