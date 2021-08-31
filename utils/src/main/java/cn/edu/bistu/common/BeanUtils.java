@@ -31,10 +31,9 @@ public class BeanUtils {
 
     /**
      * 将属性从source拷贝到map中，只拷贝非空属性。如果bean的表层属性有Date，那么格式化成String类型
-     *
-     * @param source
-     * @return
-     * @throws IllegalAccessException
+     * @param source 源对象
+     * @param exceptionNames 不拷贝属性名单，如果没有不拷贝的属性，那么传入null
+     * @return 返回拷贝后的map
      */
     public static Map<String, Object> bean2Map(Object source, String[] exceptionNames) {
         Class<?> sourceClass = source.getClass();
@@ -43,55 +42,37 @@ public class BeanUtils {
 
         Map<String, Object> result = new HashMap<>();
 
+        List<String> list = null;
+        if(exceptionNames != null) {
+            list = Arrays.asList(exceptionNames);
+        }
+
         try {
+            //遍历对象所有属性
             for (Field sourceFiled : allSourceFields) {
                 String sourceFiledName = sourceFiled.getName();
 
-                List<String> list = Arrays.asList(exceptionNames);
-                boolean isRemoved = list.contains(sourceFiledName);
+                //检查当前属性是否需要排除
+                boolean isRemoved = false;
+                if(list != null) {
+                    isRemoved = list.contains(sourceFiledName);
+                }
+
+                //如果当前属性不排除，拷贝到数组中
                 if (!isRemoved) {
                     sourceFiled.setAccessible(true);
+                    //如果是日期类型，将其转换成指定格式
                     if(sourceFiled.getType().getTypeName().equals("java.util.Date")) {
                         String formatDate = formatDate(source, sourceFiled);
                         result.put(sourceFiledName, formatDate);
                     } else {
+                        //如果不是日期类型，且属性不为空，将其拷贝到map中
                         Object sourceProperty = sourceFiled.get(source);
                         if (sourceProperty != null) {
                             result.put(sourceFiledName, sourceProperty);
                         }
                     }
                 }
-            }
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
-
-        return result;
-    }
-
-    /**
-     * 将属性从source拷贝到map中，只拷贝非空属性。
-     *
-     * @param source
-     * @return
-     * @throws IllegalAccessException
-     */
-    public static Map<String, Object> bean2Map(Object source) {
-        Class<?> sourceClass = source.getClass();
-
-        List<Field> allSourceFields = getAllDeclaredFields(sourceClass);
-
-        MapService result = new MapService();
-
-        try {
-            for (Field sourceFiled : allSourceFields) {
-                sourceFiled.setAccessible(true);
-                Object sourceProperty = sourceFiled.get(source);
-                if (sourceProperty != null) {
-                    String sourceFiledName = sourceFiled.getName();
-                    result.put(sourceFiledName, sourceProperty);
-                }
-
             }
         } catch (IllegalAccessException ex) {
             ex.printStackTrace();
