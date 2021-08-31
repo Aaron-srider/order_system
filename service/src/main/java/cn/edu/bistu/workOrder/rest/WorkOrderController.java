@@ -1,11 +1,14 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
+import cn.edu.bistu.common.exception.FrontDataMissingException;
 import cn.edu.bistu.common.exception.ParameterMissingException;
 import cn.edu.bistu.common.exception.ParameterRedundentException;
+import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
+import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.MapService;
@@ -34,7 +37,6 @@ import java.util.*;
 
 @Slf4j
 @RestController
-@CrossOrigin
 public class WorkOrderController {
 
     @Autowired
@@ -75,9 +77,6 @@ public class WorkOrderController {
                         "isSearchCount"
                 });
 
-        log.debug(((List<WorkOrderVo>) resultMap.get("records")).get(0).getCreateTime().toString());
-
-
         return Result.ok(resultMap);
     }
 
@@ -116,21 +115,30 @@ public class WorkOrderController {
 
     /**
      * 根据工单号返回工单附件
-     * 入参：工单号(路径传参)
+     * 入参：工单号
      *
      * @return
      */
-    @GetMapping("/workOrder/attachment/{workOrderId}")
-    public void downloadAttachment(@PathVariable(name = "workOrderId") Long workOrderId, HttpServletResponse resp) throws IOException {
+    @GetMapping("/workOrder/attachment")
+    public void downloadAttachment(Long workOrderId, HttpServletResponse resp) throws IOException {
+
+        if(workOrderId == null) {
+            throw new FrontDataMissingException(new String[] {
+                    "workOrderId"
+            }, ResultCodeEnum.FRONT_DATA_MISSING);
+        }
 
         //查询附件
         WorkOrder workOrder = workOrderService.getById(workOrderId);
+        if(workOrder == null) {
+            throw new WorkOrderNotExistsException("workOrderId: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
+        }
         byte[] attachmentBytes = workOrder.getAttachment();
 
         //log.debug("" + attachmentBytes.length);
 
         if (attachmentBytes == null) {
-            throw new AttachmentNotExistsException();
+            throw new AttachmentNotExistsException(null, ResultCodeEnum.ATTACHMENT_NOT_EXISTS);
         }
 
         //获取附件的MIME类型
@@ -150,22 +158,52 @@ public class WorkOrderController {
         out.write(attachmentBytes, 0, attachmentBytes.length);
     }
 
-
     /**
-     * 上传工单附件
+     * 上传工单附件，只有工单发起者能调用此接口为自己的工单上传附件，
+     * 若工单访问接口的用户与工单发起者不同，那么不允许访问
      * 入参：附件、工单号
      *
      * @return 如果缺失上传文件，返回错误代码102
      */
-    @PostMapping("/workOrder/attachment/{workOrderId}")
+    @PostMapping("/workOrder/attachment")
     public Result uploadAttachment(
             @RequestPart("attachment") MultipartFile attachment
-            , @PathVariable(name = "workOrderId") Long workOrderId
+            , @RequestPart("workOrderId") String json
+            , HttpServletRequest req
     ) throws IOException {
 
+        //获取用户id
+        MapService userInfo = (MapService) req.getAttribute("userInfo");
+        Long visitorId = userInfo.getVal("id", Long.class);
+
+        //从json中获取workOrderId
+        JSONObject jsonObject = JSONObject.parseObject(json);
+        Long workOrderId = jsonObject.getLong("workOrderId");
+
+        //workOrderId缺失
+        if(workOrderId == null) {
+            log.debug("workOrderId missing");
+            return Result.build(null,ResultCodeEnum.FRONT_DATA_MISSING);
+        }
+
+        WorkOrder workOrder = workOrderService.getById(workOrderId);
+
+        //工单不存在
+        if(workOrder==null) {
+            log.debug("workOrderId：" + ResultCodeEnum.WORKORDER_NOT_EXISTS.toString());
+            return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
+        }
+
+        //接口访问者与工单发起者不同
+        if(!workOrder.getInitiatorId().equals(visitorId)) {
+            log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
+            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+        //上传附件
         if (attachment.getSize() != 0 && !attachment.getOriginalFilename().equals("")) {
             byte[] bytes = attachment.getBytes();
-            WorkOrder workOrder = new WorkOrder();
+            workOrder = new WorkOrder();
             workOrder.setId(workOrderId);
             workOrder.setAttachment(bytes);
             workOrder.setAttachmentName(attachment.getOriginalFilename());
@@ -174,6 +212,7 @@ public class WorkOrderController {
         } else {
             return Result.build(null, ResultCodeEnum.FRONT_DATA_MISSING);
         }
+
     }
 
     /**
@@ -185,17 +224,11 @@ public class WorkOrderController {
     public Result submitWorkOrder(@RequestBody WorkOrderVo workOrderVo,
                                   HttpServletRequest req) {
 
-
         try {
             globalValidator.setRequiredPropsName(new String[]{"flowId", "content", "title"});
 
             globalValidator.checkParamIntegrity(workOrderVo);
-        } catch (ParameterMissingException e) {
-            log.debug("missing props:" + e.getMissingParams());
-            return Result.build(e.getMissingParams(), ResultCodeEnum.FRONT_DATA_MISSING);
-        } catch (ParameterRedundentException e) {
-            log.debug("missing props:" + e.getRedundentParams());
-            return Result.build(e.getRedundentParams(), ResultCodeEnum.FRONT_DATA_REDUNDANT);
+
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } finally {
@@ -238,6 +271,7 @@ public class WorkOrderController {
 
         if(workOrderId == null) {
             log.debug("workOrderId missing");
+            //throw new FrontDataMissingException();
             return Result.build(null,ResultCodeEnum.FRONT_DATA_MISSING);
         }
 
@@ -279,10 +313,50 @@ public class WorkOrderController {
             return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
-
         workOrder.setAttachment(null);
 
         Result result = workOrderService.detail(workOrder);
+
+        return result;
+    }
+
+    /**
+     * 查看历史工单详情
+     * @param json 查询工单的id
+     * @param req
+     * @return
+     */
+    @PostMapping("/workOrder/history/detail")
+    public Result historyDetail(@RequestBody String json,  HttpServletRequest req) {
+
+        MapService userInfo = (MapService) req.getAttribute("userInfo");
+        Long visitorId = userInfo.getVal("id", Long.class);
+
+        JSONObject jsonObject = JSONObject.parseObject(json);
+
+        Long workOrderHistoryId = jsonObject.getLong("workOrderHistoryId");
+
+        if(workOrderHistoryId == null) {
+            log.debug("workOrderHistoryId missing");
+            return Result.build(null,ResultCodeEnum.FRONT_DATA_MISSING);
+        }
+
+        WorkOrderHistory workOrderHistory = workOrderHistorService.getById(workOrderHistoryId);
+
+        if(workOrderHistory==null) {
+            log.debug("workOrderId：" + ResultCodeEnum.WORKORDER_NOT_EXISTS.toString());
+            return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
+        }
+
+        if(!workOrderHistory.getInitiatorId().equals(visitorId)) {
+            log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
+            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+
+        workOrderHistory.setAttachment(null);
+
+        Result result = workOrderHistorService.detail(workOrderHistory);
 
         return result;
     }
