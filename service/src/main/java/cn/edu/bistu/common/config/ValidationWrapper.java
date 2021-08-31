@@ -3,6 +3,7 @@ package cn.edu.bistu.common.config;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.ParameterMissingException;
 import cn.edu.bistu.common.exception.ParameterRedundentException;
+import cn.edu.bistu.constants.ResultCodeEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -145,13 +146,13 @@ public class ValidationWrapper {
         //获取缺失属性列表
         List<String> missingParam = checkMissingParam(object);
         if (!missingParam.isEmpty()) {
-            throw new ParameterMissingException(missingParam);
+            throw new ParameterMissingException(missingParam, ResultCodeEnum.FRONT_DATA_MISSING);
         }
 
         //获取多余属性列表
         List<String> redundantParams = this.checkRedundantParam(object);
         if (!redundantParams.isEmpty()) {
-            throw new ParameterRedundentException(redundantParams);
+            throw new ParameterRedundentException(redundantParams, ResultCodeEnum.FRONT_DATA_REDUNDANT);
         }
 
         //清空必需列表和可选列表，不要阻碍下次使用该对象。
