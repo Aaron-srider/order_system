@@ -71,12 +71,6 @@ public class ApprovalController {
             globalValidator.setRequiredPropsName(new String[]{"workOrderId"});
             globalValidator.setOptionalPropsName(new String[]{"comment"});
             globalValidator.checkParamIntegrity(approvalRecord);
-        } catch (ParameterMissingException e) {
-            log.debug("missing props:" + e.getMissingParams());
-            return Result.build(e.getMissingParams(), ResultCodeEnum.FRONT_DATA_MISSING);
-        } catch (ParameterRedundentException e) {
-            log.debug("missing props:" + e.getRedundentParams());
-            return Result.build(e.getRedundentParams(), ResultCodeEnum.FRONT_DATA_REDUNDANT);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } finally {
