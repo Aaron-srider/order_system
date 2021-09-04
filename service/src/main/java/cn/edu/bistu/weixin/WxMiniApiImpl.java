@@ -1,10 +1,15 @@
 package cn.edu.bistu.weixin;
 
 import cn.edu.bistu.auth.WeChatUtil;
+import cn.edu.bistu.model.AccessToken;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.io.*;
+import java.util.Properties;
 
 /**
  * 微信小程序Api接口实现类
@@ -16,6 +21,9 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Service
 public class WxMiniApiImpl implements WxMiniApi {
+
+    public static final String appid = "wxbc043e13b23bfec6";
+    public static final String secret = "1725148a11cbdd403435138295080768";
 
     @Override
     public JSONObject authCode2Session(String appId, String secret, String jsCode) {
@@ -30,4 +38,104 @@ public class WxMiniApiImpl implements WxMiniApi {
         }
 
     }
+
+
+    /**
+     * 获取小程序的accessToken接口，如果本地缓存了access-token且没有过期，直接从本地获取，否则访问微信接口。
+     * 之所以要缓存到本地，是因为每天请求微信接口的次数是有限制的。
+     * @param appId 小程序appId
+     * @param secret 小程序secret
+     * @return 返回访问微信服务器的accessToken
+     */
+    @Override
+    public String getAccessToken(String appId, String secret) {
+
+
+        File file = new File("access_token");
+
+
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        ObjectInputStream in = null;
+        try {
+            in = new ObjectInputStream(new FileInputStream(file));
+        } catch (StreamCorruptedException | EOFException ex) {
+            String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + secret;
+            String str = WeChatUtil.httpRequest(url, "GET", null);
+            JSONObject jsonObject = JSONObject.parseObject(str);
+            String token = jsonObject.getString("access_token");
+            String expiresIn = jsonObject.getString("expires_in");
+            AccessToken accessToken = new AccessToken();
+            accessToken.setToken(token);
+            accessToken.setExpireIn(expiresIn);
+
+            ObjectOutputStream out = null;
+            try {
+                out = new ObjectOutputStream(new FileOutputStream(file));
+                out.writeObject(accessToken);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return token;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        AccessToken accessToken = null;
+        try {
+            accessToken = (AccessToken) in.readObject();
+
+            if (accessToken.isExpired()) {
+                String url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + appId + "&secret=" + secret;
+                String str = WeChatUtil.httpRequest(url, "GET", null);
+                JSONObject jsonObject = JSONObject.parseObject(str);
+                String token = jsonObject.getString("access_token");
+                String expiresIn = jsonObject.getString("expires_in");
+                accessToken.setToken(token);
+                accessToken.setExpireIn(expiresIn);
+
+                ObjectOutputStream out = null;
+                try {
+                    out = new ObjectOutputStream(new FileOutputStream(file));
+                    out.writeObject(accessToken);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return token;
+            } else {
+                return accessToken.getToken();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
+
+
+
+    public static void main(String[] args) {
+        WxMiniApiImpl wxMiniApi = new WxMiniApiImpl();
+        String accessToken = wxMiniApi.getAccessToken(appid, secret);
+        System.out.println(accessToken);
+
+
+    }
+
+
 }

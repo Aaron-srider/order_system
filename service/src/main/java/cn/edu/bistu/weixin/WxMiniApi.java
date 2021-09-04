@@ -36,4 +36,7 @@ public interface WxMiniApi {
      *          45011	     频率限制，每个用户每分钟100次
      */
     JSONObject authCode2Session(String appId, String secret, String jsCode);
+
+    String getAccessToken(String appId, String secret);
+
 }
