@@ -52,7 +52,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             //检查用户信息是否完善，已经完善就跳过
             Integer isComplete = userMapper.selectById(userVo.getId()).getInfoComplete();
 
-            //如果未完善，检查前端信息是否完整
+            //如果未完善，完善信息
             if (isComplete.equals(0)) {
 
                 userVo.setInfoComplete(1);
