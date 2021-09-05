@@ -41,5 +41,13 @@ public class WorkOrder extends BaseEntity{
 
     Integer isFinished;
 
+    /**
+     * 判断工单是否已经完结
+     * @return 若isFinished字段为1，返回true；否则返回false。
+     */
+    public boolean isFinished() {
+        return isFinished.equals(1);
+    }
+
 
 }
