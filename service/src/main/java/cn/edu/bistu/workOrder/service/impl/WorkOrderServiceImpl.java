@@ -136,7 +136,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         //查询工单流程
         Flow flow = flowMapper.selectById(workOrder.getFlowId());
 
-        Map<String, Object> flowMap = BeanUtils.bean2Map(flow);
+        Map<String, Object> flowMap = BeanUtils.bean2Map(flow, null);
 
         //查询工单所有节点
         List<FlowNode> flowNodeList = flowNodeMapper.selectListByFlowId(flow.getId());
