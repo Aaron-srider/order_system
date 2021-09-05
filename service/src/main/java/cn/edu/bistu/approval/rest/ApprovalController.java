@@ -39,26 +39,15 @@ public class ApprovalController {
     @PostMapping("/approval/pass")
     public Result pass(@RequestBody ApprovalRecord approvalRecord,
                        HttpServletRequest req) {
+        //获取审批者id
         MapService mapService = (MapService) req.getAttribute("userInfo");
         Long approverId = mapService.getVal("id", Long.class);
 
+        //生成审批记录
         approvalRecord.setApproverId(approverId);
         Long workOrderId = approvalRecord.getWorkOrderId();
 
-        Map<String, Object> map = approvalService.isLastNode(workOrderId);
-        boolean isLastNode = (boolean) map.get("isLastNode");
-
-        FlowNode currentNode = (FlowNode) map.get("currentNode");
-        approvalRecord.setFlowNodeId(currentNode.getId());
-
-        //如果不是最后一个节点，将工单移动至下一个节点
-        if (!isLastNode) {
-            approvalService.pass(approvalRecord, currentNode.getNextId());
-        }
-        //如果是最后一个节点，工单结束
-        else {
-            approvalService.finish(approvalRecord);
-        }
+        approvalService.pass(approvalRecord);
 
         return Result.ok();
     }
