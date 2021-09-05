@@ -14,6 +14,11 @@ public class WorkOrderHistory extends BaseEntity{
     /**
      * 记录工单结束前的位置
      */
+    private Long workOrderId;
+
+    /**
+     * 记录工单结束前的位置
+     */
     private Long flowNodeId;
 
     @NotNull
