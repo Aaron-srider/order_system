@@ -50,6 +50,7 @@
 <select id="selectById" resultType="cn.edu.bistu.model.vo.UserVo">
     select
         u.id,
+        u.open_id,
         student_id,
         job_id,
         u.role,
@@ -71,7 +72,6 @@
     where u.id=#{id}
     and deleted=0;
 </select>
-
 
 
 </mapper>
