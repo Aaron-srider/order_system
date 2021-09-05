@@ -127,6 +127,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         //生成历史工单
         WorkOrderHistory workOrderHistory = new WorkOrderHistory();
         BeanUtils.copyProperties(workOrder, workOrderHistory);
+        workOrderHistory.setWorkOrderId(workOrderId);
         workOrderHistoryMapper.insert(workOrderHistory);
     }
 
@@ -195,10 +196,10 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         //保存工单
         workOrderService.save(workOrderVo);
 
-        //通知审批者
-        UserVo userVo = userMapper.selectById(workOrderVo.getId());
-        String openId = userVo.getOpenId();
-        wxMiniApi.sendSubscribeMsg(openId);
+        //通知审批者，这步暂时不动
+        //UserVo userVo = userMapper.selectById(workOrderVo.getId());
+        //String openId = userVo.getOpenId();
+        //wxMiniApi.sendSubscribeMsg(openId);
     }
 
 
