@@ -11,7 +11,7 @@ public interface WorkOrderService extends IService<WorkOrder>{
     IPage<WorkOrderVo> listWorkOrder(WorkOrderVo workOrderVo);
 
 
-    Result revoke(Long workOrderId, Long initiator);
+    void revoke(Long workOrderId, Long initiator);
 
     Result detail(WorkOrder workOrder);
 }

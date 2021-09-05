@@ -269,15 +269,14 @@ public class WorkOrderController {
 
         Long workOrderId = jsonObject.getLong("workOrderId");
 
+        //工单id缺失
         if(workOrderId == null) {
-            log.debug("workOrderId missing");
-            //throw new FrontDataMissingException();
-            return Result.build(null,ResultCodeEnum.FRONT_DATA_MISSING);
+            throw new FrontDataMissingException("workOrderId missing", ResultCodeEnum.FRONT_DATA_MISSING);
         }
 
-        Result result = workOrderService.revoke(workOrderId, initiator);
+        workOrderService.revoke(workOrderId, initiator);
 
-        return result;
+        return Result.ok();
     }
 
     /**

@@ -4,6 +4,7 @@ import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ContextPathConfiguration;
+import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowMapper;
 import cn.edu.bistu.flow.mapper.FlowNodeMapper;
@@ -86,30 +87,37 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     @Override
-    public Result revoke(Long workOrderId, Long initiator) {
+    public void revoke(Long workOrderId, Long initiator) {
 
         WorkOrder workOrder = workOrderMapper.selectById(workOrderId);
 
+        //“撤回接口”访问者与工单发起者不是同一个用户，无权操作
         if (!workOrder.getInitiatorId().equals(initiator)) {
-            log.debug("id " + initiator + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
-            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
+            throw new WorkOrderBeenFinishedException("id " + initiator + " has no right",
+                    ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
+        //工单已经结束，撤回操作非法
+        if(workOrder.getIsFinished().equals(1)) {
+            throw new WorkOrderBeenFinishedException("workOrderId:" + workOrderId,
+                    ResultCodeEnum.WORKORDER_BEEN_FINISHED);
+        }
+
+        //工单已经被审批过，撤回操作非法
         if (workOrder.getIsExamined().equals(1)) {
-            log.debug("workOrderId " + workOrderId + "：" + ResultCodeEnum.WORKORDER_BEEN_EXAMINED.toString());
-            return Result.build(null, ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
+            throw new WorkOrderBeenFinishedException("workOrderId:" + workOrderId,
+                    ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
         }
 
+        //更新工单状态
         workOrder.setIsFinished(1);
         workOrder.setStatus(3);
-
         workOrderMapper.updateById(workOrder);
 
+        //生成历史工单
         WorkOrderHistory workOrderHistory = new WorkOrderHistory();
         BeanUtils.copyProperties(workOrder, workOrderHistory);
         workOrderHistoryMapper.insert(workOrderHistory);
-
-        return Result.ok();
     }
 
     @Override
