@@ -1,15 +1,17 @@
-package cn.edu.bistu.weixin;
+package cn.edu.bistu.wx.service;
 
 import cn.edu.bistu.auth.WeChatUtil;
-import cn.edu.bistu.model.AccessToken;
+import cn.edu.bistu.model.wx.AccessToken;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.tools.doclets.internal.toolkit.util.DocFinder;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.util.Properties;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * 微信小程序Api接口实现类
@@ -24,6 +26,7 @@ public class WxMiniApiImpl implements WxMiniApi {
 
     public static final String appid = "wxbc043e13b23bfec6";
     public static final String secret = "1725148a11cbdd403435138295080768";
+    public static final String TOKEN = "123456";
 
     @Override
     public JSONObject authCode2Session(String appId, String secret, String jsCode) {
@@ -39,11 +42,11 @@ public class WxMiniApiImpl implements WxMiniApi {
 
     }
 
-
     /**
      * 获取小程序的accessToken接口，如果本地缓存了access-token且没有过期，直接从本地获取，否则访问微信接口。
      * 之所以要缓存到本地，是因为每天请求微信接口的次数是有限制的。
-     * @param appId 小程序appId
+     *
+     * @param appId  小程序appId
      * @param secret 小程序secret
      * @return 返回访问微信服务器的accessToken
      */
@@ -86,8 +89,7 @@ public class WxMiniApiImpl implements WxMiniApi {
             return token;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -125,17 +127,66 @@ public class WxMiniApiImpl implements WxMiniApi {
         return null;
     }
 
+    @Override
+    public void sendSubscribeMsg(String openId) {
+        String httpBody = "{    \n" +
+                "            \"touser\": \""+openId+"\",\n" +
+                "            \"template_id\": \"N4xxLi6-KWyqh1dwhHkPJ5CRDvcz9fugvjfH0VsJrJY\",\n" +
+                "            \"page\": \"index\",\n" +
+                "            \"miniprogram_state\": \"developer\",\n" +
+                "            \"lang\": \"zh_CN\",\n" +
+                "            \"data\": {\n" +
+                "                \"name1\": {\n" +
+                "                    \"value\": \"张三\"\n" +
+                "                },\n" +
+                "                \"time2\": {\n" +
+                "                    \"value\": \"2015年01月05日\"\n" +
+                "                },\n" +
+                "                \"thing3\": {\n" +
+                "                    \"value\": \"测试备注\"\n" +
+                "                }\n" +
+                "            }\n" +
+                "        }";
 
+        String token = getAccessToken(appid, secret);
+        String url = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + token;
+        JSONObject jsonObject = JSONObject.parseObject(httpBody);
 
-
-
-    public static void main(String[] args) {
-        WxMiniApiImpl wxMiniApi = new WxMiniApiImpl();
-        String accessToken = wxMiniApi.getAccessToken(appid, secret);
-        System.out.println(accessToken);
-
-
+        String result = WeChatUtil.httpPost(url, jsonObject);
+        log.debug(result);
     }
+
+
+    @Override
+    public boolean check(String sig, String times, String nonce)  {
+
+        String[] arr = new String[]{TOKEN, times, nonce};
+        Arrays.sort(arr);
+
+        String str = arr[0] + arr[1] + arr[2];
+
+        MessageDigest messageDigest = null;
+        try {
+            messageDigest = MessageDigest.getInstance("sha1");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        byte[] digest = messageDigest.digest(str.getBytes());
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        char[] chars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        for (byte b : digest) {
+            stringBuilder.append(chars[(b >> 4) & 15]);
+            stringBuilder.append(chars[b & 15]);
+        }
+
+        String mySig = stringBuilder.toString();
+
+        return mySig.equalsIgnoreCase(sig);
+    }
+
 
 
 }
