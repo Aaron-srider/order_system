@@ -36,6 +36,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(authenticationInterceptor)
                 .excludePathPatterns("/auth/login")
                 .excludePathPatterns("/auth/userInfoCompletion")
+                .excludePathPatterns("/wx")
         ;
 
         //用户授权
@@ -43,6 +44,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(authorizationInterceptor)
                 .excludePathPatterns("/auth/login")
                 .excludePathPatterns("/auth/userInfoCompletion")
+                .excludePathPatterns("/wx")
         ;
 
     }
