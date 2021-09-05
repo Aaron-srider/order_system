@@ -174,10 +174,10 @@ public class ApprovalServiceImpl implements ApprovalService {
         workOrderHistoryService.save(workOrderHistory);
 
         //发送微信通知
-        Long initiatorId = workOrder.getInitiatorId();
-        UserVo userVo = userMapper.selectById(initiatorId);
-        String openId = userVo.getOpenId();
-        //模板还没选好，此步跳过
+        //Long initiatorId = workOrder.getInitiatorId();
+        //UserVo userVo = userMapper.selectById(initiatorId);
+        //String openId = userVo.getOpenId();
+        ////模板还没选好，此步跳过
         //wxMiniApi.sendSubscribeMsg(openId);
 
     }
@@ -202,7 +202,6 @@ public class ApprovalServiceImpl implements ApprovalService {
         approvalRecordMapper.insert(approvalRecord);
 
 
-
         workOrder.setStatus(2);
         workOrder.setIsFinished(1);
         workOrder.setIsExamined(1);
@@ -225,11 +224,10 @@ public class ApprovalServiceImpl implements ApprovalService {
 
 
         //发送微信通知
-        Long initiatorId = workOrder.getInitiatorId();
-
-        UserVo userVo = userMapper.selectById(initiatorId);
-        String openId = userVo.getOpenId();
-        wxMiniApi.sendSubscribeMsg(openId);
+        //Long initiatorId = workOrder.getInitiatorId();
+        //UserVo userVo = userMapper.selectById(initiatorId);
+        //String openId = userVo.getOpenId();
+        //wxMiniApi.sendSubscribeMsg(openId);
 
     }
 
