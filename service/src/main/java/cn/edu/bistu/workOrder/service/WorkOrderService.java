@@ -14,4 +14,6 @@ public interface WorkOrderService extends IService<WorkOrder>{
     void revoke(Long workOrderId, Long initiator);
 
     Result detail(WorkOrder workOrder);
+
+    void submitWorkOrder(WorkOrderVo workOrderVo);
 }

@@ -8,16 +8,19 @@ import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowMapper;
 import cn.edu.bistu.flow.mapper.FlowNodeMapper;
+import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.Flow;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.auth.User;
+import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
+import cn.edu.bistu.wx.service.WxMiniApi;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -35,6 +38,9 @@ import java.util.Map;
 @Slf4j
 @Service
 public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder> implements WorkOrderService {
+    @Autowired
+    WxMiniApi wxMiniApi;
+
 
     @Autowired
     WorkOrderMapper workOrderMapper;
@@ -52,13 +58,17 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     FlowNodeMapper flowNodeMapper;
 
-
+    @Autowired
+    FlowNodeService flowNodeService;
 
     @Autowired
     WorkOrderHistoryMapper workOrderHistoryMapper;
 
     @Autowired
     ContextPathConfiguration contextPathConfiguration;
+
+    @Autowired
+    WorkOrderService workOrderService;
 
     @Override
     public IPage<WorkOrderVo> listWorkOrder(WorkOrderVo workOrderVo) {
@@ -168,6 +178,27 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
         Result result = Result.ok(workOrderMap);
         return result;
+    }
+
+    @Override
+    public void submitWorkOrder(WorkOrderVo workOrderVo) {
+
+        //获取工单对应的所有流程节点
+        Long flowId = workOrderVo.getFlowId();
+        List<FlowNode> flowNodes = flowNodeService.getFlowNodeByFlowId(flowId);
+
+        //设置生成的工单的状态
+        workOrderVo.setFlowNodeId(flowNodes.get(0).getId());//目前所处流程节点
+        workOrderVo.setStatus(0);                           //工单状态
+        workOrderVo.setIsExamined(0);                       //是否被审批过
+        workOrderVo.setIsFinished(0);                       //是否完成
+        //保存工单
+        workOrderService.save(workOrderVo);
+
+        //通知审批者
+        UserVo userVo = userMapper.selectById(workOrderVo.getId());
+        String openId = userVo.getOpenId();
+        wxMiniApi.sendSubscribeMsg(openId);
     }
 
 
