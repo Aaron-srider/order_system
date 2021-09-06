@@ -2,6 +2,9 @@ package cn.edu.bistu.approval.service;
 
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.model.vo.WorkOrderVo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Map;
@@ -37,4 +40,6 @@ public interface ApprovalService {
      * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。
      */
     void workOrderFinish(WorkOrder workOrder, ApprovalRecord approvalRecord);
+
+    Page<WorkOrderVo> listWorkOrderToBeApproved(Long visitorId, Map<String, Object> page);
 }
