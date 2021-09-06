@@ -20,7 +20,6 @@ public class User extends BaseEntity {
     @TableField("session_key")
     private String sessionKey;
 
-    private Role role;
     private String name;
     @TableField("info_complete")
     private Integer infoComplete;
@@ -42,13 +41,17 @@ public class User extends BaseEntity {
     private Integer classId;
     private Integer grade;
     @TableField("student_id")
-    private Long studentId;
+    private String studentId;
 
     //教师领导属性
     @TableField("secondary_dept_id")
     private Long secondaryDeptId;
     @TableField("job_id")
-    private Long jobId;
+    private String jobId;
+
+    public boolean isUserInfoCompleted() {
+        return infoComplete.equals(1);
+    }
 
 
 }
