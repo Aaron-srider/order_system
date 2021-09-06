@@ -4,36 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.auth.mapper.UserMapper">
 
-    <select id="selectByOpenId" resultType="cn.edu.bistu.model.vo.UserVo">
-        select
-            u.id
-            ,role
-            ,u.name
-            ,col.name college_name
-            ,ma.name major_name
-            ,se.name secondary_dept_name
-            ,cl.name class_name
-            ,grade
-            ,gender
-            ,avatar_url
-            ,nick_name
-            ,student_id
-            ,job_id
-            ,info_complete
-            ,create_time
-            ,update_time
-        from user u left join  class cl on u.class_id=cl.id
-        left join college col on u.college_id=col.id
-        left join major ma on u.major_id=ma.id
-        left join secondary_dept se on u.secondary_dept_id=se.id
-        where open_id=#{openId};
-    </select>
-
-    <update id="updateUserById">
+    <update id="userInfoComplete">
         update user
         set
             name=#{name},
-            role=#{role},
             college_id=(select id from college where name=#{collegeName}),
             major_id=(select id from major where name=#{majorName}),
             class_id=(select id from class where name=#{className}),
@@ -42,36 +16,64 @@
             student_id=#{studentId},
             job_id=#{jobId},
             update_time=#{updateTime},
-            info_complete=#{infoComplete}
-
+            info_complete=1
         where id=#{id}
 </update>
 
-<select id="selectById" resultType="cn.edu.bistu.model.vo.UserVo">
-    select
-        u.id,
-        u.open_id,
-        student_id,
-        job_id,
-        u.role,
-        ma.name majorName,
-        u.create_time,
-        u.update_time,
-        col.name collegeName,
-        se.name secondaryDeptName,
-        cl.name className,
-        grade,
-        u.name,
-        avatar_url,
-        gender,
-        nick_name
-    from user u left join class cl on u.class_id=cl.id
-    left join college col on u.college_id=col.id
-    left join major ma on u.major_id=ma.id
-    left join secondary_dept se on u.secondary_dept_id=se.id
-    where u.id=#{id}
-    and deleted=0;
+    <select id="getOneById" resultType="cn.edu.bistu.model.vo.UserVo">
+        select
+            u.id,
+            u.open_id,
+            student_id,
+            job_id,
+            r.name role,
+            ma.name majorName,
+            u.create_time,
+            u.update_time,
+            col.name collegeName,
+            se.name secondaryDeptName,
+            cl.name className,
+            grade,
+            u.name,
+            avatar_url,
+            gender,
+            nick_name
+        from user u left join class cl on u.class_id=cl.id
+        left join college col on u.college_id=col.id
+        left join major ma on u.major_id=ma.id
+        left join secondary_dept se on u.secondary_dept_id=se.id
+        left join user_role ur on u.id=ur.user_id
+        left join role r on ur.role_id=r.id
+        where u.id=#{id}
+        and u.deleted=0 and r.deleted=0 and ur.deleted=0;
 </select>
+
+    <select id="getApprovalWorkOrders" resultType="cn.edu.bistu.model.vo.WorkOrderVo">
+        select
+        wo.id,
+        wo.is_examined,
+        wo.flow_id,
+        wo.create_time,
+        wo.update_time,
+        wo.attachment_name,
+        wo.status,
+        wo.title,
+        wo.content,
+        u2.student_id,
+        u2.job_id,
+        f.name flow_name,
+        u2.name initiator_name
+        from work_order wo left join flow_node fn on wo.flow_node_id=fn.id
+        left join user u on fn.approver_id=u.id
+        left join flow f on wo.flow_id = f.id
+        left join user u2 on wo.initiator_id = u2.id
+        <where>
+            u.id=#{approverId} and wo.deleted=0 and fn.deleted=0 and u.deleted=0 and f.deleted=0 and u2.deleted=0
+            <if test="workOrderVo.title!=null and workOrderVo.title!=''">
+                and wo.title like '%' #{workOrderVo.title} '%'
+            </if>
+        </where>
+    </select>
 
 
 </mapper>
