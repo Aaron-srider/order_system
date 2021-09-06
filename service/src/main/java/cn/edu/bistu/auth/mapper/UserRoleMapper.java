@@ -1,0 +1,9 @@
+package cn.edu.bistu.auth.mapper;
+
+import cn.edu.bistu.model.entity.auth.UserRole;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface UserRoleMapper extends BaseMapper<UserRole> {
+}
