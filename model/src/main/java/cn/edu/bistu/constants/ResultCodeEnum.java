@@ -27,6 +27,7 @@ public enum ResultCodeEnum {
     WORKORDER_BEEN_EXAMINED(113, "此工单已经被审批过，无法撤销"),
     WORKORDER_NOT_EXISTS(114, "工单不存在"),
     WORKORDER_BEEN_FINISHED(115, "工单已经结束"),
+    USER_NOT_REGISTERED(116, "用户没有注册"),
 
 
     SUCCESS(200,"成功"),
