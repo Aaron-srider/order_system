@@ -7,37 +7,37 @@ public enum Role {
     /**
      * 系统管理员
      */
-    ADMIN(0),
+    ADMIN(1),
 
     /**
      * 业务员
      */
-    OPERATOR(1),
+    OPERATOR(2),
 
     /**
      * 院级领导
      */
-    COLLEGE_LEVEL_LEADER(2),
+    COLLEGE_LEVEL_LEADER(3),
 
     /**
      * 部门领导
      */
-    DEPT_LEVEL_LEADER(3),
+    DEPT_LEVEL_LEADER(4),
 
     /**
      * 教师
      */
-    TEACHER(4),
+    TEACHER(5),
 
     /**
      * 本科生
      */
-    UNDERGRADUATE(5),
+    UNDERGRADUATE(6),
 
     /**
      * 研究生
      */
-    POSTGRADUATE(6);
+    POSTGRADUATE(7);
 
     private Integer value;
 
