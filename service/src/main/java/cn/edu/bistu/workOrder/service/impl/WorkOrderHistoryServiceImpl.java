@@ -8,7 +8,6 @@ import cn.edu.bistu.flow.mapper.FlowNodeMapper;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.Flow;
 import cn.edu.bistu.model.entity.FlowNode;
-import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
@@ -79,7 +78,7 @@ public class WorkOrderHistoryServiceImpl extends ServiceImpl<WorkOrderHistoryMap
 
         Long initiatorId = workOrderHistory.getInitiatorId();
         //获取发起者信息
-        User user = userMapper.selectById(initiatorId);
+        User user = userMapper.getOneById(initiatorId);
 
         //不返回用户openId和sessionKey
         Map<String, Object> initiator = BeanUtils.bean2Map(user, new String[] {
