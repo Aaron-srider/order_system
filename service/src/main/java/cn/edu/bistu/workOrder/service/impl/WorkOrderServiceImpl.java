@@ -2,7 +2,6 @@ package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ContextPathConfiguration;
 import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
@@ -15,7 +14,6 @@ import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.auth.User;
-import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
@@ -27,11 +25,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
@@ -136,7 +132,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
         Long initiatorId = workOrder.getInitiatorId();
         //获取发起者信息
-        User user = userMapper.selectById(initiatorId);
+        User user = userMapper.getOneById(initiatorId);
 
         //不返回用户openId和sessionKey
         Map<String, Object> initiator = BeanUtils.bean2Map(user, new String[] {
@@ -197,7 +193,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         workOrderService.save(workOrderVo);
 
         //通知审批者，这步暂时不动
-        //UserVo userVo = userMapper.selectById(workOrderVo.getId());
+        //UserVo userVo = userMapper.getOneById(workOrderVo.getId());
         //String openId = userVo.getOpenId();
         //wxMiniApi.sendSubscribeMsg(openId);
     }
