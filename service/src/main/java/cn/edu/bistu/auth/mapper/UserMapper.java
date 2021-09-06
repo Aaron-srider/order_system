@@ -65,5 +65,31 @@ public interface UserMapper extends BaseMapper<User> {
      */
     UserVo getOneById(Long id);
 
-    Page<WorkOrderVo> getApprovalWorkOrders(@Param("approverId") Long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
+    /**
+     * 主要连接用户表、审批节点表、工单表，获取指定用户的待审批工单，工单信息如下：
+     *
+     * wo.id                :工单id
+     * wo.is_examined,      ：工单是否被审批过
+     * wo.flow_id,          ：工单流程id
+     * wo.create_time,      ：工单创建时间
+     * wo.update_time,      ：工单修改时间
+     * wo.attachment_name,  ：工单附件名称
+     * wo.status,           ：工单状态
+     * wo.title,            ：工单标题
+     * wo.content,          ：工单内容
+     * initiator.student_id ,   ：发起者学号
+     * initiator.job_id ,       ：发起者工号
+     * initiator.name initiatorName,    ：发起者姓名
+     * r.name role,                     ：发起者角色
+     * f.name flowName                  ：工单流程名称
+     *
+     * @param page 分页数据，包含以下有效数据:
+     *             size：要获取的页数大小
+     *             current：要获取的页数
+     * @param approverId 审批者id
+     * @param workOrderVo 包含有效数据:
+     *                     title
+     * @return
+     */
+    Page<WorkOrderVo> getApprovalWorkOrders(Page<WorkOrderVo> page, @Param("approverId") Long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
 }
