@@ -11,13 +11,18 @@ import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.UserVo;
+import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.*;
@@ -94,6 +99,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     /**
      * 工单审批通过逻辑，若工单处于最后一个节点，触发工单结束逻辑；否则，触发工单流转逻辑。
+     *
      * @param approvalRecord 审批记录
      */
     @Override
@@ -117,14 +123,15 @@ public class ApprovalServiceImpl implements ApprovalService {
         }
         //工单流转
         else {
-            Long nextFlowNodeId = ((FlowNode)lastNodeMap.get("nextNode")).getId();
+            Long nextFlowNodeId = ((FlowNode) lastNodeMap.get("nextNode")).getId();
             WorkOrderFlowToNext(workOrder, approvalRecord, nextFlowNodeId);
         }
     }
 
     /**
      * 工单流转逻辑，将工单流转到下一个节点，并保存审批记录，该方法的触发条件是审批通过或提交工单。
-     * @param workOrder 待流转工单，待完善信息：工单状态，是否被审批过，工单下一个审批节点。
+     *
+     * @param workOrder      待流转工单，待完善信息：工单状态，是否被审批过，工单下一个审批节点。
      * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。
      * @param nextFlowNodeId 下一个审批节点id
      */
@@ -147,7 +154,8 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     /**
      * 工单结束逻辑，更新工单状态并保存，生成历史工单并保存，保存审批记录，将工单结束状态通过微信发送给工单发起者。
-     * @param workOrder 待结束的工单，待完善信息：工单状态，工单是否结束，工单是否被审批。
+     *
+     * @param workOrder      待结束的工单，待完善信息：工单状态，工单是否结束，工单是否被审批。
      * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。
      */
     @Override
@@ -175,11 +183,19 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //发送微信通知
         //Long initiatorId = workOrder.getInitiatorId();
-        //UserVo userVo = userMapper.selectById(initiatorId);
+        //UserVo userVo = userMapper.getOneById(initiatorId);
         //String openId = userVo.getOpenId();
         ////模板还没选好，此步跳过
         //wxMiniApi.sendSubscribeMsg(openId);
 
+    }
+
+    @Override
+    public Page<WorkOrderVo> listWorkOrderToBeApproved(Long visitorId, Map<String, Object> map) {
+        WorkOrderVo workOrderVo = new WorkOrderVo();
+        org.springframework.beans.BeanUtils.copyProperties(map, workOrderVo);
+        Page<WorkOrderVo> workOrderPages = userMapper.getApprovalWorkOrders(visitorId, workOrderVo);
+        return workOrderPages;
     }
 
     @Override
@@ -225,7 +241,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //发送微信通知
         //Long initiatorId = workOrder.getInitiatorId();
-        //UserVo userVo = userMapper.selectById(initiatorId);
+        //UserVo userVo = userMapper.getOneById(initiatorId);
         //String openId = userVo.getOpenId();
         //wxMiniApi.sendSubscribeMsg(openId);
 
