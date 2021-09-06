@@ -50,30 +50,33 @@
 
     <select id="getApprovalWorkOrders" resultType="cn.edu.bistu.model.vo.WorkOrderVo">
         select
-        wo.id,
-        wo.is_examined,
-        wo.flow_id,
-        wo.create_time,
-        wo.update_time,
-        wo.attachment_name,
-        wo.status,
-        wo.title,
-        wo.content,
-        u2.student_id,
-        u2.job_id,
-        f.name flow_name,
-        u2.name initiator_name
+            wo.id,
+            wo.is_examined,
+            wo.flow_id,
+            wo.create_time,
+            wo.update_time,
+            wo.attachment_name,
+            wo.status,
+            wo.title,
+            wo.content,
+            initiator.student_id ,
+            initiator.job_id ,
+            f.name flowName,
+            initiator.name initiatorName,
+            r.name role
         from work_order wo left join flow_node fn on wo.flow_node_id=fn.id
-        left join user u on fn.approver_id=u.id
+        left join user approver on fn.approver_id=approver.id
         left join flow f on wo.flow_id = f.id
-        left join user u2 on wo.initiator_id = u2.id
+        left join user initiator on wo.initiator_id = initiator.id
+        left join user_role ur on ur.user_id = initiator.id
+        left join role r on r.id=ur.role_id
         <where>
-            u.id=#{approverId} and wo.deleted=0 and fn.deleted=0 and u.deleted=0 and f.deleted=0 and u2.deleted=0
+            approver.id=#{approverId} and wo.deleted=0 and fn.deleted=0 and approver.deleted=0 and f.deleted=0 and initiator.deleted=0
+            and r.deleted = 0 and ur.deleted=0
             <if test="workOrderVo.title!=null and workOrderVo.title!=''">
                 and wo.title like '%' #{workOrderVo.title} '%'
             </if>
         </where>
     </select>
-
 
 </mapper>
