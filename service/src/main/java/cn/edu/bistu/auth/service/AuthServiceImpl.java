@@ -12,10 +12,12 @@ import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,6 +159,28 @@ public class AuthServiceImpl implements AuthService {
 
         //授权失败
         return false;
+    }
+
+    public  Map<Long, Object>  forgeToken(Long[] userIds) {
+        Map<Long, Object> map =  new HashMap<>();
+
+        for (Long userId : userIds) {
+            Map<String, Object> claim = new HashMap<>();
+            claim.put("id", userId);
+            String token = JwtHelper.createToken(claim);
+            map.put(userId, token);
+        }
+        return map;
+    }
+
+    @Test
+    public void forgeToken() {
+        Map<Long, Object> tokens = forgeToken(new Long[]{
+                1L
+        });
+
+        System.out.println(tokens);
+
     }
 
 }
