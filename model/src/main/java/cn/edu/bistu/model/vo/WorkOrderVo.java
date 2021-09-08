@@ -9,11 +9,12 @@ import lombok.Data;
 public class WorkOrderVo extends WorkOrder{
 
 
-
     String studentId;
     String jobId;
     String initiatorName;
     String flowName;
+
+    String role;
 
     String attachmentUrl;
 
