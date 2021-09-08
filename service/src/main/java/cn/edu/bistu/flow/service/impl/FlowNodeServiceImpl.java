@@ -14,23 +14,4 @@ import java.util.List;
 @Slf4j
 @Service
 public class FlowNodeServiceImpl extends ServiceImpl<FlowNodeMapper, FlowNode> implements FlowNodeService {
-
-
-    @Autowired
-    FlowNodeMapper flowNodeMapper;
-
-    /**
-     * 查询指定流程对应的所有结点（按nodeOrder升序排列）
-     * @param flowId 流程id
-     * @return 流程对应的所有结点
-     */
-    public List<FlowNode> getFlowNodeByFlowId(Long flowId) {
-        QueryWrapper<FlowNode> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("flow_id", flowId).orderByAsc("node_order");
-
-        List<FlowNode> flowNodes = flowNodeMapper.selectList(queryWrapper);
-
-        return flowNodes;
-    }
-
 }
