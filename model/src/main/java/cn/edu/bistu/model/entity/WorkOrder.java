@@ -11,7 +11,6 @@ import java.util.Date;
 @Data
 public class WorkOrder extends BaseEntity{
 
-
     /**
      * 1表示已经审批过，0表示从未被审批
      */
@@ -45,7 +44,7 @@ public class WorkOrder extends BaseEntity{
      * 判断工单是否已经完结
      * @return 若isFinished字段为1，返回true；否则返回false。
      */
-    public boolean isFinished() {
+    public boolean workOrderFinished() {
         return isFinished.equals(1);
     }
 
