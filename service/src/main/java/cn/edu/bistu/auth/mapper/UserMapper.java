@@ -40,19 +40,19 @@ public interface UserMapper extends BaseMapper<User> {
      * u.id                         ：用户id
      * u.name,                      ：用户名称
      * u.open_id,                   ：用户open_id
-     * r.name role,                 ：角色名称
+     * r.name role,                 ：角色名称       连接查询
      * u.create_time,               ：创建时间
      * u.update_time,               ：修改时间
-     * col.name collegeName         ：学院名称
+     * col.name collegeName         ：学院名称       连接查询
      *
      * 》教师专有
      * job_id,                      ：工号
-     * se.name secondaryDeptName,   ：二级部门名称
+     * se.name secondaryDeptName,   ：二级部门名称     连接查询
      *
      * 》学生专有
      * student_id,                  ：学号
-     * ma.name majorName,           ：专业名称
-     * cl.name className,           ：班级名称
+     * ma.name majorName,           ：专业名称       连接查询
+     * cl.name className,           ：班级名称       连接查询
      * grade,                       ：年级号
      *
      * 》微信信息
