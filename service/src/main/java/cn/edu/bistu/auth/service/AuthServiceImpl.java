@@ -101,11 +101,11 @@ public class AuthServiceImpl implements AuthService {
         JSONObject resultUser = userDao.getOneUserByWrapper(wrapper);
 
         ResultCodeEnum resultCode = null;
-
+        User user = null;
         //用户没有注册，向数据库插入新用户，不返回token
         if (resultUser == null) {
 
-            User user = new User();
+            user = new User();
             user.setOpenId(openId);
             user.setSessionKey(sessionKey);
             user.setInfoComplete(0);
@@ -116,10 +116,10 @@ public class AuthServiceImpl implements AuthService {
         }
         //用户已经注册，判断是否完善了信息，是则返回token
         else {
-
-            Integer infoComplete = resultUser.getInteger("infoComplete");
+            user = (User)resultUser.get("result");
+            Integer infoComplete = user.getInfoComplete();
             //如果用户已经完善信息，返回登录token
-            if (infoComplete == 1) {
+            if (infoComplete.equals(infoComplete)) {
                 Map<String, Object> claim = new HashMap<>();
                 Integer id = resultUser.getInteger("id");
                 claim.put("id", id);
@@ -136,9 +136,8 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        resultUser.put("openId", null);
-        resultUser.put("sessionKey", null);
-        resultUser.put("unionId", null);
+        user.setOpenId(null);
+        user.setSessionKey(null);
 
         return Result.build(resultUser, resultCode);
     }
