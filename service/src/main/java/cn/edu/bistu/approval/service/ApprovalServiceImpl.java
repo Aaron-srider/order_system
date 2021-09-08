@@ -5,26 +5,23 @@ import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.flow.service.FlowNodeService;
+import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
-import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
+import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 
@@ -33,19 +30,16 @@ import java.util.*;
 public class ApprovalServiceImpl implements ApprovalService {
 
     @Autowired
-    WorkOrderService workOrderService;
+    FlowDao flowDao;
 
     @Autowired
-    FlowNodeService flowNodeService;
+    WorkOrderDao workOrderDao;
 
     @Autowired
     ApprovalRecordMapper approvalRecordMapper;
 
     @Autowired
     WorkOrderHistoryService workOrderHistoryService;
-
-    @Autowired
-    UserMapper userMapper;
 
     @Autowired
     WxMiniApi wxMiniApi;
@@ -57,16 +51,19 @@ public class ApprovalServiceImpl implements ApprovalService {
      * @param workOrderId 工单id
      * @return 结果Map：isLastNode->boolean;nextNode->FlowNode
      */
-    public Map<String, Object> isLastNode(Long workOrderId) {
-        WorkOrder workOrder = workOrderService.getById(workOrderId);
+    public Map<String, Object> isLastNode(Long workOrderId) throws NoSuchFieldException, IllegalAccessException {
 
-        Long flowId = workOrder.getFlowId();
+        JSONObject workOrder = workOrderDao.getOneWorkOrderById(workOrderId);
 
-        List<FlowNode> flowNodeList = flowNodeService.getFlowNodeByFlowId(flowId);
+        Long flowId = workOrder.getLong("flowId");
+
+        QueryWrapper<FlowNode> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("flow_id", flowId);
+        List<FlowNode> flowNodeList = flowDao.getFlowNodeMapper().selectList(queryWrapper);
 
         System.out.println(flowNodeList);
 
-        Long currentFlowNodeId = workOrder.getFlowNodeId();
+        Long currentFlowNodeId = workOrder.getLong("flowNodeId");
 
         boolean isLastNode = flowNodeList.get(flowNodeList.size() - 1).getId().equals(currentFlowNodeId);
         Map<String, Object> map = new HashMap<>();
@@ -103,12 +100,12 @@ public class ApprovalServiceImpl implements ApprovalService {
      * @param approvalRecord 审批记录
      */
     @Override
-    public void pass(ApprovalRecord approvalRecord) {
+    public void pass(ApprovalRecord approvalRecord) throws NoSuchFieldException, IllegalAccessException {
         Long workOrderId = approvalRecord.getWorkOrderId();
-        WorkOrder workOrder = workOrderService.getById(workOrderId);
+        WorkOrder workOrder = workOrderDao.getWorkOrderMapper().selectById(workOrderId);
 
         //若工单已结束，审批操作非法
-        if (workOrder.isFinished()) {
+        if (workOrder.getIsFinished().equals(1)) {
             throw new WorkOrderBeenFinishedException("workOrderId: " + workOrderId,
                     ResultCodeEnum.WORKORDER_BEEN_FINISHED);
         }
@@ -148,7 +145,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         workOrder.setStatus(0);     //在审
         workOrder.setIsExamined(1);  //已经被审批过
         workOrder.setFlowNodeId(nextFlowNodeId);    //更新工单审批节点
-        workOrderService.updateById(workOrder);
+        workOrderDao.getWorkOrderMapper().updateById(workOrder);
     }
 
 
@@ -171,7 +168,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         workOrder.setStatus(1);         //顺利结束
         workOrder.setIsFinished(1);     //工单结束
         workOrder.setIsExamined(1);     //工单已经被审批过
-        workOrderService.updateById(workOrder);
+        workOrderDao.getWorkOrderMapper().updateById(workOrder);
         log.debug("workOrder to be updated:" + workOrder);
 
         //生成历史工单
@@ -191,18 +188,21 @@ public class ApprovalServiceImpl implements ApprovalService {
     }
 
     @Override
-    public Page<WorkOrderVo> listWorkOrderToBeApproved(Long visitorId, Map<String, Object> map) {
-        WorkOrderVo workOrderVo = new WorkOrderVo();
-        org.springframework.beans.BeanUtils.copyProperties(map, workOrderVo);
-        Page<WorkOrderVo> workOrderPages = userMapper.getApprovalWorkOrders(visitorId, workOrderVo);
-        return workOrderPages;
+    public Page<JSONObject> listWorkOrderToBeApproved(Long visitorId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
+        Page<WorkOrder> page = new Page<>();
+        page.setCurrent(workOrderVo.getCurrent());
+        page.setSize(workOrderVo.getSize());
+
+        Page<JSONObject> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
+
+        return pageData;
     }
 
     @Override
     public void reject(ApprovalRecord approvalRecord) {
 
         //检查工单是否已经结束
-        WorkOrder workOrder = workOrderService.getById(approvalRecord.getWorkOrderId());
+        WorkOrder workOrder =  workOrderDao.getWorkOrderMapper().selectById(approvalRecord.getWorkOrderId());
         if (workOrder.getIsFinished().equals(1)) {
             throw new
                     WorkOrderBeenFinishedException(
@@ -222,7 +222,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         workOrder.setIsFinished(1);
         workOrder.setIsExamined(1);
 
-        workOrderService.updateById(workOrder);
+        workOrderDao.getWorkOrderMapper().updateById(workOrder);
 
         log.debug("workOrder to be updated:" + workOrder);
 
