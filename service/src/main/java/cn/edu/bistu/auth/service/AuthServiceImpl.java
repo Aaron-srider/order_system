@@ -2,22 +2,26 @@ package cn.edu.bistu.auth.service;
 
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.auth.exception.Jscode2sessionException;
+import cn.edu.bistu.auth.mapper.AuthDao;
 import cn.edu.bistu.auth.mapper.AuthMapper;
-import cn.edu.bistu.common.BeanUtils;
+import cn.edu.bistu.auth.mapper.UserMapper;
+import cn.edu.bistu.common.exception.UserNotRegisteredException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.WxLoginStatus;
 import cn.edu.bistu.model.entity.auth.Permission;
+import cn.edu.bistu.model.entity.auth.User;
+import cn.edu.bistu.model.entity.auth.UserRole;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +31,16 @@ import java.util.Map;
 public class AuthServiceImpl implements AuthService {
 
     @Autowired
+    AuthDao authDao;
+
+    @Autowired
     WxMiniApi wxMiniApi;
 
     @Autowired
-    UserService userService;
+    AuthMapper authMapper;
 
     @Autowired
-    AuthMapper authMapper;
+    UserMapper userMapper;
 
     @Value("${appId}")
     String appId;
@@ -86,18 +93,23 @@ public class AuthServiceImpl implements AuthService {
         }
 
         //判断用户表中是否存在该用户，不存在则进行解密得到用户信息，并进行新增用户
-        UserVo resultUser = authMapper.authenticateUserByOpenId(openId);
+        //UserVo resultUser = authMapper.authenticateUserByOpenId(openId);
+
+        //判断用户表中是否存在该用户，不存在则进行解密得到用户信息，并进行新增用户
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("open_id", openId);
+        JSONObject resultUser = authDao.getOneUserByWrapper(wrapper);
 
         ResultCodeEnum resultCode = null;
 
         //用户没有注册，向数据库插入新用户，不返回token
         if (resultUser == null) {
 
-            resultUser = new UserVo();
-            resultUser.setOpenId(openId);
-            resultUser.setSessionKey(sessionKey);
-            resultUser.setInfoComplete(0);
-            userService.save(resultUser);
+            User user = new User();
+            user.setOpenId(openId);
+            user.setSessionKey(sessionKey);
+            user.setInfoComplete(0);
+            authDao.getUserMapper().insert(user);
 
             resultCode = ResultCodeEnum.USER_INFO_NOT_COMPLETE;
             log.debug("用户注册：" + ResultCodeEnum.USER_INFO_NOT_COMPLETE.toString());
@@ -105,17 +117,17 @@ public class AuthServiceImpl implements AuthService {
         //用户已经注册，判断是否完善了信息，是则返回token
         else {
 
+            Integer infoComplete = resultUser.getInteger("infoComplete");
             //如果用户已经完善信息，返回登录token
-            if (resultUser.getInfoComplete() == 1) {
+            if (infoComplete == 1) {
                 Map<String, Object> claim = new HashMap<>();
-                claim.put("id", resultUser.getId());
+                Integer id = resultUser.getInteger("id");
+                claim.put("id", id);
                 String token = JwtHelper.createToken(claim);
 
-                resultUser.setToken(token);
+                resultUser.put("token", token);
 
                 resultCode = ResultCodeEnum.SUCCESS;
-                log.debug("用户登录成功");
-                log.debug("用户id:" + resultUser.getId());
             }
             //如果用户没有完善信息，就不返回登录token
             else {
@@ -124,12 +136,11 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        Map<String, Object> resultData = BeanUtils.bean2Map(resultUser, new String[]{
-                "openId",
-                "sessionKey"
-        });
+        resultUser.put("openId", null);
+        resultUser.put("sessionKey", null);
+        resultUser.put("unionId", null);
 
-        return Result.build(resultData, resultCode);
+        return Result.build(resultUser, resultCode);
     }
 
 
@@ -171,6 +182,33 @@ public class AuthServiceImpl implements AuthService {
             map.put(userId, token);
         }
         return map;
+    }
+
+    @Override
+    public void userInfoCompletion(UserVo userVo, Long roleId) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("id", userVo.getId());
+        JSONObject user = authDao.getOneUserByWrapper(wrapper);
+
+        //用户没注册
+        if (user == null) {
+            throw new UserNotRegisteredException("user id: " + userVo.getId(), ResultCodeEnum.USER_NOT_REGISTERED);
+        }
+
+        Integer infoComplete = user.getInteger("infoComplete");
+        //用户已经完善过信息了
+        if (infoComplete.equals(1)) {
+            throw new UserNotRegisteredException("user id: " + userVo.getId(), ResultCodeEnum.USER_INFO_COMPLETED);
+        }
+
+        //更新用户表
+        authDao.getUserMapper().userInfoComplete(userVo);
+
+        //向UserRole表中插入数据
+        UserRole userRole = new UserRole();
+        userRole.setRoleId(roleId);
+        userRole.setUserId(userVo.getId());
+        authDao.getUserRoleMapper().insert(userRole);
     }
 
     @Test

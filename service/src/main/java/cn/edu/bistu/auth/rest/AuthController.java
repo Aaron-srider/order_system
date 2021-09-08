@@ -2,7 +2,6 @@ package cn.edu.bistu.auth.rest;
 
 
 import cn.edu.bistu.auth.service.AuthService;
-import cn.edu.bistu.auth.service.UserService;
 import cn.edu.bistu.common.config.ParamIntegrityChecker;
 import cn.edu.bistu.common.exception.FrontDataMissingException;
 import cn.edu.bistu.constants.ResultCodeEnum;
@@ -10,18 +9,13 @@ import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.vo.UserVo;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.tools.corba.se.idl.IncludeGen;
-import com.sun.xml.internal.xsom.impl.scd.Iterators;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
@@ -31,9 +25,6 @@ public class AuthController {
 
     @Autowired
     AuthService authService;
-
-    @Autowired
-    UserService userService;
 
     @Autowired
     ParamIntegrityChecker paramIntegrityChecker;
@@ -101,7 +92,7 @@ public class AuthController {
             userVo.setStudentId((String)map.get("studentId"));
         }
 
-        userService.userInfoCompletion(userVo, roleId);
+        authService.userInfoCompletion(userVo, roleId);
         return Result.ok();
     }
 
