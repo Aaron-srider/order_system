@@ -1,8 +1,8 @@
 package cn.edu.bistu.auth.service;
 
+import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.auth.exception.Jscode2sessionException;
-import cn.edu.bistu.auth.mapper.AuthDao;
 import cn.edu.bistu.auth.mapper.AuthMapper;
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.exception.UserNotRegisteredException;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class AuthServiceImpl implements AuthService {
 
     @Autowired
-    AuthDao authDao;
+    UserDao userDao;
 
     @Autowired
     WxMiniApi wxMiniApi;
@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
         //判断用户表中是否存在该用户，不存在则进行解密得到用户信息，并进行新增用户
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("open_id", openId);
-        JSONObject resultUser = authDao.getOneUserByWrapper(wrapper);
+        JSONObject resultUser = userDao.getOneUserByWrapper(wrapper);
 
         ResultCodeEnum resultCode = null;
 
@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
             user.setOpenId(openId);
             user.setSessionKey(sessionKey);
             user.setInfoComplete(0);
-            authDao.getUserMapper().insert(user);
+            userDao.getUserMapper().insert(user);
 
             resultCode = ResultCodeEnum.USER_INFO_NOT_COMPLETE;
             log.debug("用户注册：" + ResultCodeEnum.USER_INFO_NOT_COMPLETE.toString());
@@ -188,7 +188,7 @@ public class AuthServiceImpl implements AuthService {
     public void userInfoCompletion(UserVo userVo, Long roleId) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("id", userVo.getId());
-        JSONObject user = authDao.getOneUserByWrapper(wrapper);
+        JSONObject user = userDao.getOneUserByWrapper(wrapper);
 
         //用户没注册
         if (user == null) {
@@ -202,13 +202,13 @@ public class AuthServiceImpl implements AuthService {
         }
 
         //更新用户表
-        authDao.getUserMapper().userInfoComplete(userVo);
+        userDao.getUserMapper().userInfoComplete(userVo);
 
         //向UserRole表中插入数据
         UserRole userRole = new UserRole();
         userRole.setRoleId(roleId);
         userRole.setUserId(userVo.getId());
-        authDao.getUserRoleMapper().insert(userRole);
+        userDao.getUserRoleMapper().insert(userRole);
     }
 
     @Test
