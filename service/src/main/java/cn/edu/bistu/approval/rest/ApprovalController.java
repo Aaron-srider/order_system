@@ -16,6 +16,7 @@ import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sun.xml.internal.xsom.impl.parser.BaseContentRef;
@@ -46,7 +47,7 @@ public class ApprovalController extends BaseController {
 
     @PostMapping("/approval/pass")
     public Result pass(@RequestBody ApprovalRecord approvalRecord,
-                       HttpServletRequest req) {
+                       HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
         //获取审批者id
         MapService mapService = (MapService) req.getAttribute("userInfo");
         Long approverId = mapService.getVal("id", Long.class);
@@ -82,12 +83,12 @@ public class ApprovalController extends BaseController {
     }
 
     @PostMapping("/approval/list")
-    public Result list(@RequestBody Map<String, Object> page, HttpServletRequest req) {
+    public Result list(@RequestBody Map<String, Object> page, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
         MapService optional = MapService.map()
                 .putMap("size", 10)
                 .putMap("current", 1)
-                .putMap("title", null);
+                .putMap("title", "");
         paramIntegrityChecker.setOptionalPropsName(optional);
         paramIntegrityChecker.checkMapParamIntegrity(page);
 
@@ -101,18 +102,9 @@ public class ApprovalController extends BaseController {
             workOrderVo.setTitle((String)title);
         }
 
-        Page<WorkOrderVo> result = approvalService.listWorkOrderToBeApproved(getVisitorId(req), workOrderVo);
+        Page<JSONObject> result = approvalService.listWorkOrderToBeApproved(getVisitorId(req), workOrderVo);
 
-        Map<String, Object> resultMap = BeanUtils.bean2Map(result,
-                new String[]{
-                        "serialVersionUID",
-                        "hitCount",
-                        "optimizeCountSql",
-                        "orders",
-                        "isSearchCount"
-                });
-
-        return Result.ok(resultMap);
+        return Result.ok(result);
     }
 
 
