@@ -13,6 +13,7 @@ import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.Result;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
+import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -68,7 +69,6 @@ public class ApprovalController extends BaseController {
         paramIntegrityChecker.setOptionalPropsName(optional);
         paramIntegrityChecker.checkMapParamIntegrity(paramMap);
 
-
         //生成审批记录
         ApprovalRecord approvalRecord = new ApprovalRecord();
         approvalRecord.setComment((String)paramMap.get("comment"));
@@ -83,13 +83,25 @@ public class ApprovalController extends BaseController {
 
     @PostMapping("/approval/list")
     public Result list(@RequestBody Map<String, Object> page, HttpServletRequest req) {
-        MapService optional = MapService.map().putMap("size", 10)
+
+        MapService optional = MapService.map()
+                .putMap("size", 10)
                 .putMap("current", 1)
                 .putMap("title", null);
         paramIntegrityChecker.setOptionalPropsName(optional);
         paramIntegrityChecker.checkMapParamIntegrity(page);
 
-        Page<WorkOrderVo> result = approvalService.listWorkOrderToBeApproved(getVisitorId(req), page);
+        WorkOrderVo workOrderVo = new WorkOrderVo();
+        Integer size = (Integer)page.get("size");
+        Integer current = (Integer)page.get("current");
+        workOrderVo.setSize(size.longValue());
+        workOrderVo.setCurrent(current.longValue());
+        Object title = page.get("title");
+        if(title != null) {
+            workOrderVo.setTitle((String)title);
+        }
+
+        Page<WorkOrderVo> result = approvalService.listWorkOrderToBeApproved(getVisitorId(req), workOrderVo);
 
         Map<String, Object> resultMap = BeanUtils.bean2Map(result,
                 new String[]{
@@ -102,5 +114,7 @@ public class ApprovalController extends BaseController {
 
         return Result.ok(resultMap);
     }
+
+
 
 }
