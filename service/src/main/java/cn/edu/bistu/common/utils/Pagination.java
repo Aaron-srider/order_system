@@ -37,6 +37,7 @@ public class Pagination {
         } else {
             //准备分页数据，起始页大小和每页大小
             offset = ((Long) (page.offset())).intValue();
+            size = ((Long) (page.getSize())).intValue();
             //结束索引，如果结束索引大于记录总数
             endset = offset + size > total ? total : offset + size;
 
