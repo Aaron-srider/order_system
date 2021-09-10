@@ -1,23 +1,23 @@
 package cn.edu.bistu.workOrder.mapper;
 
 import cn.edu.bistu.User.mapper.UserDao;
-import cn.edu.bistu.auth.mapper.AuthDao;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.mapper.FlowDao;
+import cn.edu.bistu.model.common.JsonUtils;
+import cn.edu.bistu.model.common.DaoResult;
+import cn.edu.bistu.model.common.DaoResultImpl;
 import cn.edu.bistu.model.entity.Flow;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.WorkOrderVo;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
-import org.apache.ibatis.annotations.Param;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +30,7 @@ import java.util.List;
  * ，并在接口中委托mapper查询数据，并组装返回。
  */
 @Data
+@Slf4j
 @Repository
 public class WorkOrderDao {
 
@@ -54,7 +55,7 @@ public class WorkOrderDao {
      * @param wrapper 工单查询条件
      * @return 返回工单分页数据，以及分页数据；如果不分页，返回的page对象的size，current，total置零，records仍然为有用数据。
      */
-    public Page<JSONObject> getWorkOrderPageByWrapper(Page<WorkOrder> page, QueryWrapper<WorkOrder> wrapper) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<Page<JSONObject>> getWorkOrderPageByWrapper(Page<WorkOrder> page, QueryWrapper<WorkOrder> wrapper) throws NoSuchFieldException, IllegalAccessException {
         List<WorkOrder> workOrderList = workOrderMapper.selectList(wrapper);
 
         //用于封装工单结果
@@ -68,7 +69,10 @@ public class WorkOrderDao {
 
         Page<JSONObject> page1 = Pagination.page(page, resultList);
 
-        return page1;
+        DaoResult<Page<JSONObject>> objectDaoResult = new DaoResultImpl<>();
+        objectDaoResult.setResult(page1);
+
+        return objectDaoResult;
     }
 
     /**
@@ -77,18 +81,21 @@ public class WorkOrderDao {
      * @param wrapper 工单查询条件
      * @return 返回工单分页数据，以及分页数据
      */
-    public JSONObject getOneWorkOrderByWrapper(QueryWrapper<WorkOrder> wrapper) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<WorkOrder> getOneWorkOrderByWrapper(QueryWrapper<WorkOrder> wrapper) throws NoSuchFieldException, IllegalAccessException {
         WorkOrder workOrder = workOrderMapper.selectOne(wrapper);
         JSONObject jsonObject = workOrderHandler(workOrder);
-        return jsonObject;
+        DaoResult<WorkOrder> objectDaoResult = new DaoResultImpl<>();
+        objectDaoResult.setValue(jsonObject);
+        return objectDaoResult;
     }
 
     /**
      * 返回指定工单，基于方法getOneWorkOrderByWrapper进行封装，指定查询条件为id。
+     *
      * @param id 工单id
      * @return 返回指定工单
      */
-    public JSONObject getOneWorkOrderById(Long id) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<WorkOrder> getOneWorkOrderById(Long id) throws NoSuchFieldException, IllegalAccessException {
         QueryWrapper<WorkOrder> workOrderQueryWrapper = new QueryWrapper<>();
         workOrderQueryWrapper.eq("id", id);
         return getOneWorkOrderByWrapper(workOrderQueryWrapper);
@@ -100,10 +107,12 @@ public class WorkOrderDao {
      * @param wrapper 工单查询条件
      * @return 返回工单分页数据，以及分页数据
      */
-    public JSONObject getOneWorkOrderHistoryByWrapper(QueryWrapper<WorkOrderHistory> wrapper) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<WorkOrderHistory> getOneWorkOrderHistoryByWrapper(QueryWrapper<WorkOrderHistory> wrapper) throws NoSuchFieldException, IllegalAccessException {
         WorkOrderHistory WorkOrderHistory = workOrderHistoryMapper.selectOne(wrapper);
         JSONObject jsonObject = workOrderHandler(WorkOrderHistory);
-        return jsonObject;
+        DaoResultImpl<WorkOrderHistory> objectDaoResult = new DaoResultImpl<>();
+        objectDaoResult.setValue(jsonObject);
+        return objectDaoResult;
     }
 
 
@@ -114,11 +123,8 @@ public class WorkOrderDao {
      * @param wrapper 工单查询条件
      * @return 返回工单分页数据，以及分页数据
      */
-    public Page<JSONObject> getWorkOrderHistoryPageByWrapper(Page<WorkOrderHistory> page, QueryWrapper<WorkOrderHistory> wrapper) throws NoSuchFieldException, IllegalAccessException {
-
-        Page<WorkOrderHistory> resultPage = workOrderHistoryMapper.selectPage(page, wrapper);
-
-        List<WorkOrderHistory> workOrderHistoryList = resultPage.getRecords();
+    public DaoResult<Page<JSONObject>> getWorkOrderHistoryPageByWrapper(Page<WorkOrderHistory> page, QueryWrapper<WorkOrderHistory> wrapper) throws NoSuchFieldException, IllegalAccessException {
+        List<WorkOrderHistory> workOrderHistoryList = workOrderHistoryMapper.selectList(wrapper);
 
         //用于封装工单结果
         List<JSONObject> resultList = new ArrayList<>();
@@ -129,11 +135,12 @@ public class WorkOrderDao {
             resultList.add(jsonObject);
         }
 
-        Page<JSONObject> resultPage1 = new Page<>();
-        org.springframework.beans.BeanUtils.copyProperties(resultPage, resultPage1);
-        resultPage1.setRecords(resultList);
+        Page<JSONObject> page1 = Pagination.page(page, resultList);
 
-        return resultPage1;
+        DaoResult<Page<JSONObject>> objectDaoResult = new DaoResultImpl<>();
+        objectDaoResult.setResult(page1);
+
+        return objectDaoResult;
     }
 
     /**
@@ -152,7 +159,7 @@ public class WorkOrderDao {
      * @throws NoSuchFieldException
      * @throws IllegalAccessException
      */
-    private JSONObject workOrderHandler(Object object) throws NoSuchFieldException, IllegalAccessException {
+    private <T> JSONObject workOrderHandler(Object object) throws NoSuchFieldException, IllegalAccessException {
 
         Class<?> aClass = object.getClass();
 
@@ -172,34 +179,45 @@ public class WorkOrderDao {
         flowNodeIdField.setAccessible(true);
         Long flowNodeId = (Long) flowNodeIdField.get(object);
 
-        JSONObject jsonObject = improveWorkOrderInformation(initiatorId, flowId, flowNodeId);
+        JSONObject detailInfo = improveWorkOrderInformation(initiatorId, flowId, flowNodeId);
 
-        jsonObject.put("result", object);
+        JSONObject oneWorkOrder = new JSONObject();
 
-        return jsonObject;
+        JsonUtils.setResult(oneWorkOrder, object);
+        JsonUtils.setDetailInfo(oneWorkOrder, detailInfo);
+
+        return oneWorkOrder;
     }
 
+    /**
+     * 传入workOrder的一系列id，将其转化为对应的实体
+     *
+     * @return 数据结构如下：
+     * {
+     * "initiator":{xx}
+     * "flow":{xx}
+     * "currentFlowNode":{xx}
+     * }
+     */
     private JSONObject improveWorkOrderInformation(Long initiatorId, Long flowId, Long flowNodeId) {
         //获取发起者信息
-        QueryWrapper<User> userWrapper = new QueryWrapper<>();
-        userWrapper.eq("id", initiatorId);
-        JSONObject initiator = userDao.getOneUserByWrapper(userWrapper);
-        User result = (User) initiator.get("result");
-        result.setOpenId(null);
-        result.setSessionKey(null);
+        DaoResult<User> daoInitiator = userDao.getOneUserById(initiatorId);
+        User initiator = daoInitiator.getResult();
+        initiator.setOpenId(null);
+        initiator.setSessionKey(null);
 
         //获取工单流程信息
         QueryWrapper<Flow> flowWrapper = new QueryWrapper<>();
         flowWrapper.eq("id", flowId);
-        JSONObject oneFlow = flowDao.getOneFlowByWrapper(flowWrapper);
+        DaoResult<Flow> daoFlow = flowDao.getOneFlowByWrapper(flowWrapper);
 
         //获取工单目前所在流程节点信息
         FlowNode currentFlowNode = flowDao.getFlowNodeMapper().selectById(flowNodeId);
 
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("initiator", initiator);
-        jsonObject.put("flow", oneFlow);
+        jsonObject.put("initiator", daoInitiator.getValue());
+        jsonObject.put("flow", daoFlow.getValue());
         jsonObject.put("currentFlowNode", currentFlowNode);
 
         return jsonObject;
@@ -208,6 +226,7 @@ public class WorkOrderDao {
     /**
      * 从审批节点表，工单表中查出指定审批者的待审批工单信息。
      * 主要委托getWorkOrderPageByWrapper接口获取工单数据。
+     *
      * @param page        分页数据，包含以下有效数据:
      *                    size：要获取的页数大小
      *                    current：要获取的页数
@@ -216,7 +235,7 @@ public class WorkOrderDao {
      *                    title
      * @return
      */
-    public Page<JSONObject> getApprovalWorkOrderPage(Page<WorkOrder> page, Long approverId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<Page<JSONObject>> getApprovalWorkOrderPage(Page<WorkOrder> page, Long approverId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
 
         QueryWrapper<FlowNode> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("approver_id", approverId);
@@ -226,8 +245,10 @@ public class WorkOrderDao {
         for (FlowNode flowNode : flowNodeList) {
             Long flowNodeId = flowNode.getId();
             QueryWrapper<WorkOrder> workOrderQueryWrapper = new QueryWrapper<>();
-            workOrderQueryWrapper.eq("flow_node_id", flowNodeId).like("title", workOrderVo.getTitle());
-            Page<JSONObject> workOrderPage = getWorkOrderPageByWrapper(null, workOrderQueryWrapper);
+            workOrderQueryWrapper.eq("flow_node_id", flowNodeId).like("title", workOrderVo.getTitle()).eq("is_finished", 0);
+            DaoResult<Page<JSONObject>> daoWorkOrderPage = getWorkOrderPageByWrapper(page, workOrderQueryWrapper);
+            Page<JSONObject> workOrderPage = daoWorkOrderPage.getResult();
+
             List<JSONObject> records = workOrderPage.getRecords();
 
             resultList.addAll(records);
@@ -235,7 +256,11 @@ public class WorkOrderDao {
 
         Page<JSONObject> page1 = Pagination.page(page, resultList);
 
-        return page1;
+        DaoResult<Page<JSONObject>> pageDaoResult = new DaoResultImpl<>();
+
+        pageDaoResult.setResult(page1);
+
+        return pageDaoResult;
     }
 
 }
