@@ -2,6 +2,7 @@ package cn.edu.bistu.common.utils;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Pagination {
@@ -43,11 +44,18 @@ public class Pagination {
 
             size = endset - offset;
 
-            current = ((Long)(page.getCurrent())).intValue();
+            current = ((Long) (page.getCurrent())).intValue();
         }
 
-        //截取分页数据
-        resultList = rowList.subList(offset, endset);
+        if (endset < offset) {
+            //截取分页数据
+            resultList = new ArrayList<>();
+            size = ((Long) (page.getSize())).intValue();
+        } else {
+            //截取分页数据
+            resultList = rowList.subList(offset, endset);
+        }
+
 
         //设置分页对象
         Page<T> resultPage = new Page<>();
@@ -72,4 +80,14 @@ public class Pagination {
         return false;
     }
 
+    public static void main(String[] args) {
+        ArrayList<String> objects = new ArrayList<>();
+        objects.add("ajlsd");
+        objects.add("ajlsd");
+        objects.add("ajlsd");
+        objects.add("ajlsd");
+
+        List<String> strings = objects.subList(8, 0);
+
+    }
 }
