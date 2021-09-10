@@ -99,8 +99,8 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         QueryWrapper<WorkOrder> wrapper = new QueryWrapper<>();
         wrapper.eq("id", workOrder.getId());
         DaoResult<WorkOrder> daoResultPage = workOrderDao.getOneWorkOrderByWrapper(wrapper);
-        new ServiceResultImpl<JSONObject>(daoResultPage.getValue());
-        return   new ServiceResultImpl<>(daoResultPage.getValue());
+        new ServiceResultImpl<>(daoResultPage.getValue());
+        return new ServiceResultImpl<>(daoResultPage.getValue());
     }
 
     @Override
