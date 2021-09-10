@@ -1,40 +1,32 @@
 package cn.edu.bistu.workOrder.service.impl;
 
-import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.config.ContextPathConfiguration;
 import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
-import cn.edu.bistu.flow.mapper.FlowMapper;
-import cn.edu.bistu.flow.mapper.FlowNodeMapper;
 import cn.edu.bistu.flow.service.FlowNodeService;
-import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.entity.Flow;
+import cn.edu.bistu.model.common.DaoResult;
+import cn.edu.bistu.model.common.ServiceResult;
+import cn.edu.bistu.model.common.ServiceResultImpl;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
-import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
-import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -58,11 +50,13 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     ContextPathConfiguration contextPathConfiguration;
 
     @Override
-    public Page<JSONObject> listWorkOrder(WorkOrder workOrderVo, Page<WorkOrder> page) throws NoSuchFieldException, IllegalAccessException {
+    public ServiceResult<JSONObject> listWorkOrder(WorkOrder workOrderVo, Page<WorkOrder> page) throws NoSuchFieldException, IllegalAccessException {
         QueryWrapper<WorkOrder> wrapper = new QueryWrapper<>();
         wrapper.like("title", workOrderVo.getTitle());
-        Page<JSONObject> resultPage = workOrderDao.getWorkOrderPageByWrapper(page,wrapper);
-        return resultPage;
+        DaoResult<Page<JSONObject>> daoResultPage = workOrderDao.getWorkOrderPageByWrapper(page,wrapper);
+        JSONObject value = daoResultPage.getValue();
+
+        return new ServiceResultImpl<JSONObject>(value);
     }
 
     @Override
@@ -101,11 +95,12 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     @Override
-    public JSONObject detail(WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
+    public  ServiceResult<JSONObject> detail(WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
         QueryWrapper<WorkOrder> wrapper = new QueryWrapper<>();
         wrapper.eq("id", workOrder.getId());
-        JSONObject resultPage = workOrderDao.getOneWorkOrderByWrapper(wrapper);
-        return resultPage;
+        DaoResult<WorkOrder> daoResultPage = workOrderDao.getOneWorkOrderByWrapper(wrapper);
+        new ServiceResultImpl<JSONObject>(daoResultPage.getValue());
+        return   new ServiceResultImpl<>(daoResultPage.getValue());
     }
 
     @Override
