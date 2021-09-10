@@ -28,6 +28,7 @@ public enum ResultCodeEnum {
     WORKORDER_NOT_EXISTS(114, "工单不存在"),
     WORKORDER_BEEN_FINISHED(115, "工单已经结束"),
     USER_NOT_REGISTERED(116, "用户没有注册"),
+    INTERFACE_ACCESS_ERRORS(117, "接口访问错误"),
 
 
     SUCCESS(200,"成功"),

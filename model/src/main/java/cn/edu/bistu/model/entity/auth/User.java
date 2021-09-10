@@ -49,9 +49,6 @@ public class User extends BaseEntity {
     @TableField("job_id")
     private String jobId;
 
-    public boolean isUserInfoCompleted() {
-        return infoComplete.equals(1);
-    }
 
 
 }

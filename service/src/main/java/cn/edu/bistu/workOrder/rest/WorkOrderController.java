@@ -6,6 +6,7 @@ import cn.edu.bistu.common.exception.FrontDataMissingException;
 import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.flow.service.FlowNodeService;
+import cn.edu.bistu.model.common.ServiceResult;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.common.BeanUtils;
@@ -86,8 +87,8 @@ public class WorkOrderController extends BaseController {
         page.setCurrent(current);
 
         //获取结果
-        Page<JSONObject> result = workOrderService.listWorkOrder(workOrder, page);
-
+        ServiceResult<JSONObject> serviceResult= workOrderService.listWorkOrder(workOrder, page);
+        JSONObject result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
 
@@ -325,8 +326,9 @@ public class WorkOrderController extends BaseController {
 
         workOrder.setAttachment(null);
 
-        JSONObject result = workOrderService.detail(workOrder);
-
+        //获取结果
+        ServiceResult<JSONObject> serviceResult= workOrderService.detail(workOrder);
+        JSONObject result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
 
@@ -366,8 +368,9 @@ public class WorkOrderController extends BaseController {
 
         workOrderHistory.setAttachment(null);
 
-        JSONObject result = workOrderHistorService.detail(workOrderHistory);
-
+        //获取结果
+        ServiceResult<JSONObject> serviceResult= workOrderHistorService.detail(workOrderHistory);
+        JSONObject result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
 

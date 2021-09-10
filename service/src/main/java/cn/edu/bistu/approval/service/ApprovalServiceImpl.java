@@ -1,11 +1,14 @@
 package cn.edu.bistu.approval.service;
 
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
-import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.BeanUtils;
+import cn.edu.bistu.common.exception.HaveNoRightException;
 import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
+import cn.edu.bistu.model.common.DaoResult;
+import cn.edu.bistu.model.common.ServiceResult;
+import cn.edu.bistu.model.common.ServiceResultImpl;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
@@ -13,7 +16,6 @@ import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
-import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -51,11 +53,12 @@ public class ApprovalServiceImpl implements ApprovalService {
      * @param workOrderId 工单id
      * @return 结果Map：isLastNode->boolean;nextNode->FlowNode
      */
-    public Map<String, Object> isLastNode(Long workOrderId) throws NoSuchFieldException, IllegalAccessException {
+      private Map<String, Object> isLastNode(Long workOrderId) throws NoSuchFieldException, IllegalAccessException {
 
-        JSONObject workOrder = workOrderDao.getOneWorkOrderById(workOrderId);
+        DaoResult<WorkOrder> daoWorkOrder = workOrderDao.getOneWorkOrderById(workOrderId);
+        WorkOrder workOrder = daoWorkOrder.getResult();
 
-        Long flowId = workOrder.getLong("flowId");
+        Long flowId = workOrder.getFlowId();
 
         QueryWrapper<FlowNode> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("flow_id", flowId);
@@ -63,7 +66,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         System.out.println(flowNodeList);
 
-        Long currentFlowNodeId = workOrder.getLong("flowNodeId");
+        Long currentFlowNodeId = workOrder.getFlowNodeId();
 
         boolean isLastNode = flowNodeList.get(flowNodeList.size() - 1).getId().equals(currentFlowNodeId);
         Map<String, Object> map = new HashMap<>();
@@ -102,6 +105,10 @@ public class ApprovalServiceImpl implements ApprovalService {
     @Override
     public void pass(ApprovalRecord approvalRecord) throws NoSuchFieldException, IllegalAccessException {
         Long workOrderId = approvalRecord.getWorkOrderId();
+
+        //检查用户是否有权限审批该工单
+        checkApprovalRightOfUser(approvalRecord.getApproverId(), workOrderId);
+
         WorkOrder workOrder = workOrderDao.getWorkOrderMapper().selectById(workOrderId);
 
         //若工单已结束，审批操作非法
@@ -132,8 +139,7 @@ public class ApprovalServiceImpl implements ApprovalService {
      * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。
      * @param nextFlowNodeId 下一个审批节点id
      */
-    @Override
-    public void WorkOrderFlowToNext(WorkOrder workOrder, ApprovalRecord approvalRecord, Long nextFlowNodeId) {
+    private void WorkOrderFlowToNext(WorkOrder workOrder, ApprovalRecord approvalRecord, Long nextFlowNodeId) {
 
         //保存审批记录
         approvalRecord.setFlowNodeId(workOrder.getFlowNodeId());
@@ -155,8 +161,7 @@ public class ApprovalServiceImpl implements ApprovalService {
      * @param workOrder      待结束的工单，待完善信息：工单状态，工单是否结束，工单是否被审批。
      * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。
      */
-    @Override
-    public void workOrderFinish(WorkOrder workOrder, ApprovalRecord approvalRecord) {
+    private void workOrderFinish(WorkOrder workOrder, ApprovalRecord approvalRecord) {
 
         //保存审批记录
         approvalRecord.setFlowNodeId(workOrder.getFlowNodeId());    //这一步一定要在更新工单状态之前
@@ -188,18 +193,24 @@ public class ApprovalServiceImpl implements ApprovalService {
     }
 
     @Override
-    public Page<JSONObject> listWorkOrderToBeApproved(Long visitorId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
+    public ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
         Page<WorkOrder> page = new Page<>();
         page.setCurrent(workOrderVo.getCurrent());
         page.setSize(workOrderVo.getSize());
 
-        Page<JSONObject> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
+        DaoResult<Page<JSONObject>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
+        Page<JSONObject> result = pageData.getResult();
 
-        return pageData;
+        ServiceResult<Page<JSONObject>> serviceResult = new ServiceResultImpl<>(result);
+        return serviceResult;
     }
 
     @Override
-    public void reject(ApprovalRecord approvalRecord) {
+    public void reject(ApprovalRecord approvalRecord) throws NoSuchFieldException, IllegalAccessException {
+       Long workOrderId =  approvalRecord.getWorkOrderId();
+
+        //检查用户是否有权限审批该工单
+        checkApprovalRightOfUser(approvalRecord.getApproverId(), workOrderId);
 
         //检查工单是否已经结束
         WorkOrder workOrder =  workOrderDao.getWorkOrderMapper().selectById(approvalRecord.getWorkOrderId());
@@ -245,6 +256,17 @@ public class ApprovalServiceImpl implements ApprovalService {
         //String openId = userVo.getOpenId();
         //wxMiniApi.sendSubscribeMsg(openId);
 
+    }
+
+
+    private void checkApprovalRightOfUser(Long userId, Long workOrderId) throws NoSuchFieldException, IllegalAccessException {
+        DaoResult<WorkOrder> daoWorkOrder = workOrderDao.getOneWorkOrderById(workOrderId);
+        JSONObject detailInfo = daoWorkOrder.getDetailInfo();
+        FlowNode currentFlowNode = detailInfo.getObject("currentFlowNode", FlowNode.class);
+        if(!currentFlowNode.getApproverId().equals(userId)) {
+            throw new HaveNoRightException("user id:" + userId,
+                    ResultCodeEnum.HAVE_NO_RIGHT);
+        }
     }
 
 }

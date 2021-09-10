@@ -35,16 +35,18 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
         HandlerInterceptor authenticationInterceptor = getMyInterceptors(AuthenticationInterceptor.class);
         registry.addInterceptor(authenticationInterceptor)
                 .excludePathPatterns("/auth/login")
-                .excludePathPatterns("/auth/userInfoCompletion")
+                .excludePathPatterns("/auth/userInfoCompletion/**")
                 .excludePathPatterns("/wx")
+                .excludePathPatterns("/test")
         ;
 
         //用户授权
         HandlerInterceptor authorizationInterceptor = getMyInterceptors(AuthorizationInterceptor.class);
         registry.addInterceptor(authorizationInterceptor)
                 .excludePathPatterns("/auth/login")
-                .excludePathPatterns("/auth/userInfoCompletion")
+                .excludePathPatterns("/auth/userInfoCompletion/**")
                 .excludePathPatterns("/wx")
+                .excludePathPatterns("/test")
         ;
 
     }
