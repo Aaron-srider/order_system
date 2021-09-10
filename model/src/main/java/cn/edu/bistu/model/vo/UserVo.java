@@ -15,5 +15,6 @@ public class UserVo extends User {
     private String majorName;
     private String className;
     private String secondaryDeptName;
+    private Long roleId;
 
 }
