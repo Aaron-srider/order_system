@@ -1,25 +1,18 @@
 package cn.edu.bistu.approval.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ParamIntegrityChecker;
-import cn.edu.bistu.common.config.ValidationWrapper;
-import cn.edu.bistu.common.exception.ParameterMissingException;
-import cn.edu.bistu.common.exception.ParameterRedundentException;
 import cn.edu.bistu.common.rest.BaseController;
-import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.common.ServiceResult;
 import cn.edu.bistu.model.entity.ApprovalRecord;
-import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sun.xml.internal.xsom.impl.parser.BaseContentRef;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,12 +42,11 @@ public class ApprovalController extends BaseController {
     public Result pass(@RequestBody ApprovalRecord approvalRecord,
                        HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
         //获取审批者id
-        MapService mapService = (MapService) req.getAttribute("userInfo");
-        Long approverId = mapService.getVal("id", Long.class);
+        Long approverId = getVisitorId(req);
 
         //生成审批记录
         approvalRecord.setApproverId(approverId);
-        Long workOrderId = approvalRecord.getWorkOrderId();
+
 
         approvalService.pass(approvalRecord);
 
@@ -63,7 +55,7 @@ public class ApprovalController extends BaseController {
 
     @PostMapping("/approval/reject")
     public Result reject(@RequestBody Map<String, Object> paramMap,
-                         HttpServletRequest req) {
+                         HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
         paramIntegrityChecker.setRequiredPropsName(new String[]{"workOrderId"});
         MapService optional = MapService.map().putMap("comment", "");
@@ -102,8 +94,8 @@ public class ApprovalController extends BaseController {
             workOrderVo.setTitle((String)title);
         }
 
-        Page<JSONObject> result = approvalService.listWorkOrderToBeApproved(getVisitorId(req), workOrderVo);
-
+        ServiceResult<Page<JSONObject>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), workOrderVo);
+        Page<JSONObject> result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
 
