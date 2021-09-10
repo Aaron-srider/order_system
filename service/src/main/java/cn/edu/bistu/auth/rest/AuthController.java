@@ -2,21 +2,18 @@ package cn.edu.bistu.auth.rest;
 
 
 import cn.edu.bistu.auth.service.AuthService;
+import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ParamIntegrityChecker;
 import cn.edu.bistu.common.exception.FrontDataMissingException;
+import cn.edu.bistu.common.exception.InterfaceAccessException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.common.ServiceResult;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -29,25 +26,59 @@ public class AuthController {
     @Autowired
     ParamIntegrityChecker paramIntegrityChecker;
 
-    @PostMapping("/auth/login")
-    public Result login(@RequestBody String code) {
-        JSONObject parse = JSON.parseObject(code);
-        code = (String) parse.get("code");
-
-        Result result = authService.authentication(code);
-        return result;
+    @GetMapping("/auth/login")
+    public Result login(String code) {
+        ServiceResult<JSONObject> result = authService.authentication(code);
+        JSONObject serviceResult = result.getServiceResult();
+        return Result.ok(serviceResult);
     }
 
-    @PostMapping("/auth/userInfoCompletion")
-    public Result completeUserInfo(@RequestBody Map<String, Object> map) {
+    @PutMapping("/auth/userInfoCompletion/{roleCase}")
+    public Result completeUserInfo(
+            @PathVariable("roleCase") String roleCase,
+            @RequestBody MapService mapService) {
+        UserVo userVo = handleUserParams(mapService, roleCase);
+        authService.userInfoCompletion(userVo);
+        return Result.ok();
+    }
 
-        Long roleId = ((Integer) map.get("roleId")).longValue();
-        if (roleId == null) {
+    private UserVo handleUserParams(MapService mapService, String expectedRole) {
+        //检查完善信息的用户的角色是否是教师
+        Integer role_id = (Integer) mapService.get("roleId");
+        String roleCase = checkUserRole(role_id, expectedRole);
+
+        checkUserParamIntegrity(mapService, roleCase);
+
+        UserVo userVo = assembleUser(mapService, roleCase);
+        userVo.setRoleId(role_id.longValue());
+        return userVo;
+    }
+
+    private void checkUserParamIntegrity(MapService mapService, String userRole) {
+        String[] requiredParams = null;
+        switch (userRole) {
+            case "teacher":
+                requiredParams = new String[]{"id", "roleId", "name", "collegeName", "secondaryDeptName", "jobId"};
+                break;
+            case "student":
+                requiredParams = new String[]{"id", "roleId", "name", "collegeName", "majorName", "className", "grade", "studentId"};
+                break;
+            default:
+                throw new InterfaceAccessException("unknown role:" + userRole, ResultCodeEnum.INTERFACE_ACCESS_ERRORS);
+        }
+        paramIntegrityChecker.setRequiredPropsName(requiredParams);
+        paramIntegrityChecker.checkMapParamIntegrity(mapService);
+    }
+
+    private String checkUserRole(Integer role_id, String roleString) {
+
+        if (role_id == null) {
             throw new FrontDataMissingException("param missing: roleId", ResultCodeEnum.FRONT_DATA_MISSING);
         }
 
-        String roleCase = null;
+        Long roleId = role_id.longValue();
 
+        String roleCase;
         switch (roleId.intValue()) {
             case 3:
             case 4:
@@ -62,38 +93,33 @@ public class AuthController {
                 roleCase = "admin";
         }
 
+        if (!roleCase.equals(roleString)) {
+            throw new InterfaceAccessException(null, ResultCodeEnum.INTERFACE_ACCESS_ERRORS);
+        }
+        return roleCase;
+    }
+
+    private UserVo assembleUser(MapService mapService, String roleCase) {
         UserVo userVo = new UserVo();
-        //老师
-        if (roleCase.equals("teacher")) {
-            paramIntegrityChecker.setRequiredPropsName(new String[]{
-                    "id", "roleId", "name", "collegeName", "secondaryDeptName", "jobId"
-            });
-            paramIntegrityChecker.checkMapParamIntegrity(map);
-
-            userVo.setId(((Integer)map.get("id")).longValue());
-            userVo.setName((String) map.get("name"));
-            userVo.setCollegeName((String)map.get("collegeName"));
-            userVo.setSecondaryDeptName((String)map.get("secondaryDeptName"));
-            userVo.setJobId((String)map.get("jobId"));
+        switch (roleCase) {
+            case "student":
+                userVo.setId((mapService.getVal("id", Integer.class)).longValue());
+                userVo.setName(mapService.getVal("name", String.class));
+                userVo.setCollegeName(mapService.getVal("collegeName", String.class));
+                userVo.setMajorName(mapService.getVal("majorName", String.class));
+                userVo.setClassName(mapService.getVal("className", String.class));
+                userVo.setGrade(mapService.getVal("grade", Integer.class));
+                userVo.setStudentId(mapService.getVal("studentId", String.class));
+                break;
+            case "teacher":
+                userVo.setId((mapService.getVal("id", Integer.class)).longValue());
+                userVo.setName(mapService.getVal("name", String.class));
+                userVo.setCollegeName(mapService.getVal("collegeName", String.class));
+                userVo.setSecondaryDeptName(mapService.getVal("secondaryDeptName", String.class));
+                userVo.setJobId(mapService.getVal("jobId", String.class));
+                break;
         }
-        //学生
-        else if(roleCase.equals("student")) {
-            paramIntegrityChecker.setRequiredPropsName(new String[]{
-                    "id", "roleId", "name", "collegeName", "majorName", "className", "grade", "studentId"
-            });
-            paramIntegrityChecker.checkMapParamIntegrity(map);
-
-            userVo.setId(((Integer)map.get("id")).longValue());
-            userVo.setName((String) map.get("name"));
-            userVo.setCollegeName((String)map.get("collegeName"));
-            userVo.setMajorName((String)map.get("majorName"));
-            userVo.setClassName((String)map.get("className"));
-            userVo.setGrade((Integer)map.get("grade"));
-            userVo.setStudentId((String)map.get("studentId"));
-        }
-
-        authService.userInfoCompletion(userVo, roleId);
-        return Result.ok();
+        return userVo;
     }
 
 }
