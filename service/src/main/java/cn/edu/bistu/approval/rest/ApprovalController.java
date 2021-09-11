@@ -15,9 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -38,7 +36,7 @@ public class ApprovalController extends BaseController {
     @Autowired
     ParamIntegrityChecker paramIntegrityChecker;
 
-    @PostMapping("/approval/pass")
+    @PutMapping("/approval/pass")
     public Result pass(@RequestBody ApprovalRecord approvalRecord,
                        HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
         //获取审批者id
@@ -53,7 +51,7 @@ public class ApprovalController extends BaseController {
         return Result.ok();
     }
 
-    @PostMapping("/approval/reject")
+    @PutMapping("/approval/reject")
     public Result reject(@RequestBody Map<String, Object> paramMap,
                          HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
@@ -74,25 +72,36 @@ public class ApprovalController extends BaseController {
         return Result.ok();
     }
 
-    @PostMapping("/approval/list")
-    public Result list(@RequestBody Map<String, Object> page, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
+    @GetMapping("/approval/workOrders")
+    public Result list(@RequestParam(required = false) Integer size,
+                       @RequestParam(required = false) Integer current,
+                       @RequestParam(required = false) String title,
+                       HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        MapService optional = MapService.map()
-                .putMap("size", 10)
-                .putMap("current", 1)
-                .putMap("title", "");
-        paramIntegrityChecker.setOptionalPropsName(optional);
-        paramIntegrityChecker.checkMapParamIntegrity(page);
+        //MapService optional = MapService.map()
+        //        .putMap("size", 10)
+        //        .putMap("current", 1)
+        //        .putMap("title", "");
+        //paramIntegrityChecker.setOptionalPropsName(optional);
+        //paramIntegrityChecker.checkMapParamIntegrity(page);
+
+        if (size == null) {
+            size = 10;
+        }
+        if (current == null) {
+            current = 1;
+        }
+        if (title == null) {
+            title = "";
+        }
 
         WorkOrderVo workOrderVo = new WorkOrderVo();
-        Integer size = (Integer)page.get("size");
-        Integer current = (Integer)page.get("current");
+        //Integer size = (Integer)page.get("size");
+        //Integer current = (Integer)page.get("current");
         workOrderVo.setSize(size.longValue());
         workOrderVo.setCurrent(current.longValue());
-        Object title = page.get("title");
-        if(title != null) {
-            workOrderVo.setTitle((String)title);
-        }
+        //Object title = page.get("title");
+        workOrderVo.setTitle(title);
 
         ServiceResult<Page<JSONObject>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), workOrderVo);
         Page<JSONObject> result = serviceResult.getServiceResult();
