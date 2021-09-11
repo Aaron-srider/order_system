@@ -159,8 +159,9 @@ public class AuthServiceImpl implements AuthService {
 
             int index = allowedUrl.lastIndexOf("/*");
             if(index != -1) {
-                requestURL = requestURL.substring(0, index);
                 allowedUrl = allowedUrl.substring(0, index);
+                index = index > requestURL.length() ? requestURL.length() : index;
+                requestURL = requestURL.substring(0, index);
             }
 
             if (allowedUrl.equals(requestURL) && allowedMethod.toLowerCase().equals(requestMethod.toLowerCase())) {
