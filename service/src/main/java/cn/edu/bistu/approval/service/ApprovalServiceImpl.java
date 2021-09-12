@@ -193,12 +193,9 @@ public class ApprovalServiceImpl implements ApprovalService {
     }
 
     @Override
-    public ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
-        Page<WorkOrder> page = new Page<>();
-        page.setCurrent(workOrderVo.getCurrent());
-        page.setSize(workOrderVo.getSize());
+    public ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrder> page, WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
 
-        DaoResult<Page<JSONObject>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
+        DaoResult<Page<JSONObject>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrder);
         Page<JSONObject> result = pageData.getResult();
 
         ServiceResult<Page<JSONObject>> serviceResult = new ServiceResultImpl<>(result);

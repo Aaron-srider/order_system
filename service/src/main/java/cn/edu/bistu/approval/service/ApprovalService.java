@@ -3,6 +3,7 @@ package cn.edu.bistu.approval.service;
 import cn.edu.bistu.model.common.ServiceResult;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -19,5 +20,5 @@ public interface ApprovalService {
 
     void reject(ApprovalRecord approvalRecord) throws NoSuchFieldException, IllegalAccessException;
 
-    ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException;
+    ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrder> page, WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException;
 }

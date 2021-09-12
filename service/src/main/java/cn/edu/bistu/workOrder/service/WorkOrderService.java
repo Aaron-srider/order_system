@@ -16,5 +16,5 @@ public interface WorkOrderService extends IService<WorkOrder>{
 
     ServiceResult<JSONObject>  detail(WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException;
 
-    void submitWorkOrder(WorkOrderVo workOrderVo);
+    void submitWorkOrder(WorkOrder workOrder);
 }

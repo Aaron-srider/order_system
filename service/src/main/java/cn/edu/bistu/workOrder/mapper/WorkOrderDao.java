@@ -231,11 +231,11 @@ public class WorkOrderDao {
      *                    size：要获取的页数大小
      *                    current：要获取的页数
      * @param approverId  审批者id
-     * @param workOrderVo 包含有效数据:
+     * @param workOrder 包含有效数据:
      *                    title
      * @return
      */
-    public DaoResult<Page<JSONObject>> getApprovalWorkOrderPage(Page<WorkOrder> page, Long approverId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<Page<JSONObject>> getApprovalWorkOrderPage(Page<WorkOrder> page, Long approverId, WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
 
         QueryWrapper<FlowNode> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("approver_id", approverId);
@@ -245,7 +245,7 @@ public class WorkOrderDao {
         for (FlowNode flowNode : flowNodeList) {
             Long flowNodeId = flowNode.getId();
             QueryWrapper<WorkOrder> workOrderQueryWrapper = new QueryWrapper<>();
-            workOrderQueryWrapper.eq("flow_node_id", flowNodeId).like("title", workOrderVo.getTitle()).eq("is_finished", 0);
+            workOrderQueryWrapper.eq("flow_node_id", flowNodeId).like("title", workOrder.getTitle()).eq("is_finished", 0);
             DaoResult<Page<JSONObject>> daoWorkOrderPage = getWorkOrderPageByWrapper(page, workOrderQueryWrapper);
             Page<JSONObject> workOrderPage = daoWorkOrderPage.getResult();
 
