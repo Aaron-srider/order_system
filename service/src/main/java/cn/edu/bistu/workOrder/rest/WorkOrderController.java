@@ -29,6 +29,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -142,8 +143,10 @@ public class WorkOrderController extends BaseController {
      *
      * @return
      */
-    @GetMapping("/workOrder/attachment")
-    public void downloadAttachment(@NotNull Long workOrderId, HttpServletResponse resp) throws IOException {
+    @GetMapping("/workOrder/attachment/{workOrderId}")
+    public void downloadAttachment(
+            @PathVariable("workOrderId") @NotNull Long workOrderId,
+                                   HttpServletResponse resp) throws IOException {
 
         //查询附件
         WorkOrder workOrder = workOrderService.getById(workOrderId);
@@ -182,26 +185,15 @@ public class WorkOrderController extends BaseController {
      *
      * @return 如果缺失上传文件，返回错误代码102
      */
-    @PutMapping("/workOrder/attachment")
+    @PutMapping("/workOrder/attachment/{workOrderId}")
     public Result uploadAttachment(
             @RequestPart("attachment") MultipartFile attachment
-            , @RequestPart("workOrderId") String json
+            , @PathVariable("workOrderId") @NotNull Long workOrderId
             , HttpServletRequest req
     ) throws IOException {
 
         //获取用户id
-        MapService userInfo = (MapService) req.getAttribute("userInfo");
-        Long visitorId = userInfo.getVal("id", Long.class);
-
-        //从json中获取workOrderId
-        JSONObject jsonObject = JSONObject.parseObject(json);
-        Long workOrderId = jsonObject.getLong("workOrderId");
-
-        //workOrderId缺失
-        if (workOrderId == null) {
-            log.debug("workOrderId missing");
-            return Result.build(null, ResultCodeEnum.FRONT_DATA_MISSING);
-        }
+        Long visitorId = getVisitorId(req);
 
         WorkOrder workOrder = workOrderService.getById(workOrderId);
 
