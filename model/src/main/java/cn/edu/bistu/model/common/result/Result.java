@@ -1,4 +1,4 @@
-package cn.edu.bistu.model.common;
+package cn.edu.bistu.model.common.result;
 
 import cn.edu.bistu.constants.ResultCodeEnum;
 import lombok.Data;

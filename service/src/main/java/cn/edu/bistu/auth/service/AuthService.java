@@ -1,7 +1,6 @@
 package cn.edu.bistu.auth.service;
 
-import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.common.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.vo.UserVo;
 import com.alibaba.fastjson.JSONObject;
 

@@ -5,17 +5,11 @@ import cn.edu.bistu.auth.service.AuthService;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.ResponseHelper;
 import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.Result;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.SignatureException;
+import cn.edu.bistu.model.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

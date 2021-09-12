@@ -2,15 +2,12 @@ package cn.edu.bistu.auth.rest;
 
 
 import cn.edu.bistu.auth.service.AuthService;
-import cn.edu.bistu.common.MapService;
-import cn.edu.bistu.common.config.ParamIntegrityChecker;
-import cn.edu.bistu.common.exception.FrontDataMissingException;
 import cn.edu.bistu.common.exception.InterfaceAccessException;
 import cn.edu.bistu.common.validation.UserRoleValue;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.CheckUserRole;
-import cn.edu.bistu.model.common.Result;
-import cn.edu.bistu.model.common.ServiceResult;
+import cn.edu.bistu.model.common.result.Result;
+import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.vo.UserVo;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @RestController
 @Slf4j

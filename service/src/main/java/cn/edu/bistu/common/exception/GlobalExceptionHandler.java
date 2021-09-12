@@ -1,15 +1,11 @@
 package cn.edu.bistu.common.exception;
 
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.common.result.Result;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.SendingContext.RunTime;
-import org.springframework.boot.context.properties.bind.BindResult;
-import org.springframework.core.MethodParameter;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;

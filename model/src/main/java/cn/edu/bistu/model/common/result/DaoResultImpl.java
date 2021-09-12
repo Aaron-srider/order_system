@@ -1,4 +1,4 @@
-package cn.edu.bistu.model.common;
+package cn.edu.bistu.model.common.result;
 
 import cn.edu.bistu.model.entity.College;
 import cn.edu.bistu.model.entity.Major;
