@@ -1,6 +1,7 @@
 package cn.edu.bistu.model.common;
 
-import com.alibaba.fastjson.JSON;
+import cn.edu.bistu.model.common.result.DaoResult;
+import cn.edu.bistu.model.common.result.DaoResultImpl;
 import com.alibaba.fastjson.JSONObject;
 
 /**
