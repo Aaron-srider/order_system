@@ -1,7 +1,6 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.config.ParamIntegrityChecker;
 import cn.edu.bistu.common.exception.FrontDataMissingException;
 import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
 import cn.edu.bistu.common.rest.BaseController;
@@ -55,9 +54,6 @@ public class WorkOrderController extends BaseController {
 
     @Autowired
     ValidationWrapper globalValidator;
-
-    @Autowired
-    ParamIntegrityChecker paramIntegrityChecker;
 
     /**
      * 返回分页的工单列表，支持名称模糊搜索

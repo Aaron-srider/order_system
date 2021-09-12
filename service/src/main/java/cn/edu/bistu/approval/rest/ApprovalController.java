@@ -2,7 +2,6 @@ package cn.edu.bistu.approval.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.MapService;
-import cn.edu.bistu.common.config.ParamIntegrityChecker;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.Result;
