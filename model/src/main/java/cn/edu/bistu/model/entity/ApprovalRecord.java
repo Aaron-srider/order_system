@@ -1,6 +1,8 @@
 package cn.edu.bistu.model.entity;
 
 
+import cn.edu.bistu.model.common.validation.Insert;
+import cn.edu.bistu.model.common.validation.Update;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
@@ -34,7 +36,7 @@ public class ApprovalRecord extends BaseEntity
     /**
      * 审批对应的工单id
      */
-    @NotNull
+    @NotNull(groups = {Update.class})
     private Long workOrderId;
 
     /**
