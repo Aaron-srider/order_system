@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bistu.message.mapper.Messagemapper">
+
+    <select id="getReceiveMessageById" resultType="cn.edu.bistu.model.vo.MessageVo">
+        SELECT
+            m.id,
+            m.status,
+            m.sender,
+            m.description,
+            m.send_time,
+            u.name AS userName,
+            c.name AS className
+        FROM class c
+        LEFT JOIN USER u
+        ON c.id=u.class_id
+        LEFT JOIN message m
+        ON m.sender=u.id
+        WHERE m.receiver = #{id} and host_id = #{id}
+        ORDER BY m.send_time DESC
+    </select>
+
+    <select id="getSendMessageById" resultType="cn.edu.bistu.model.vo.MessageVo">
+        SELECT
+            m.id,
+            m.description,
+            m.send_time,
+            u.name AS userName,
+            c.name AS className
+        FROM class c
+        LEFT JOIN USER u
+        ON c.id=u.class_id
+        LEFT JOIN message m
+        ON m.receiver=u.id
+        WHERE m.sender = #{id} and host_id = #{id}
+        ORDER BY m.send_time DESC
+    </select>
+
+</mapper>
