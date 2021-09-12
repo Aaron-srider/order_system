@@ -74,7 +74,7 @@ public class Pagination {
     private static boolean getAll(Page page) {
         if (page == null) {
             return true;
-        } else if (page.offset() == 0) {
+        } else if (page.getCurrent() <= 0) {
             return true;
         }
         return false;
