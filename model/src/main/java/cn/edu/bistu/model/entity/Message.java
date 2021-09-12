@@ -20,8 +20,8 @@ public class Message {
     private Integer type;
 
     private byte[] content;
-    @TableField(value = "send_time")
-    private Date sendTime;
+    @TableField(value = "create_time")
+    private Date createTime;
     private Integer status;
 
     private String title;

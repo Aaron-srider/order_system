@@ -8,7 +8,7 @@
         SELECT
             m.id,
             m.description,
-            m.send_time,
+            m.create_time,
             u.name AS userName,
             c.name AS className
         FROM message m
@@ -17,14 +17,14 @@
         LEFT JOIN class c
         ON u.class_id=c.id
         WHERE m.receiver = #{id}
-        ORDER BY m.send_time DESC
+        ORDER BY m.create_time DESC
     </select>
 
     <select id="getSendMessageById" resultType="cn.edu.bistu.model.vo.MessageVo">
         SELECT
             m.id,
             m.description,
-            m.send_time,
+            m.create_time,
             u.name AS userName,
             c.name AS className
         FROM message m
@@ -33,7 +33,7 @@
         LEFT JOIN class c
         ON u.class_id=c.id
         WHERE m.sender = #{id}
-        ORDER BY m.send_time DESC
+        ORDER BY m.create_time DESC
     </select>
 
 </mapper>
