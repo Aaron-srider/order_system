@@ -217,7 +217,6 @@ public class AuthServiceImpl implements AuthService {
         });
 
         System.out.println(tokens);
-
     }
 
     private void improveUserRoleInfo(Long roleId, Long userId) {

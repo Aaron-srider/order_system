@@ -13,16 +13,14 @@ import java.util.Date;
 @Data
 public class Message {
 
-    private Integer id;
-    @TableField(value = "user_id")
-    private Integer user_id;
-    private Integer sender;
-    private Integer receiver;
+    private Long id;
+
+    private Long sender;
+    private Long receiver;
     private Integer type;
 
-    @TableField(fill = FieldFill.INSERT)
     private byte[] content;
-    @TableField(value = "send_time",fill = FieldFill.INSERT)
+    @TableField(value = "send_time")
     private Date sendTime;
     private Integer status;
 

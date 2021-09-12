@@ -8,11 +8,7 @@ import cn.edu.bistu.model.entity.Message;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -49,8 +45,10 @@ public class MessageController {
     }
 
     @PostMapping("/sendMessage")
-    public Result sendMessage(HttpServletRequest request) {
-
+    public Result sendMessage(@RequestBody Message message, HttpServletRequest request) {
+        MapService userInfo = (MapService) request.getAttribute("userInfo");
+        Long sender = userInfo.getVal("id", Long.class);
+        message.setSender(sender);
         return null;
     }
 

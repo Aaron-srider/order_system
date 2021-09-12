@@ -48,6 +48,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                 .excludePathPatterns("/auth/userInfoCompletion/**")
                 .excludePathPatterns("/wx")
                 .excludePathPatterns("/test")
+                .excludePathPatterns("/message/**")
         ;
 
     }
