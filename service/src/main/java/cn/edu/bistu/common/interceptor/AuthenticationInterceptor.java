@@ -4,7 +4,7 @@ import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.ResponseHelper;
 import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.common.result.Result;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;

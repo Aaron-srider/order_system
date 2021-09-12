@@ -1,11 +1,15 @@
 package cn.edu.bistu.model.entity;
 
+import cn.edu.bistu.model.common.validation.Insert;
+import cn.edu.bistu.model.common.validation.Query;
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.Date;
+
 
 
 @Data
@@ -15,29 +19,37 @@ public class WorkOrder extends BaseEntity{
      * 1表示已经审批过，0表示从未被审批
      */
     @TableField(fill= FieldFill.INSERT)
+    @Null(groups = {Insert.class})
     private Integer isExamined;
 
-    @NotNull
+
     private Long initiatorId;
-    @NotNull
+
+    @NotNull(groups = {Insert.class})
     private Long flowId;
 
-    @NotNull
+    @NotNull(groups = {Insert.class})
     private String title;
 
+    @Null(groups = {Insert.class})
     private byte[] attachment;
+
+    @Null(groups = {Insert.class})
     private String attachmentName;
 
 
     @TableField(fill= FieldFill.INSERT)
+    @Null(groups = {Insert.class})
     private Integer status;
 
 
-    @NotNull
+    @NotNull(groups = {Insert.class})
     private String content;
 
+    @Null(groups = {Insert.class})
     Long flowNodeId;
 
+    @Null(groups = {Insert.class})
     Integer isFinished;
 
     /**

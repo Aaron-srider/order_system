@@ -2,12 +2,6 @@ package cn.edu.bistu.common.interceptor;
 
 
 import cn.edu.bistu.common.utils.IpGetter;
-import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.Result;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;

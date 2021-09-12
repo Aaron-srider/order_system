@@ -10,27 +10,22 @@ import cn.edu.bistu.common.exception.CodeInvalidException;
 import cn.edu.bistu.common.exception.UserInfoNotCompleteException;
 import cn.edu.bistu.common.exception.UserNotRegisteredException;
 import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.DaoResult;
-import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.WxLoginStatus;
-import cn.edu.bistu.model.common.ServiceResult;
-import cn.edu.bistu.model.common.ServiceResultImpl;
+import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.auth.Permission;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.entity.auth.UserRole;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.wx.service.WxMiniApi;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -159,8 +154,9 @@ public class AuthServiceImpl implements AuthService {
 
             int index = allowedUrl.lastIndexOf("/*");
             if(index != -1) {
-                requestURL = requestURL.substring(0, index);
                 allowedUrl = allowedUrl.substring(0, index);
+                index = index > requestURL.length() ? requestURL.length() : index;
+                requestURL = requestURL.substring(0, index);
             }
 
             if (allowedUrl.equals(requestURL) && allowedMethod.toLowerCase().equals(requestMethod.toLowerCase())) {

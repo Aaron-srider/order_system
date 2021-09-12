@@ -1,7 +1,7 @@
 package cn.edu.bistu.flow.mapper;
 
-import cn.edu.bistu.model.common.DaoResult;
-import cn.edu.bistu.model.common.DaoResultImpl;
+import cn.edu.bistu.model.common.result.DaoResult;
+import cn.edu.bistu.model.common.result.DaoResultImpl;
 import cn.edu.bistu.model.entity.Flow;
 import cn.edu.bistu.model.entity.FlowNode;
 import com.alibaba.fastjson.JSONObject;

@@ -1,7 +1,6 @@
 package cn.edu.bistu.workOrder.service;
 
-import cn.edu.bistu.model.common.ServiceResult;
-import cn.edu.bistu.model.common.ServiceResultImpl;
+import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

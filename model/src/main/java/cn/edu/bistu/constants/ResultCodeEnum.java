@@ -29,6 +29,7 @@ public enum ResultCodeEnum {
     WORKORDER_BEEN_FINISHED(115, "工单已经结束"),
     USER_NOT_REGISTERED(116, "用户没有注册"),
     INTERFACE_ACCESS_ERRORS(117, "接口访问错误"),
+    FRONT_DATA_ERROR(118, "前端参数错误"),
 
 
     SUCCESS(200,"成功"),

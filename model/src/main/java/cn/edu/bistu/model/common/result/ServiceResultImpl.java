@@ -1,7 +1,4 @@
-package cn.edu.bistu.model.common;
-
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+package cn.edu.bistu.model.common.result;
 
 public class ServiceResultImpl<T> implements ServiceResult<T> {
     private T data;

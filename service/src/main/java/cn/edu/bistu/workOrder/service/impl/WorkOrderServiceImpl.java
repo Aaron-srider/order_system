@@ -6,13 +6,12 @@ import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.flow.service.FlowNodeService;
-import cn.edu.bistu.model.common.DaoResult;
-import cn.edu.bistu.model.common.ServiceResult;
-import cn.edu.bistu.model.common.ServiceResultImpl;
+import cn.edu.bistu.model.common.result.DaoResult;
+import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
-import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
@@ -104,23 +103,23 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     @Override
-    public void submitWorkOrder(WorkOrderVo workOrderVo) {
+    public void submitWorkOrder(WorkOrder workOrder) {
 
         QueryWrapper<FlowNode> flowNodeQueryWrapper= new QueryWrapper<>();
-        Long flowId = workOrderVo.getFlowId();
+        Long flowId = workOrder.getFlowId();
         flowNodeQueryWrapper.eq("flow_id", flowId).orderByAsc("node_order");
         List<FlowNode> flowNodeList = flowDao.getFlowNodeMapper().selectList(flowNodeQueryWrapper);
 
         //设置生成的工单的状态
-        workOrderVo.setFlowNodeId(flowNodeList.get(0).getId());//目前所处流程节点
-        workOrderVo.setStatus(0);                           //工单状态
-        workOrderVo.setIsExamined(0);                       //是否被审批过
-        workOrderVo.setIsFinished(0);                       //是否完成
+        workOrder.setFlowNodeId(flowNodeList.get(0).getId());//目前所处流程节点
+        workOrder.setStatus(0);                           //工单状态
+        workOrder.setIsExamined(0);                       //是否被审批过
+        workOrder.setIsFinished(0);                       //是否完成
         //保存工单
-        save(workOrderVo);
+        save(workOrder);
 
         //通知审批者，这步暂时不动
-        //UserVo userVo = userMapper.getOneById(workOrderVo.getId());
+        //UserVo userVo = userMapper.getOneById(workOrder.getId());
         //String openId = userVo.getOpenId();
         //wxMiniApi.sendSubscribeMsg(openId);
     }

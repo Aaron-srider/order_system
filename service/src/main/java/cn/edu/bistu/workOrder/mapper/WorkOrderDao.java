@@ -5,14 +5,13 @@ import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.common.JsonUtils;
-import cn.edu.bistu.model.common.DaoResult;
-import cn.edu.bistu.model.common.DaoResultImpl;
+import cn.edu.bistu.model.common.result.DaoResult;
+import cn.edu.bistu.model.common.result.DaoResultImpl;
 import cn.edu.bistu.model.entity.Flow;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.auth.User;
-import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -231,11 +230,11 @@ public class WorkOrderDao {
      *                    size：要获取的页数大小
      *                    current：要获取的页数
      * @param approverId  审批者id
-     * @param workOrderVo 包含有效数据:
+     * @param workOrder 包含有效数据:
      *                    title
      * @return
      */
-    public DaoResult<Page<JSONObject>> getApprovalWorkOrderPage(Page<WorkOrder> page, Long approverId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
+    public DaoResult<Page<JSONObject>> getApprovalWorkOrderPage(Page<WorkOrder> page, Long approverId, WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
 
         QueryWrapper<FlowNode> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("approver_id", approverId);
@@ -245,7 +244,7 @@ public class WorkOrderDao {
         for (FlowNode flowNode : flowNodeList) {
             Long flowNodeId = flowNode.getId();
             QueryWrapper<WorkOrder> workOrderQueryWrapper = new QueryWrapper<>();
-            workOrderQueryWrapper.eq("flow_node_id", flowNodeId).like("title", workOrderVo.getTitle()).eq("is_finished", 0);
+            workOrderQueryWrapper.eq("flow_node_id", flowNodeId).like("title", workOrder.getTitle()).eq("is_finished", 0);
             DaoResult<Page<JSONObject>> daoWorkOrderPage = getWorkOrderPageByWrapper(page, workOrderQueryWrapper);
             Page<JSONObject> workOrderPage = daoWorkOrderPage.getResult();
 

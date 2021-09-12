@@ -6,14 +6,13 @@ import cn.edu.bistu.common.exception.HaveNoRightException;
 import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
-import cn.edu.bistu.model.common.DaoResult;
-import cn.edu.bistu.model.common.ServiceResult;
-import cn.edu.bistu.model.common.ServiceResultImpl;
+import cn.edu.bistu.model.common.result.DaoResult;
+import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
-import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.wx.service.WxMiniApi;
@@ -193,12 +192,9 @@ public class ApprovalServiceImpl implements ApprovalService {
     }
 
     @Override
-    public ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, WorkOrderVo workOrderVo) throws NoSuchFieldException, IllegalAccessException {
-        Page<WorkOrder> page = new Page<>();
-        page.setCurrent(workOrderVo.getCurrent());
-        page.setSize(workOrderVo.getSize());
+    public ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrder> page, WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
 
-        DaoResult<Page<JSONObject>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
+        DaoResult<Page<JSONObject>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrder);
         Page<JSONObject> result = pageData.getResult();
 
         ServiceResult<Page<JSONObject>> serviceResult = new ServiceResultImpl<>(result);

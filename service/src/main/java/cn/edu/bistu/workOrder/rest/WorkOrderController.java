@@ -1,41 +1,40 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.config.ParamIntegrityChecker;
-import cn.edu.bistu.common.exception.FrontDataMissingException;
 import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.flow.service.FlowNodeService;
-import cn.edu.bistu.model.common.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.validation.Insert;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
+import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
-import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ValidationWrapper;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.Result;
+import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
-import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.*;
 
 @Slf4j
 @RestController
+@Validated
 public class WorkOrderController extends BaseController {
 
     @Autowired
@@ -53,41 +52,44 @@ public class WorkOrderController extends BaseController {
     @Autowired
     ValidationWrapper globalValidator;
 
-    @Autowired
-    ParamIntegrityChecker paramIntegrityChecker;
-
     /**
      * 返回分页的工单列表，支持名称模糊搜索
      * 入参：size(10)，current(1)，title(NULL)
      *
      * @return
      */
-    @PostMapping("/workOrder/list")
-    public Result list(@RequestBody MapService workOrderMap, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
+    @GetMapping("/workOrders")
+    public Result list(PageVo pageVo,
+                       WorkOrder workOrder,
+                       HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        paramIntegrityChecker.setOptionalPropsName(MapService.map()
-                .putMap("size", 10)
-                .putMap("current", 1)
-                .putMap("title", "")
-        );
-        paramIntegrityChecker.checkMapParamIntegrity(workOrderMap);
+
+        if (pageVo.getSize() == null) {
+            pageVo.setSize(10);
+        }
+        if (pageVo.getCurrent() == null) {
+            pageVo.setCurrent(1);
+        }
+        if (workOrder.getTitle() == null) {
+            workOrder.setTitle("");
+        }
+        //paramIntegrityChecker.setOptionalPropsName(MapService.map()
+        //        .putMap("size", 10)
+        //        .putMap("current", 1)
+        //);
+        //paramIntegrityChecker.checkMapParamIntegrity(workOrderMap);
 
         //封装工单对象
-        WorkOrder workOrder = new WorkOrder();
-        Long visitorId = getVisitorId(req);
-        workOrder.setInitiatorId(visitorId);
-        String title = workOrderMap.getVal("title", String.class);
-        workOrder.setTitle(title);
+        workOrder.setInitiatorId(getVisitorId(req));
+        //String title = workOrderMap.getVal("title", String.class);
 
         //封装分页对象
-        Page<WorkOrder> page = new Page<>();
-        Integer size = workOrderMap.getVal("size", Integer.class);
-        Integer current = workOrderMap.getVal("current", Integer.class);
-        page.setSize(size);
-        page.setCurrent(current);
+        Page<WorkOrder> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
+        //Integer size = (Integer) workOrderMap.get("size");
+        //Integer current = (Integer) workOrderMap.get("current");
 
         //获取结果
-        ServiceResult<JSONObject> serviceResult= workOrderService.listWorkOrder(workOrder, page);
+        ServiceResult<JSONObject> serviceResult = workOrderService.listWorkOrder(workOrder, page);
         JSONObject result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
@@ -95,33 +97,39 @@ public class WorkOrderController extends BaseController {
 
     /**
      * 返回分页的历史工单列表，支持名称模糊搜索
-     * 入参：size(10)，current(1)，title(NULL)
+     * 入参：size(10)，current(1)，title("")
      *
-     * @return
      */
-    @PostMapping("/workOrder/history")
-    public Result history(@RequestBody MapService workOrderHistoryMap, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
+    @GetMapping("/workOrder/histories")
+    public Result history(PageVo pageVo,
+                          WorkOrderHistory workOrderHistory,
+                          HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        paramIntegrityChecker.setOptionalPropsName(MapService.map()
-                .putMap("size", 10)
-                .putMap("current", 1)
-                .putMap("title", "")
-        );
-        paramIntegrityChecker.checkMapParamIntegrity(workOrderHistoryMap);
+        if (pageVo.getSize() == null) {
+            pageVo.setSize(10);
+        }
+        if (pageVo.getCurrent() == null) {
+            pageVo.setCurrent(1);
+        }
+        if (workOrderHistory.getTitle() == null) {
+            workOrderHistory.setTitle("");
+        }
+
+        //paramIntegrityChecker.setOptionalPropsName(MapService.map()
+        //        .putMap("size", 10)
+        //        .putMap("current", 1)
+        //        .putMap("title", "")
+        //);
+        //paramIntegrityChecker.checkMapParamIntegrity(workOrderHistoryMap);
 
         //封装工单对象
-        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
-        Long visitorId = getVisitorId(req);
-        workOrderHistory.setInitiatorId(visitorId);
-        String title = workOrderHistoryMap.getVal("title", String.class);
-        workOrderHistory.setTitle(title);
+        workOrderHistory.setInitiatorId(getVisitorId(req));
+        //String title = workOrderHistoryMap.getVal("title", String.class);
 
         //封装分页对象
-        Page<WorkOrderHistory> page = new Page<>();
-        Integer size = workOrderHistoryMap.getVal("size", Integer.class);
-        Integer current = workOrderHistoryMap.getVal("current", Integer.class);
-        page.setSize(size);
-        page.setCurrent(current);
+        Page<WorkOrderHistory> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
+        //Integer size = workOrderHistoryMap.getVal("size", Integer.class);
+        //Integer current = workOrderHistoryMap.getVal("current", Integer.class);
 
         Page<JSONObject> result = workOrderHistorService.listWorkOrderHistory(workOrderHistory, page);
 
@@ -135,13 +143,7 @@ public class WorkOrderController extends BaseController {
      * @return
      */
     @GetMapping("/workOrder/attachment")
-    public void downloadAttachment(Long workOrderId, HttpServletResponse resp) throws IOException {
-
-        if (workOrderId == null) {
-            throw new FrontDataMissingException(new String[]{
-                    "workOrderId"
-            }, ResultCodeEnum.FRONT_DATA_MISSING);
-        }
+    public void downloadAttachment(@NotNull Long workOrderId, HttpServletResponse resp) throws IOException {
 
         //查询附件
         WorkOrder workOrder = workOrderService.getById(workOrderId);
@@ -180,7 +182,7 @@ public class WorkOrderController extends BaseController {
      *
      * @return 如果缺失上传文件，返回错误代码102
      */
-    @PostMapping("/workOrder/attachment")
+    @PutMapping("/workOrder/attachment")
     public Result uploadAttachment(
             @RequestPart("attachment") MultipartFile attachment
             , @RequestPart("workOrderId") String json
@@ -235,30 +237,15 @@ public class WorkOrderController extends BaseController {
      *
      * @return
      */
-    @PostMapping("/workOrder/submission")
-    public Result submitWorkOrder(@RequestBody WorkOrderVo workOrderVo,
+    @PostMapping("/workOrder")
+    public Result submitWorkOrder(
+            @Validated(Insert.class) @RequestBody WorkOrder workOrder,
                                   HttpServletRequest req) {
 
-        //检验前端数据是否完整
-        try {
-            globalValidator.setRequiredPropsName(new String[]{"flowId", "content", "title"});
-
-            globalValidator.checkParamIntegrity(workOrderVo);
-
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } finally {
-            globalValidator.setPropsNameNull();
-        }
-
         //获取工单提交用户id
-        MapService userInfo = (MapService) req.getAttribute("userInfo");
-        Long id = userInfo.getVal("id", Long.class);
-        workOrderVo.setInitiatorId(id);                     //发起者id
-
-        workOrderService.submitWorkOrder(workOrderVo);
-
-
+        Long visitorId = getVisitorId(req);
+        workOrder.setInitiatorId(visitorId);                     //发起者id
+        workOrderService.submitWorkOrder(workOrder);
         return Result.ok();
     }
 
@@ -266,51 +253,32 @@ public class WorkOrderController extends BaseController {
     /**
      * 撤回工单
      *
-     * @param json 撤回工单的id
+     //* @param json 撤回工单的id
      * @param req
      * @return 如果工单未被审批，或撤回者不是工单发起者，都返回错误代码；否则撤回成功
      */
-    @PostMapping("/workOrder/revoke")
-    public Result revoke(@RequestBody String json, HttpServletRequest req) {
+    @PutMapping("/workOrder/revoke")
+    public Result revoke(@NotNull Long workOrderId,
+                         HttpServletRequest req){
+        Long approverId = getVisitorId(req);
 
-        MapService userInfo = (MapService) req.getAttribute("userInfo");
-        Long initiator = userInfo.getVal("id", Long.class);
-
-        JSONObject jsonObject = JSONObject.parseObject(json);
-
-        Long workOrderId = jsonObject.getLong("workOrderId");
-
-        //工单id缺失
-        if (workOrderId == null) {
-            throw new FrontDataMissingException("workOrderId missing", ResultCodeEnum.FRONT_DATA_MISSING);
-        }
-
-        workOrderService.revoke(workOrderId, initiator);
+        workOrderService.revoke(workOrderId, approverId);
 
         return Result.ok();
     }
 
     /**
      * 查看工单详情
+     * <p>
+     * //* @param json 查询工单的id：
+     * workOrderId      工单id
      *
-     * @param json 查询工单的id：
-     *             workOrderId      工单id
      * @return
      */
-    @PostMapping("/workOrder/detail")
-    public Result detail(@RequestBody String json, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
+    @GetMapping("/workOrder/detail")
+    public Result detail(@NotNull Long workOrderId, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        MapService userInfo = (MapService) req.getAttribute("userInfo");
-        Long visitorId = userInfo.getVal("id", Long.class);
-
-        JSONObject jsonObject = JSONObject.parseObject(json);
-
-        Long workOrderId = jsonObject.getLong("workOrderId");
-
-        if (workOrderId == null) {
-            log.debug("workOrderId missing");
-            return Result.build(null, ResultCodeEnum.FRONT_DATA_MISSING);
-        }
+        Long visitorId = getVisitorId(req);
 
         WorkOrder workOrder = workOrderService.getById(workOrderId);
 
@@ -327,32 +295,22 @@ public class WorkOrderController extends BaseController {
         workOrder.setAttachment(null);
 
         //获取结果
-        ServiceResult<JSONObject> serviceResult= workOrderService.detail(workOrder);
+        ServiceResult<JSONObject> serviceResult = workOrderService.detail(workOrder);
         JSONObject result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
 
     /**
      * 查看历史工单详情
+     * <p>
+     * //* @param json 查询工单的id
      *
-     * @param json 查询工单的id
      * @param req
      * @return
      */
-    @PostMapping("/workOrder/history/detail")
-    public Result historyDetail(@RequestBody String json, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
-
-        MapService userInfo = (MapService) req.getAttribute("userInfo");
-        Long visitorId = userInfo.getVal("id", Long.class);
-
-        JSONObject jsonObject = JSONObject.parseObject(json);
-
-        Long workOrderHistoryId = jsonObject.getLong("workOrderHistoryId");
-
-        if (workOrderHistoryId == null) {
-            log.debug("workOrderHistoryId missing");
-            return Result.build(null, ResultCodeEnum.FRONT_DATA_MISSING);
-        }
+    @GetMapping("/workOrder/history/detail")
+    public Result historyDetail(@NotNull Long workOrderHistoryId, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
+        Long visitorId = getVisitorId(req);
 
         WorkOrderHistory workOrderHistory = workOrderHistorService.getById(workOrderHistoryId);
 
@@ -369,7 +327,7 @@ public class WorkOrderController extends BaseController {
         workOrderHistory.setAttachment(null);
 
         //获取结果
-        ServiceResult<JSONObject> serviceResult= workOrderHistorService.detail(workOrderHistory);
+        ServiceResult<JSONObject> serviceResult = workOrderHistorService.detail(workOrderHistory);
         JSONObject result = serviceResult.getServiceResult();
         return Result.ok(result);
     }
