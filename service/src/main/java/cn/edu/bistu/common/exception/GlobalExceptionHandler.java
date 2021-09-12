@@ -73,8 +73,6 @@ public class GlobalExceptionHandler {
         return Result.build(ex.getMessage(), ResultCodeEnum.FRONT_DATA_MISSING);
     }
 
-
-
     //@ExceptionHandler({MethodArgumentNotValidException.class})
     //@ResponseBody
     //public Result methodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -100,9 +98,6 @@ public class GlobalExceptionHandler {
         return parameterCheckResult;
     }
 
-
-
-
     /**
      * 统一处理参数校验异常
      */
@@ -110,17 +105,15 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result constraintViolationException(ConstraintViolationException ex) {
         Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+        ParameterCheckResult parameterCheckResult = new ParameterCheckResult();
         for (ConstraintViolation<?> constraintViolation : constraintViolations) {
-            System.out.println();
-            System.out.println(getLastPathNode(constraintViolation.getPropertyPath()));
-            System.out.println(constraintViolation.getInvalidValue());
-            System.out.println(constraintViolation.getMessage());
+            parameterCheckResult.putResult(getLastPathNode(constraintViolation.getPropertyPath()),
+                    constraintViolation.getMessage());
         }
 
-
-        return Result.ok()
-                ;
+        return Result.build(parameterCheckResult, ResultCodeEnum.FRONT_DATA_ERROR);
     }
+
 
     private static String getLastPathNode(Path path) {
         String wholePath = path.toString();
