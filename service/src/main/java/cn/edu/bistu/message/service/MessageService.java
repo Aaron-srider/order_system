@@ -13,14 +13,14 @@ import java.util.List;
 public interface MessageService {
 
     /**
-     * 获取收件箱
+     * 根据用户id获取收件箱
      * @param visitorId
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
     ServiceResult<JSONObject> getReceiveMessageById(Long visitorId);
 
     /**
-     * 获取发件箱
+     * 根据用户id获取发件箱
      * @param visitorId
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
@@ -32,4 +32,13 @@ public interface MessageService {
      * @return java.lang.Integer
      * */
     Long sendMessageById(Message message);
+
+    /**
+     * 根据消息id获取消息
+     * @param messageId
+     * @return cn.edu.bistu.model.entity.Message
+     * */
+    Message getMessageById(Long messageId);
+
+    void updateMessage(Message message);
 }

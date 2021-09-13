@@ -63,4 +63,16 @@ public class MessageServiceImpl implements MessageService{
         logger.info("获取的messageId: " + id);
         return id;
     }
+
+    @Override
+    public Message getMessageById(Long messageId) {
+
+        Message message = messagemapper.selectById(messageId);
+        return message;
+    }
+
+    @Override
+    public void updateMessage(Message message) {
+        messagemapper.updateById(message);
+    }
 }

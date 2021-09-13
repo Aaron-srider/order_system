@@ -9,8 +9,10 @@ import cn.edu.bistu.model.entity.Message;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -52,5 +54,36 @@ public class MessageController {
         Long id = messageService.sendMessageById(message);
         return Result.ok(id);
     }
+
+    @PutMapping("/upAttachment/{messageId}")
+    public Result upContent(@PathVariable("messageId") Long messageId,
+                            HttpServletRequest request,
+                            @RequestPart("attachment") MultipartFile attachment) throws IOException {
+
+        MapService userInfo = (MapService) request.getAttribute("userInfo");
+        Long userId = (Long) userInfo.get("id");
+
+        Message message = messageService.getMessageById(messageId);
+        if (message == null) {
+            //暂时
+            return Result.fail("消息不存在");
+        }
+
+        if (userId != message.getSender()){
+            //暂时
+            return Result.fail("发送消息用户不一致");
+        }
+
+        if (attachment.getSize() != 0 && !attachment.getOriginalFilename().equals("")) {
+            byte[] bytes = attachment.getBytes();
+            message.setContent(bytes);
+            message.setAttachmentName(attachment.getOriginalFilename());
+            messageService.updateMessage(message);
+            return Result.ok();
+        } else {
+            return Result.fail("附件不存在");
+        }
+    }
+
 
 }

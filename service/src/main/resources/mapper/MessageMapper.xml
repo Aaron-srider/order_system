@@ -7,6 +7,9 @@
     <select id="getReceiveMessageById" resultType="cn.edu.bistu.model.vo.MessageVo">
         SELECT
             m.id,
+            m.status,
+            m.type,
+            m.sender,
             m.description,
             m.create_time,
             u.name AS userName,
@@ -23,6 +26,9 @@
     <select id="getSendMessageById" resultType="cn.edu.bistu.model.vo.MessageVo">
         SELECT
             m.id,
+            m.status,
+            m.type,
+            m.receiver,
             m.description,
             m.create_time,
             u.name AS userName,
