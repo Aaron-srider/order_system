@@ -1,7 +1,9 @@
 package cn.edu.bistu.model.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,6 +15,7 @@ import java.util.Date;
 @Data
 public class Message {
 
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long sender;
@@ -26,7 +29,7 @@ public class Message {
 
     private String title;
     private String description;
-    @TableField(value = "attchment_name")
-    private String attchmentName;
+    @TableField(value = "attachment_name")
+    private String attachmentName;
 
 }

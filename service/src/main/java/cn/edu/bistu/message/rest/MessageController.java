@@ -49,7 +49,8 @@ public class MessageController {
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long sender = userInfo.getVal("id", Long.class);
         message.setSender(sender);
-        return null;
+        Long id = messageService.sendMessageById(message);
+        return Result.ok(id);
     }
 
 }

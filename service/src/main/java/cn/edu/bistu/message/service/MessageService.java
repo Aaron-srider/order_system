@@ -25,4 +25,11 @@ public interface MessageService {
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
     ServiceResult<JSONObject> getSendMessageById(Long visitorId);
+
+    /**
+     * 发送工单请求，返回插入的工单id方便上传附件
+     * @param message
+     * @return java.lang.Integer
+     * */
+    Long sendMessageById(Message message);
 }
