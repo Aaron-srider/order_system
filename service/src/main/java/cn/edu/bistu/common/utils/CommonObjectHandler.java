@@ -1,6 +1,8 @@
 package cn.edu.bistu.common.utils;
 
+import cn.edu.bistu.model.entity.Message;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.fasterxml.jackson.databind.ser.impl.MapEntrySerializer;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +20,8 @@ public class CommonObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         metaObject.setValue("createTime", new Date());
-        metaObject.setValue("deleted", 0);
+        if (!metaObject.getOriginalObject().getClass().getTypeName().equals(Message.class.getTypeName()))
+            metaObject.setValue("deleted", 0);
     }
 
     @Override
