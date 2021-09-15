@@ -21,6 +21,7 @@ import com.sun.deploy.net.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,8 +88,6 @@ public class MessageController {
     @GetMapping("/messageDetail/{messageId}")
     public Result MessageDetail(@PathVariable("messageId") Long messageId){
 
-        //参数检测..
-
 
         Message message = messageService.getMessageById(messageId);
         if (message == null) {
@@ -106,9 +105,8 @@ public class MessageController {
     }
 
     @PostMapping("/sendMessage")
-    public Result sendMessage(@RequestBody Message message, HttpServletRequest request) {
+    public Result sendMessage(@Validated @RequestBody Message message, HttpServletRequest request) {
 
-        //参数校验...
 
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long sender = userInfo.getVal("id", Long.class);
@@ -117,7 +115,7 @@ public class MessageController {
         return Result.ok(id);
     }
 
-    @PutMapping("/upAttachment/{messageId}")
+    @PutMapping("/upLoadAttachment/{messageId}")
     public Result upContent(@PathVariable("messageId") Long messageId,
                             HttpServletRequest request,
                             @RequestPart("attachment") MultipartFile attachment) throws IOException {

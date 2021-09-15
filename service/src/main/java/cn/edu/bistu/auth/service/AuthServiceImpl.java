@@ -209,7 +209,7 @@ public class AuthServiceImpl implements AuthService {
     @Test
     public void forgeToken() {
         Map<Long, Object> tokens = forgeToken(new Long[]{
-                1L
+                3L
         });
 
         System.out.println(tokens);

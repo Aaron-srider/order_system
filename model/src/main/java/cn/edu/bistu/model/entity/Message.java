@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
+import javax.validation.Constraint;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -19,6 +22,7 @@ public class Message {
     private Long id;
 
     private Long sender;
+    @NotNull
     private Long receiver;
     private Integer type;
 
@@ -27,7 +31,9 @@ public class Message {
     private Date createTime;
     private Integer status;
 
+    @NotNull
     private String title;
+    @NotNull
     private String description;
     @TableField(value = "attachment_name")
     private String attachmentName;
