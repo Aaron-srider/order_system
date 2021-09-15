@@ -1,11 +1,15 @@
 package cn.edu.bistu.message.service;
 
+import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.message.mapper.Messagemapper;
-import cn.edu.bistu.model.common.ServiceResult;
-import cn.edu.bistu.model.common.ServiceResultImpl;
+import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.Message;
 import cn.edu.bistu.model.vo.MessageVo;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.sun.org.apache.xml.internal.serializer.utils.Utils.messages;
 
 
 /**
@@ -27,23 +33,27 @@ public class MessageServiceImpl implements MessageService{
     @Autowired
     Messagemapper messagemapper;
 
+    @Autowired
+    UserMapper userMapper;
+
     static Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Override
-    public ServiceResult<JSONObject> getReceiveMessageById(Long id) {
+    public ServiceResult<JSONObject> getReceiveMessageById(Page<MessageVo> page, Long id) {
 
-        List<MessageVo> messages = messagemapper.getReceiveMessageById(id);
-        logger.info("messages: ",messages);
+        IPage<MessageVo> messages = messagemapper.getReceiveMessageById(page, id);
+
+        logger.info("messags: ", messages);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("messages",messages);
+        jsonObject.put("messages", messages);
         ServiceResult<JSONObject> result = new ServiceResultImpl<>(jsonObject);
         return result;
     }
 
     @Override
-    public ServiceResult<JSONObject> getSendMessageById(Long id) {
+    public ServiceResult<JSONObject> getSendMessageById(Page<MessageVo> page,Long id) {
 
-        List<MessageVo> messages = messagemapper.getSendMessageById(id);
+        IPage<MessageVo> messages = messagemapper.getSendMessageById(page, id);
         logger.info("messages: ",messages);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("messages",messages);
@@ -73,6 +83,17 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     public void updateMessage(Message message) {
+        messagemapper.updateById(message);
+    }
+
+    @Override
+    public void deleteMessage(Message message, boolean isSender) {
+
+        if (isSender) {
+            message.setIsShowSender(1);
+        } else {
+            message.setIsShowReceiver(1);
+        }
         messagemapper.updateById(message);
     }
 }

@@ -42,10 +42,11 @@ public enum ResultCodeEnum {
     TOKEN_FORMAT_ERROR(303, "token格式错误"),
     TOKEN_BODY_ERROR(304, "token体解压错误"),
     TOKEN_ERROR(305, "token错误"),
+    MESSAGE_NOT_EXIST(306,"消息不存在"),
+    USER_SENDMSG_NOT_CONSISTENT(307,"发送消息和上传附件的用户不一致"),
+    USER_MESSAGE_NOT_CONSISTENT(308,"用户和消息不匹配"),
 
     BACKEND_ERROR(500, "后端错误");
-
-    ;
 
     private Integer code;
 

@@ -32,4 +32,9 @@ public class Message {
     @TableField(value = "attachment_name")
     private String attachmentName;
 
+    @TableField(value = "is_show_sender")
+    private Integer isShowSender;
+    @TableField(value = "is_show_receiver")
+    private Integer isShowReceiver;
+
 }
