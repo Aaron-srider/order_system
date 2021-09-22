@@ -19,7 +19,6 @@ public class BaseEntity {
     @NotNull(groups = {WhenTeacher.class})
     @NotNull(groups = {WhenStudent.class})
     @NotNull(groups = {Revoke.class})
-
     private Long id;
 
     @TableField(fill= FieldFill.INSERT)
@@ -33,5 +32,8 @@ public class BaseEntity {
     @TableLogic
     @TableField(fill= FieldFill.INSERT)
     private Integer deleted;
+
+
+
 
 }

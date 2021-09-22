@@ -3,6 +3,8 @@ package cn.edu.bistu.User.mapper;
 import cn.edu.bistu.auth.mapper.RoleMapper;
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.auth.mapper.UserRoleMapper;
+import cn.edu.bistu.common.JsonUtils;
+import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.dept.mapper.DeptMapper;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
@@ -13,11 +15,17 @@ import cn.edu.bistu.model.entity.SecondaryDept;
 import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.entity.auth.UserRole;
+import cn.edu.bistu.model.vo.UserVo;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Data
@@ -45,6 +53,7 @@ public class UserDao {
         DaoResult<User> daoResult = getOneUserByWrapper(wrapper);
         return daoResult;
     }
+
     /**
      * 拿到用户详细的信息，将所有引用id都置换成实体类，将整个user封装到一个JSONObject中返回
      *
@@ -52,15 +61,40 @@ public class UserDao {
      * @return 如果用户的id指针不为空，那么替换为相应的实体；如果用户为空，result字段为空；否则，返回用户完整信息。
      */
     public DaoResult<User> getOneUserByWrapper(QueryWrapper<User> wrapper) {
-        DaoResultImpl<User> result = new DaoResultImpl<>();
         User user = userMapper.selectOne(wrapper);
 
         JSONObject detailInfo = new JSONObject();
-        if(user != null) {
+        if (user != null) {
             detailInfo = improveUserInfo(user);
-            result.setDetailInfo(detailInfo);
         }
+
+        DaoResultImpl<User> result = new DaoResultImpl<>();
         result.setResult(user);
+        result.setDetailInfo(detailInfo);
+        return result;
+    }
+
+    public DaoResult<List<JSONObject>> getUserListByWrapper(Page<UserVo> page, QueryWrapper<User> wrapper) {
+        List<User> userList = userMapper.selectList(wrapper);
+
+
+            List<JSONObject> resultList = new ArrayList<>();
+        if (userList != null && userList.size() != 0) {
+            for (User user : userList) {
+                JSONObject oneUserResult = new JSONObject();
+                oneUserResult.put("result", user);
+                JSONObject detailInfo = improveUserInfo(user);
+                oneUserResult.put("detailInfo", detailInfo);
+                resultList.add(oneUserResult);
+            }
+        }
+
+        Page<JSONObject> page1 = Pagination.page(page, resultList);
+
+        DaoResultImpl<List<JSONObject>> result = new DaoResultImpl<>();
+        result.setResult(page1.getRecords());
+        page1.setRecords(null);
+        result.setDetailInfo(JsonUtils.convertObj2JsonObj(page1));
         return result;
     }
 
@@ -72,7 +106,7 @@ public class UserDao {
      */
     private Role getUserRole(Long id) {
         UserRole userRole = userRoleMapper.selectById(id);
-        if(userRole != null) {
+        if (userRole != null) {
             Long roleId = userRole.getRoleId();
             Role role = roleMapper.selectById(roleId);
             return role;
@@ -82,13 +116,13 @@ public class UserDao {
 
     /**
      * @return 数据结构：
-     *      {
-     *          "class":{}
-     *          "college":{}
-     *          "secondaryDept":{}
-     *          "major":{}
-     *          "role":{}
-     *      }
+     * {
+     * "class":{}
+     * "college":{}
+     * "secondaryDept":{}
+     * "major":{}
+     * "role":{}
+     * }
      */
     private JSONObject improveUserInfo(User user) {
         JSONObject jsonObject = new JSONObject();
@@ -105,7 +139,7 @@ public class UserDao {
             jsonObject.put("secondaryDept", secondaryDept);
 
         }
-        if(user.getMajorId()!= null) {
+        if (user.getMajorId() != null) {
             Major major = deptMapper.getMajorMapper().selectById(user.getMajorId());
             jsonObject.put("major", major);
         }

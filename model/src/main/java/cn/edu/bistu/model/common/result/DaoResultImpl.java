@@ -6,6 +6,8 @@ import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 
 public class DaoResultImpl<T> implements DaoResult<T>{
 
@@ -92,6 +94,7 @@ public class DaoResultImpl<T> implements DaoResult<T>{
 
         System.out.println(userDaoResult);
     }
+
 }
 
 

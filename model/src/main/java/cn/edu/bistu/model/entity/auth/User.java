@@ -64,5 +64,8 @@ public class User extends BaseEntity {
     private String jobId;
 
 
+    @TableField(fill= FieldFill.INSERT)
+    private Integer isLock;
+
 
 }
