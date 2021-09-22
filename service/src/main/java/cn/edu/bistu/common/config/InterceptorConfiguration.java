@@ -1,6 +1,7 @@
 package cn.edu.bistu.common.config;
 
 import cn.edu.bistu.common.interceptor.AuthorizationInterceptor;
+import cn.edu.bistu.common.interceptor.CORSInterceptor;
 import cn.edu.bistu.common.interceptor.LogInterceptor;
 import cn.edu.bistu.common.interceptor.AuthenticationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 
 @Configuration
@@ -24,33 +27,49 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        /**
-         * 打印来访日志
-         */
+        //enable(registry, false);
         HandlerInterceptor logInterceptor = getMyInterceptors(LogInterceptor.class);
         registry.addInterceptor(logInterceptor)
         ;
 
-        //用户认证
-        HandlerInterceptor authenticationInterceptor = getMyInterceptors(AuthenticationInterceptor.class);
-        registry.addInterceptor(authenticationInterceptor)
-                .excludePathPatterns("/auth/login")
-                .excludePathPatterns("/auth/userInfoCompletion/**")
-                .excludePathPatterns("/wx")
-                .excludePathPatterns("/test")
+        HandlerInterceptor corsInterceptor = getMyInterceptors(CORSInterceptor.class);
+        registry.addInterceptor(corsInterceptor)
         ;
 
-        //用户授权
-        HandlerInterceptor authorizationInterceptor = getMyInterceptors(AuthorizationInterceptor.class);
-        registry.addInterceptor(authorizationInterceptor)
-                .excludePathPatterns("/auth/login")
-                .excludePathPatterns("/auth/userInfoCompletion/**")
-                .excludePathPatterns("/wx")
-                .excludePathPatterns("/test")
-                .excludePathPatterns("/message/**")
-        ;
 
     }
+
+    public void enable(InterceptorRegistry registry, boolean enable) {
+        if(enable) {
+            /**
+             * 打印来访日志
+             */
+            HandlerInterceptor logInterceptor = getMyInterceptors(LogInterceptor.class);
+            registry.addInterceptor(logInterceptor)
+            ;
+
+            //用户认证
+            HandlerInterceptor authenticationInterceptor = getMyInterceptors(AuthenticationInterceptor.class);
+            registry.addInterceptor(authenticationInterceptor)
+                    .excludePathPatterns("/auth/login")
+                    .excludePathPatterns("/auth/userInfoCompletion/**")
+                    .excludePathPatterns("/wx")
+                    .excludePathPatterns("/test")
+            ;
+
+            //用户授权
+            HandlerInterceptor authorizationInterceptor = getMyInterceptors(AuthorizationInterceptor.class);
+            registry.addInterceptor(authorizationInterceptor)
+                    .excludePathPatterns("/auth/login")
+                    .excludePathPatterns("/auth/userInfoCompletion/**")
+                    .excludePathPatterns("/wx")
+                    .excludePathPatterns("/test")
+                    .excludePathPatterns("/message/**")
+            ;
+        }
+    }
+
+
 
 
 }
