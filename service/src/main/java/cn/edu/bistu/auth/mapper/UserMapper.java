@@ -92,4 +92,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @return
      */
     Page<WorkOrderVo> getApprovalWorkOrders(Page<WorkOrderVo> page, @Param("approverId") Long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
+
+    List<Long> queryByCondition(UserVo userVo);
+
 }

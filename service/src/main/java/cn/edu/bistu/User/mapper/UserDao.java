@@ -5,7 +5,7 @@ import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.auth.mapper.UserRoleMapper;
 import cn.edu.bistu.common.JsonUtils;
 import cn.edu.bistu.common.utils.Pagination;
-import cn.edu.bistu.dept.mapper.DeptMapper;
+import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
 import cn.edu.bistu.model.entity.Clazz;
@@ -38,7 +38,7 @@ public class UserDao {
     @Autowired
     UserRoleMapper userRoleMapper;
     @Autowired
-    DeptMapper deptMapper;
+    DeptDao deptDao;
 
     public DaoResult<User> getOneUserByOpenId(String openId) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
@@ -78,7 +78,7 @@ public class UserDao {
         List<User> userList = userMapper.selectList(wrapper);
 
 
-            List<JSONObject> resultList = new ArrayList<>();
+        List<JSONObject> resultList = new ArrayList<>();
         if (userList != null && userList.size() != 0) {
             for (User user : userList) {
                 JSONObject oneUserResult = new JSONObject();
@@ -127,20 +127,20 @@ public class UserDao {
     private JSONObject improveUserInfo(User user) {
         JSONObject jsonObject = new JSONObject();
         if (user.getClassId() != null) {
-            Clazz clazz = deptMapper.getClazzMapper().selectById(user.getClassId());
+            Clazz clazz = deptDao.getClazzMapper().selectById(user.getClassId());
             jsonObject.put("class", clazz);
         }
         if (user.getCollegeId() != null) {
-            College college = deptMapper.getCollegeMapper().selectById(user.getCollegeId());
+            College college = deptDao.getCollegeMapper().selectById(user.getCollegeId());
             jsonObject.put("college", college);
         }
         if (user.getSecondaryDeptId() != null) {
-            SecondaryDept secondaryDept = deptMapper.getSecondaryDeptMapper().selectById(user.getSecondaryDeptId());
+            SecondaryDept secondaryDept = deptDao.getSecondaryDeptMapper().selectById(user.getSecondaryDeptId());
             jsonObject.put("secondaryDept", secondaryDept);
 
         }
         if (user.getMajorId() != null) {
-            Major major = deptMapper.getMajorMapper().selectById(user.getMajorId());
+            Major major = deptDao.getMajorMapper().selectById(user.getMajorId());
             jsonObject.put("major", major);
         }
 

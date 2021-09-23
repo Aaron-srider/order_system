@@ -4,6 +4,33 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.auth.mapper.UserMapper">
 
+
+    <select id="queryByCondition" resultType="long">
+
+        select u.id from user u
+        <if test="secondaryDeptName!=null and secondaryDeptName!=''">
+            join secondary_dept sd on sd.id=u.secondary_dept_id
+        </if>
+        <if test="clazzName!=null and clazzName!=''">
+            join class cl on cl.id=u.class_id
+        </if>
+        <if test="majorName!=null and majorName!=''">
+            join major ma on ma.id=u.major_id
+        </if>
+        <where>
+            u.name like "%" #{name} "%" and u.deleted=0
+            <if test="studentId!=null and studentId!=''">
+                and student_id=#{studentId}
+            </if>
+            <if test="jobId!=null and jobId!=''">
+                and job_id=#{jobId}X
+            </if>
+        </where>
+
+
+    </select>
+
+
     <update id="userInfoComplete">
         update user
         set
@@ -50,20 +77,20 @@
 
     <select id="getApprovalWorkOrders" resultType="cn.edu.bistu.model.vo.WorkOrderVo">
         select
-            wo.id,
-            wo.is_examined,
-            wo.flow_id,
-            wo.create_time,
-            wo.update_time,
-            wo.attachment_name,
-            wo.status,
-            wo.title,
-            wo.content,
-            initiator.student_id ,
-            initiator.job_id ,
-            f.name flowName,
-            initiator.name initiatorName,
-            r.name role
+        wo.id,
+        wo.is_examined,
+        wo.flow_id,
+        wo.create_time,
+        wo.update_time,
+        wo.attachment_name,
+        wo.status,
+        wo.title,
+        wo.content,
+        initiator.student_id ,
+        initiator.job_id ,
+        f.name flowName,
+        initiator.name initiatorName,
+        r.name role
         from work_order wo left join flow_node fn on wo.flow_node_id=fn.id
         left join user approver on fn.approver_id=approver.id
         left join flow f on wo.flow_id = f.id
@@ -71,7 +98,8 @@
         left join user_role ur on ur.user_id = initiator.id
         left join role r on r.id=ur.role_id
         <where>
-            approver.id=#{approverId} and wo.deleted=0 and fn.deleted=0 and approver.deleted=0 and f.deleted=0 and initiator.deleted=0
+            approver.id=#{approverId} and wo.deleted=0 and fn.deleted=0 and approver.deleted=0 and f.deleted=0 and
+            initiator.deleted=0
             and r.deleted = 0 and ur.deleted=0
             <if test="workOrderVo.title!=null and workOrderVo.title!=''">
                 and wo.title like '%' #{workOrderVo.title} '%'

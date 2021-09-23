@@ -1,5 +1,6 @@
 package cn.edu.bistu.model.vo;
 
+import cn.edu.bistu.model.common.validation.ConditionQuery;
 import cn.edu.bistu.model.common.validation.CustomSequenceProvider;
 import cn.edu.bistu.model.common.validation.WhenStudent;
 import cn.edu.bistu.model.common.validation.WhenTeacher;
@@ -30,7 +31,7 @@ public class UserVo extends User {
 
     @NotNull(groups = {WhenStudent.class})
     @Null(groups = {WhenTeacher.class})
-    private String className;
+    private String clazzName;
 
     @NotNull(groups = {WhenTeacher.class})
     @Null(groups = {WhenStudent.class})
@@ -38,5 +39,8 @@ public class UserVo extends User {
 
     @NotNull
     private Long roleId;
+
+    @NotNull(groups = {ConditionQuery.class})
+    private String roleCategory;
 
 }
