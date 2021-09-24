@@ -66,6 +66,8 @@ public class UserDao {
             detailInfo = improveUserInfo(user);
         }
 
+
+
         DaoResultImpl<User> result = new DaoResultImpl<>();
         result.setResult(user);
         result.setDetailInfo(detailInfo);
@@ -127,6 +129,11 @@ public class UserDao {
      * }
      */
     private JSONObject improveUserInfo(User user) {
+        //排除重要信息
+        user.setOpenId(null);
+        user.setSessionKey(null);
+
+        //完善附加信息
         JSONObject jsonObject = new JSONObject();
 
         if (user.getCollegeId() != null) {
@@ -136,7 +143,6 @@ public class UserDao {
         if (user.getSecondaryDeptId() != null) {
             SecondaryDept secondaryDept = deptDao.getSecondaryDeptMapper().selectById(user.getSecondaryDeptId());
             jsonObject.put("secondaryDept", secondaryDept);
-
         }
         if (user.getMajorId() != null) {
             Major major = deptDao.getMajorMapper().selectById(user.getMajorId());
