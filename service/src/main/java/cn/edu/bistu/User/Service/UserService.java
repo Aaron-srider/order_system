@@ -33,4 +33,6 @@ public interface UserService {
     public ServiceResult<JSONObject> getAllUsers(Page<UserVo> page, UserVo userVo);
 
     public void lock(User user);
+
+    public ServiceResult<JSONObject> updateUser(UserVo userVo);
 }

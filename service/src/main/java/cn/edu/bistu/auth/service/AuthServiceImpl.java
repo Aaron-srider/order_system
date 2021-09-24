@@ -1,5 +1,6 @@
 package cn.edu.bistu.auth.service;
 
+import cn.edu.bistu.User.Service.UserService;
 import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.auth.exception.Jscode2sessionException;
@@ -36,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     WxMiniApi wxMiniApi;
@@ -181,8 +185,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void userInfoCompletion(UserVo userVo) {
-        //查询数据库
+    public ServiceResult<JSONObject> userInfoCompletion(UserVo userVo) {
         Long roleId = userVo.getRoleId();
 
         DaoResult<User> daoResult = userDao.getOneUserById(userVo.getId());
@@ -199,11 +202,11 @@ public class AuthServiceImpl implements AuthService {
             throw new UserNotRegisteredException("user id: " + userVo.getId(), ResultCodeEnum.USER_INFO_COMPLETED);
         }
 
-        //更新用户表
-        userDao.getUserMapper().userInfoComplete(userVo);
+        ServiceResult<JSONObject> serviceResult = userService.updateUser(userVo);
 
         //向UserRole表中插入数据
         improveUserRoleInfo(roleId, userVo.getId());
+        return serviceResult;
     }
 
     @Test
@@ -220,7 +223,6 @@ public class AuthServiceImpl implements AuthService {
         userRole.setRoleId(roleId);
         userRole.setUserId(userId);
         userDao.getUserRoleMapper().insert(userRole);
-
     }
 
     private void registerUser(String openid, String sessionkey) {

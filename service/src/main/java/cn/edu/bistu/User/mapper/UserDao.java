@@ -104,14 +104,18 @@ public class UserDao {
      * @param id 用户的id
      * @return 如果用户角色关系表中没有用户的id，那么方法返回null，如果存在对应关系，返回对应角色。
      */
-    private Role getUserRole(Long id) {
-        UserRole userRole = userRoleMapper.selectById(id);
-        if (userRole != null) {
-            Long roleId = userRole.getRoleId();
-            Role role = roleMapper.selectById(roleId);
-            return role;
+    private List<Role> getUserRole(Long id) {
+        List<Role> roleList = new ArrayList<>();
+        List<UserRole> userRoleList = userRoleMapper.selectList(new QueryWrapper<UserRole>().eq("user_id", id));
+        if(!userRoleList.isEmpty()) {
+            for (UserRole userRole : userRoleList) {
+                Long roleId = userRole.getRoleId();
+                Role role = roleMapper.selectById(roleId);
+                roleList.add(role);
+            }
         }
-        return null;
+
+        return roleList;
     }
 
     /**
@@ -144,8 +148,9 @@ public class UserDao {
             jsonObject.put("major", major);
         }
 
-        Role userRole = getUserRole(user.getId());
-        jsonObject.put("role", userRole);
+        System.out.println(user.getId());
+        List<Role> userRoleList = getUserRole(user.getId());
+        jsonObject.put("roleList", userRoleList);
         return jsonObject;
     }
 }

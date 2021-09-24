@@ -39,12 +39,17 @@ public class User extends BaseEntity {
     private String nickName;
 
     @TableField("college_id")
+    @NotNull(groups = {WhenStudent.class, WhenTeacher.class})
     private Integer collegeId;
 
     //学生属性
     @TableField("major_id")
+    @NotNull(groups = {WhenStudent.class})
+    @Null(groups = {WhenTeacher.class})
     private Integer majorId;
     @TableField("class_id")
+    @NotNull(groups = {WhenStudent.class})
+    @Null(groups = {WhenTeacher.class})
     private Integer classId;
     @NotNull(groups = {WhenStudent.class})
     private Integer grade;
@@ -56,6 +61,8 @@ public class User extends BaseEntity {
 
     //教师领导属性
     @TableField("secondary_dept_id")
+    @NotNull(groups = {WhenTeacher.class})
+    @Null(groups = {WhenStudent.class})
     private Long secondaryDeptId;
 
     @TableField("job_id")

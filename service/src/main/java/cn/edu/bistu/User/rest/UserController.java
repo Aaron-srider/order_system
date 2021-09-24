@@ -21,6 +21,7 @@ import javax.validation.constraints.Pattern;
 
 @RestController
 @Slf4j
+@CrossOrigin
 public class UserController extends BaseController{
 
     @Autowired
@@ -42,7 +43,6 @@ public class UserController extends BaseController{
         ServiceResult<JSONObject> serviceResult = userService.getAllUsers(page, userVo);
         JSONObject result = serviceResult.getServiceResult();
         log.debug(result + "");
-        cors(resp);
         return Result.ok(result);
     }
 
@@ -57,8 +57,16 @@ public class UserController extends BaseController{
         user.setId(id);
         userService.lock(user);
 
-        cors(resp);
         return Result.ok();
     }
+
+    @PutMapping("/users")
+    public Result update(
+           @RequestBody @Validated UserVo userVo) {
+        ServiceResult<JSONObject> serviceResult = userService.updateUser(userVo);
+        return Result.ok(serviceResult.getServiceResult());
+    }
+
+
 
 }

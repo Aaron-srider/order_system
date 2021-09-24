@@ -41,7 +41,6 @@ public class AuthController {
         return Result.ok(jsonObject);
     }
 
-
     @GetMapping("/auth/login")
     public Result login(@NotNull String code) {
         ServiceResult<JSONObject> result = authService.authentication(code);
@@ -49,14 +48,11 @@ public class AuthController {
         return Result.ok(serviceResult);
     }
 
-    @PutMapping("/auth/userInfoCompletion/{roleCase}")
+    @PutMapping("/auth/userInfoCompletion")
     public Result completeUserInfo(
-            @PathVariable("roleCase")
-            @UserRoleValue(roleCases={"student","teacher"}, message = "类型必须为 student|teacher") String roleCase,
             @RequestBody @Validated UserVo userVo) {
-        checkUserRole(userVo.getRoleId().intValue(), roleCase);
-        authService.userInfoCompletion(userVo);
-        return Result.ok();
+        ServiceResult<JSONObject> serviceResult=authService.userInfoCompletion(userVo);
+        return Result.ok(serviceResult.getServiceResult());
     }
 
     private void checkUserRole(Integer role_id, String roleString) {

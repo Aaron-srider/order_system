@@ -45,5 +45,5 @@ public interface AuthService{
      *                      studentId       ：学号（字符串）
      *                      roleId          ：user的角色id，由于role与user是多对多的关系，所以需要将roleId和userId插入到关系user_role表中
      */
-    void userInfoCompletion(UserVo userVo);
+    public ServiceResult<JSONObject> userInfoCompletion(UserVo userVo);
 }

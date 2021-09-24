@@ -1,7 +1,6 @@
 package cn.edu.bistu.User.Service;
 
 import cn.edu.bistu.User.mapper.UserDao;
-import cn.edu.bistu.auth.mapper.AuthDao;
 import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -11,10 +10,10 @@ import cn.edu.bistu.model.entity.Major;
 import cn.edu.bistu.model.entity.SecondaryDept;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.UserVo;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
 import cn.edu.bistu.common.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -111,6 +110,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public void lock(User user) {
         userDao.getUserMapper().updateById(user);
+    }
+
+    @Override
+    public ServiceResult<JSONObject> updateUser(UserVo userVo) {
+        //更新用户
+        userDao.getUserMapper().updateById(userVo);
+        //返回更新后的用户
+        DaoResult<User> updatedUser = userDao.getOneUserById(userVo.getId());
+        return new ServiceResultImpl<>(updatedUser.getValue());
     }
 
 

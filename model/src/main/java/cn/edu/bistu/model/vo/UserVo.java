@@ -5,7 +5,6 @@ import cn.edu.bistu.model.common.validation.CustomSequenceProvider;
 import cn.edu.bistu.model.common.validation.WhenStudent;
 import cn.edu.bistu.model.common.validation.WhenTeacher;
 import cn.edu.bistu.model.entity.auth.User;
-import jdk.nashorn.internal.objects.annotations.Where;
 import lombok.Data;
 import org.hibernate.validator.group.GroupSequenceProvider;
 
@@ -14,7 +13,24 @@ import javax.validation.constraints.Null;
 
 
 /**
- * 与前端交互的对象
+ * 与前端交互的对象，校验规则：对roleId进行分类校验：
+ *      必传参数：
+ *              * roleId
+ *              * id
+ *              * collegeName
+ *              * name
+ *      如果roleId判断出是student：
+ *          非空：
+ *              * majorName
+ *              * clazzName
+ *              * studentId
+ *              * grade
+ *
+ *      如果roleId判断出是teacher：
+ *          非空：
+ *              * secondaryDeptName
+ *              * jobId
+ *
  */
 @Data
 @GroupSequenceProvider(CustomSequenceProvider.class)
@@ -22,19 +38,12 @@ public class UserVo extends User {
     
     private String token;
 
-    @NotNull(groups = {WhenStudent.class, WhenTeacher.class})
     private String collegeName;
 
-    @NotNull(groups = {WhenStudent.class})
-    @Null(groups = {WhenTeacher.class})
     private String majorName;
 
-    @NotNull(groups = {WhenStudent.class})
-    @Null(groups = {WhenTeacher.class})
     private String clazzName;
 
-    @NotNull(groups = {WhenTeacher.class})
-    @Null(groups = {WhenStudent.class})
     private String secondaryDeptName;
 
     @NotNull

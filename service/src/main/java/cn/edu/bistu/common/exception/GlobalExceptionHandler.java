@@ -6,6 +6,7 @@ import cn.edu.bistu.model.common.result.Result;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -57,11 +58,7 @@ public class GlobalExceptionHandler {
         return Result.build(ex.getClass().getTypeName(), ResultCodeEnum.BACKEND_ERROR);
     }
 
-    /**
-     * 统一处理其他后端异常
-     *
-     * @return
-     */
+
     @ExceptionHandler({MissingServletRequestParameterException.class})
     @ResponseBody
     public Result missingServletRequestParameterException(MissingServletRequestParameterException ex) {
@@ -84,6 +81,14 @@ public class GlobalExceptionHandler {
         ParameterCheckResult parameterCheckResult = bindingResultPackager(bindingResult);
         return Result.build(parameterCheckResult, ResultCodeEnum.FRONT_DATA_ERROR);
     }
+
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    @ResponseBody
+    public Result httpMessageNotReadableException(Exception ex) throws NoSuchFieldException, IllegalAccessException {
+        return Result.build(ex.getMessage(), ResultCodeEnum.FRONT_DATA_ERROR);
+    }
+
+
 
     private ParameterCheckResult bindingResultPackager(BindingResult bindingResult) {
         ParameterCheckResult parameterCheckResult = new ParameterCheckResult();
