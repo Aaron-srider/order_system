@@ -42,7 +42,6 @@ public class UserVo extends User {
 
     private String majorName;
 
-    private String clazzName;
 
     private String secondaryDeptName;
 

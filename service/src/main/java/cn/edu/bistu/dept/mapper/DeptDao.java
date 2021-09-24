@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Getter
 public class DeptDao {
-    @Autowired
-    ClazzMapper clazzMapper;
 
     @Autowired
     CollegeMapper collegeMapper;

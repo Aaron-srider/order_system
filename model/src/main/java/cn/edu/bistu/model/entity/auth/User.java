@@ -47,10 +47,10 @@ public class User extends BaseEntity {
     @NotNull(groups = {WhenStudent.class})
     @Null(groups = {WhenTeacher.class})
     private Integer majorId;
-    @TableField("class_id")
+    @TableField("clazz_name")
     @NotNull(groups = {WhenStudent.class})
     @Null(groups = {WhenTeacher.class})
-    private Integer classId;
+    private String clazzName;
     @NotNull(groups = {WhenStudent.class})
     private Integer grade;
     @TableField("student_id")
@@ -70,9 +70,7 @@ public class User extends BaseEntity {
     @Null(groups = {WhenStudent.class})
     private String jobId;
 
-
     @TableField(fill= FieldFill.INSERT)
     private Integer isLock;
-
 
 }

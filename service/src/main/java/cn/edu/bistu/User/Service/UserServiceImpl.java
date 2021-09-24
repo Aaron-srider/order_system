@@ -5,12 +5,10 @@ import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
-import cn.edu.bistu.model.entity.Clazz;
 import cn.edu.bistu.model.entity.Major;
 import cn.edu.bistu.model.entity.SecondaryDept;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -43,18 +41,10 @@ public class UserServiceImpl implements UserService {
 
         //设置学生的有关条件，className, majorName
         if ("student".equals(userVo.getRoleCategory())) {
+
             //利用className模糊查询
-            if (!BeanUtils.isEmpty(userVo.getClazzName())) {
-                //从clazz表中模糊查询出id列表
-                List<Clazz> clazzList = userDao.getDeptDao().getClazzMapper().selectList(new QueryWrapper<Clazz>().select("id").like("name", userVo.getClazzName()));
-                List<Long> clazzIds = new ArrayList<>();
-                for (Clazz clazz : clazzList) {
-                    clazzIds.add(clazz.getId());
-                }
-                //如果列表不为空，将其设置为过滤条件
-                if (!clazzIds.isEmpty()) {
-                    userQueryWrapper.in("class_id", clazzIds);
-                }
+            if (!BeanUtils.isEmpty(userVo.getName())) {
+                userQueryWrapper.like("clazz_name", userVo.getClazzName());
             }
 
             if (!BeanUtils.isEmpty(userVo.getMajorName())) {

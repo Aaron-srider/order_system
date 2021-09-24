@@ -8,7 +8,6 @@ import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
-import cn.edu.bistu.model.entity.Clazz;
 import cn.edu.bistu.model.entity.College;
 import cn.edu.bistu.model.entity.Major;
 import cn.edu.bistu.model.entity.SecondaryDept;
@@ -16,7 +15,6 @@ import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.entity.auth.UserRole;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -130,10 +128,7 @@ public class UserDao {
      */
     private JSONObject improveUserInfo(User user) {
         JSONObject jsonObject = new JSONObject();
-        if (user.getClassId() != null) {
-            Clazz clazz = deptDao.getClazzMapper().selectById(user.getClassId());
-            jsonObject.put("class", clazz);
-        }
+
         if (user.getCollegeId() != null) {
             College college = deptDao.getCollegeMapper().selectById(user.getCollegeId());
             jsonObject.put("college", college);
