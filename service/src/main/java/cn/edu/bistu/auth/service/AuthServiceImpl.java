@@ -20,6 +20,7 @@ import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.entity.auth.UserRole;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.wx.service.WxMiniApi;
+import cn.edu.bistu.wx.service.WxMiniApiImpl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +69,11 @@ public class AuthServiceImpl implements AuthService {
 
         String openId = jsonObject.getString("openid");
         String sessionKey = jsonObject.getString("session_key");
+        String unionId = jsonObject.getString("unionid");
         WxLoginStatus wxLoginStatus = new WxLoginStatus();
         wxLoginStatus.setOpenId(openId);
         wxLoginStatus.setSessionKey(sessionKey);
+        wxLoginStatus.setUnionId(unionId);
         return wxLoginStatus;
     }
 
@@ -87,12 +91,15 @@ public class AuthServiceImpl implements AuthService {
         //获取用户微信openId
         String openId = "";
         String sessionKey = "";
+        String unionId = "";
+
 
         try {
             //获取微信登录态
             WxLoginStatus wxLoginStatus = getWxLoginStatus(code);
             openId = wxLoginStatus.getOpenId();
             sessionKey = wxLoginStatus.getSessionKey();
+            unionId = wxLoginStatus.getUnionId();
         } catch (Jscode2sessionException ex) {
             if (ex.getErrcode().equals(40029)) {
                 throw new CodeInvalidException("code:" + code, ResultCodeEnum.OAUTH_CODE_INVALID);
@@ -108,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
 
         //用户没有注册，向数据库插入新用户，不返回token
         if (resultUser == null) {
-            registerUser(openId, sessionKey);
+            registerUser(openId, sessionKey, unionId);
         }
         //用户已经注册，判断是否完善了信息，是则返回token
         else {
@@ -210,6 +217,41 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Test
+    public void getOpenIdAndUnionIdByTrick() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("邢铖", "0033e7Ga1xsfOB0VNoGa1RHQtf43e7Gd");
+        //map.put("姓名", "");
+        //map.put("姓名", "");
+
+        for (String name : map.keySet()) {
+            String code = (String) map.get(name);
+
+            JSONObject jsonObject = new WxMiniApiImpl().authCode2Session("wxbc043e13b23bfec6", "1725148a11cbdd403435138295080768", code);
+            if (jsonObject == null) {
+                throw new RuntimeException("调用微信端授权认证接口错误");
+            } else if (jsonObject.get("errcode") != null) {
+                throw new Jscode2sessionException((Integer) jsonObject.get("errcode")
+                        , (String) jsonObject.get("errmsg"));
+            }
+
+            String openId = jsonObject.getString("openid");
+            String sessionKey = jsonObject.getString("session_key");
+            String unionId = jsonObject.getString("unionid");
+            WxLoginStatus wxLoginStatus = new WxLoginStatus();
+            wxLoginStatus.setOpenId(openId);
+            wxLoginStatus.setSessionKey(sessionKey);
+            wxLoginStatus.setUnionId(unionId);
+
+            map.put(name, wxLoginStatus);
+        }
+
+        JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(map));
+
+        System.out.println(jsonObject);
+
+    }
+
+    @Test
     public void forgeToken() {
         Map<Long, Object> tokens = forgeToken(new Long[]{
                 3L
@@ -225,10 +267,11 @@ public class AuthServiceImpl implements AuthService {
         userDao.getUserRoleMapper().insert(userRole);
     }
 
-    private void registerUser(String openid, String sessionkey) {
+    private void registerUser(String openid, String sessionkey, String unionId) {
         User user = new User();
         user.setOpenId(openid);
         user.setSessionKey(sessionkey);
+        user.setUnionId(unionId);
         user.setInfoComplete(0);
         userDao.getUserMapper().insert(user);
         throw new UserInfoNotCompleteException("user id:" + user.getId(), ResultCodeEnum.USER_INFO_NOT_COMPLETE);
