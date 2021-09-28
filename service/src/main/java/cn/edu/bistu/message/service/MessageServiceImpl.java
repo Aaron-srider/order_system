@@ -9,7 +9,6 @@ import cn.edu.bistu.model.vo.MessageVo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
-
-import static com.sun.org.apache.xml.internal.serializer.utils.Utils.messages;
-
 
 /**
  * @author: Mr.Yu
