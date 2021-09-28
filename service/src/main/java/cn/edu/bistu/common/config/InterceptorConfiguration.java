@@ -27,14 +27,14 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
-        //enable(registry, false);
-        HandlerInterceptor logInterceptor = getMyInterceptors(LogInterceptor.class);
-        registry.addInterceptor(logInterceptor)
-        ;
 
+
+        //跨域拦截优先
         HandlerInterceptor corsInterceptor = getMyInterceptors(CORSInterceptor.class);
         registry.addInterceptor(corsInterceptor)
         ;
+
+        enable(registry, true);
 
 
     }
@@ -55,6 +55,11 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/auth/userInfoCompletion/**")
                     .excludePathPatterns("/wx")
                     .excludePathPatterns("/test")
+                    //暂时登录测试接口不拦截
+                    .excludePathPatterns("/vue-admin-template/**")
+                    .excludePathPatterns("/utils/**")
+                    .excludePathPatterns("/users/**")
+                    .excludePathPatterns("/admin/**")
             ;
 
             //用户授权
@@ -65,7 +70,13 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/wx")
                     .excludePathPatterns("/test")
                     .excludePathPatterns("/message/**")
-            ;
+                    //暂时登录测试接口不拦截
+
+                    .excludePathPatterns("/vue-admin-template/**")
+                    .excludePathPatterns("/utils/**")
+                    .excludePathPatterns("/users/**")
+                    .excludePathPatterns("/admin/**")
+             ;
         }
     }
 
