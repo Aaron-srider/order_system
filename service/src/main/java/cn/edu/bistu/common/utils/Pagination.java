@@ -96,9 +96,13 @@ public class Pagination {
         PageVo pageVo = new PageVo();
         if(current == null) {
             pageVo.setCurrent(1);
+        } else {
+            pageVo.setCurrent(current);
         }
         if(size == null) {
             pageVo.setSize(10);
+        } else {
+            pageVo.setSize(size);
         }
 
         return pageVo;

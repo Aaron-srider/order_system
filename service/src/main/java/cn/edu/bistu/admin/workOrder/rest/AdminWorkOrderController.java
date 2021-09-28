@@ -55,15 +55,14 @@ public class AdminWorkOrderController extends BaseController {
     @Autowired
     FlowNodeService flowNodeService;
 
-    @GetMapping("/admin/workOrders/{current}/{size}")
-    public Result workOrders(@PathVariable("current") Integer current,
-                             @PathVariable("size") Integer size,
+    @GetMapping("/admin/workOrders")
+    public Result workOrders(Integer current,
+                             Integer size,
                              AdminWorkOrderQueryVo adminWorkOrderQueryVo
                              ) throws NoSuchFieldException, IllegalAccessException {
 
         PageVo pageVo = Pagination.setDefault(current, size);
-        Page<WorkOrder> page = new Page<>();
-        BeanUtils.copyProperties(pageVo, page);
+        Page<WorkOrder> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
         ServiceResult serviceResult = workOrderService.getAllWorkOrders(page, adminWorkOrderQueryVo);
         return Result.ok(serviceResult.getServiceResult());
     }

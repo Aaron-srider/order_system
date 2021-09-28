@@ -32,6 +32,8 @@ import java.util.List;
 @Slf4j
 @Repository
 public class WorkOrderDao {
+    @Autowired
+    WorkOrderStatusMapper workOrderStatusMapper;
 
     @Autowired
     UserDao userDao;
