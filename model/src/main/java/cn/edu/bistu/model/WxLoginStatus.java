@@ -6,4 +6,5 @@ import lombok.Data;
 public class WxLoginStatus {
     private String sessionKey;
     private String openId;
+    private String unionId;
 }
