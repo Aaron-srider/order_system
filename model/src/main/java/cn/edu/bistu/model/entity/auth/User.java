@@ -21,6 +21,9 @@ public class User extends BaseEntity {
     @TableField("open_id")
     private String openId;
 
+    @TableField("union_id")
+    private String unionId;
+
     @TableField("session_key")
     private String sessionKey;
 
