@@ -36,6 +36,7 @@ import java.net.URLEncoder;
 @Slf4j
 @RestController
 @Validated
+@CrossOrigin
 public class WorkOrderController extends BaseController {
 
     @Autowired
