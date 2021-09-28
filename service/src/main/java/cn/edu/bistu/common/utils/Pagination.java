@@ -1,5 +1,6 @@
 package cn.edu.bistu.common.utils;
 
+import cn.edu.bistu.model.vo.PageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.ArrayList;
@@ -89,5 +90,17 @@ public class Pagination {
 
         List<String> strings = objects.subList(8, 0);
 
+    }
+
+    public static PageVo setDefault(Integer current, Integer size) {
+        PageVo pageVo = new PageVo();
+        if(current == null) {
+            pageVo.setCurrent(1);
+        }
+        if(size == null) {
+            pageVo.setSize(10);
+        }
+
+        return pageVo;
     }
 }
