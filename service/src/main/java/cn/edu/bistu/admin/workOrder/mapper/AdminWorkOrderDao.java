@@ -1,5 +1,7 @@
 package cn.edu.bistu.admin.workOrder.mapper;
 
+import cn.edu.bistu.model.entity.WorkOrder;
+
 import java.util.List;
 
 public interface AdminWorkOrderDao {
@@ -21,5 +23,11 @@ public interface AdminWorkOrderDao {
      * @param workOrderId 根据该id删除对应的工单审批记录
      */
     public void deleteWorkOrderApprovalRecordsByWorkOrderId(Long workOrderId);
+
+    /**
+     * 根据id修改工单的标题和内容
+     * @param workOrder 有效载荷：id/title/content
+     */
+    public void updateWorkOrderById(WorkOrder workOrder);
 
 }

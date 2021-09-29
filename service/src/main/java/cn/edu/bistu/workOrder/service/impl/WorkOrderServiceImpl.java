@@ -177,7 +177,6 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
         }
 
-
         String startDate = adminWorkOrderQueryVo.getStartDate();
         String endDate = adminWorkOrderQueryVo.getEndDate();
         if (!BeanUtils.isEmpty(endDate)) {

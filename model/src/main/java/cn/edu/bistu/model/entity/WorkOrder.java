@@ -1,5 +1,6 @@
 package cn.edu.bistu.model.entity;
 
+import cn.edu.bistu.model.common.validation.AdminUpdate;
 import cn.edu.bistu.model.common.validation.Insert;
 import cn.edu.bistu.model.common.validation.Query;
 import com.baomidou.mybatisplus.annotation.*;
@@ -22,13 +23,13 @@ public class WorkOrder extends BaseEntity{
     @Null(groups = {Insert.class})
     private Integer isExamined;
 
-
     private Long initiatorId;
 
     @NotNull(groups = {Insert.class})
     private Long flowId;
 
     @NotNull(groups = {Insert.class})
+    @NotNull(groups = {AdminUpdate.class})
     private String title;
 
     @Null(groups = {Insert.class})
@@ -44,6 +45,7 @@ public class WorkOrder extends BaseEntity{
 
 
     @NotNull(groups = {Insert.class})
+    @NotNull(groups = {AdminUpdate.class})
     private String content;
 
     @Null(groups = {Insert.class})

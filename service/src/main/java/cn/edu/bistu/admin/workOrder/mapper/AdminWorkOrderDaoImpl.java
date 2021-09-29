@@ -4,7 +4,6 @@ import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,5 +25,10 @@ public class AdminWorkOrderDaoImpl extends WorkOrderDao implements AdminWorkOrde
     @Override
     public void deleteWorkOrderApprovalRecordsByWorkOrderId(Long workOrderId) {
         approvalRecordMapper.deleteWorkOrderApprovalRecordsByWorkOrderId(workOrderId);
+    }
+
+    @Override
+    public void updateWorkOrderById(WorkOrder workOrder) {
+        getWorkOrderMapper().updateById(workOrder);
     }
 }

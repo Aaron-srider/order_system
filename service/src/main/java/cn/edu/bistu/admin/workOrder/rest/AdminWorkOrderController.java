@@ -7,6 +7,7 @@ import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.validation.AdminUpdate;
 import cn.edu.bistu.model.common.validation.Insert;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.AdminWorkOrderQueryVo;
@@ -80,7 +81,14 @@ public class AdminWorkOrderController extends BaseController {
         return Result.ok();
     }
 
-
+    @PutMapping("/admin/workOrder/{id}")
+    public Result updateWorkOrder(
+            @PathVariable @NotNull Long id,
+            @RequestBody @Validated({AdminUpdate.class}) WorkOrder workOrder)  {
+        workOrder.setId(id);
+        adminWorkOrderService.updateWorkOrderByWorkOrderId(workOrder);
+        return Result.ok();
+    }
 
 
 }

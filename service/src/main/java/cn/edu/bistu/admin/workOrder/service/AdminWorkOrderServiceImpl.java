@@ -1,6 +1,7 @@
 package cn.edu.bistu.admin.workOrder.service;
 
 import cn.edu.bistu.admin.workOrder.mapper.AdminWorkOrderDao;
+import cn.edu.bistu.model.entity.WorkOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,4 +25,11 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
         }
 
     }
+
+    @Override
+    public void updateWorkOrderByWorkOrderId(WorkOrder workOrder) {
+        adminWorkOrderDao.updateWorkOrderById(workOrder);
+    }
+
+
 }
