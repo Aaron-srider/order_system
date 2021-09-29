@@ -14,6 +14,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,6 +29,7 @@ import java.util.Set;
  */
 @ControllerAdvice
 @Slf4j
+//@CrossOrigin
 public class GlobalExceptionHandler {
 
     /**
@@ -51,9 +53,9 @@ public class GlobalExceptionHandler {
      *
      * @return
      */
-    @ExceptionHandler({RuntimeException.class})
+    @ExceptionHandler({Exception.class})
     @ResponseBody
-    public Result runtimeException(RuntimeException ex) {
+    public Result exception(Exception ex) {
         log.error("exception:", ex);
         return Result.build(ex.getClass().getTypeName(), ResultCodeEnum.BACKEND_ERROR);
     }
