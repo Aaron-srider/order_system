@@ -31,5 +31,10 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
         adminWorkOrderDao.updateWorkOrderById(workOrder);
     }
 
+    @Override
+    public void invalidationWorkOrder(Long id) {
+        adminWorkOrderDao.changeWorkOrderStatusToInvalidation(id);
+    }
+
 
 }

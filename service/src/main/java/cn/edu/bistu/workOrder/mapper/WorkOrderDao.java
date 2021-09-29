@@ -264,4 +264,16 @@ public class WorkOrderDao {
         return pageDaoResult;
     }
 
+    /**
+     * 生成对应工单的历史记录，若工单没有结束，不予生成，抛出异常
+     * @param workOrder 工单
+     */
+    public void generateWorkOrderHistory(WorkOrder workOrder) {
+
+        //if(workOrder.getIsFinished()) {
+        //
+        //}
+
+    }
+
 }

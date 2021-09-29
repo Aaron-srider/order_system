@@ -30,4 +30,11 @@ public interface AdminWorkOrderDao {
      */
     public void updateWorkOrderById(WorkOrder workOrder);
 
+    /**
+     * 将指定工单作废
+     * @param id 工单id
+     */
+    public void changeWorkOrderStatusToInvalidation(Long id);
+
+
 }

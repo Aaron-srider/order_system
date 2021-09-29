@@ -19,4 +19,11 @@ public interface AdminWorkOrderService {
      */
     public void updateWorkOrderByWorkOrderId(WorkOrder workOrder);
 
+
+    /**
+     * 将指定工单作废
+     * @param id 工单id
+     */
+    public void invalidationWorkOrder(Long id);
+
 }

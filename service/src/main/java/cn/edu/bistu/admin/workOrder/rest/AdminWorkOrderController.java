@@ -90,5 +90,12 @@ public class AdminWorkOrderController extends BaseController {
         return Result.ok();
     }
 
+    @PutMapping("/admin/workOrder/invalidation/{id}")
+    public Result invalidWorkOrder(
+            @PathVariable @NotNull Long id)  {
+        adminWorkOrderService.invalidationWorkOrder(id);
+        return Result.ok();
+    }
+
 
 }

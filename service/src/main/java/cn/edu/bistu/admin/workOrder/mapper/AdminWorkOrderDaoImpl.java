@@ -31,4 +31,12 @@ public class AdminWorkOrderDaoImpl extends WorkOrderDao implements AdminWorkOrde
     public void updateWorkOrderById(WorkOrder workOrder) {
         getWorkOrderMapper().updateById(workOrder);
     }
+
+    @Override
+    public void changeWorkOrderStatusToInvalidation(Long id) {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setId(id);
+        workOrder.setStatus(4);
+        getWorkOrderMapper().updateById(workOrder);
+    }
 }
