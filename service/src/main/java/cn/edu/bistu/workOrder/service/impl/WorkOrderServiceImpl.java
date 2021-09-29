@@ -27,6 +27,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -139,12 +140,13 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         //构造查询条件
         QueryWrapper<WorkOrder> workOrderWrapper = new QueryWrapper<>();
 
-        if (adminWorkOrderQueryVo.getId() != null) {
+        Long workOrderId = adminWorkOrderQueryVo.getId();
+        if (workOrderId!=null) {
             workOrderWrapper.eq("id", adminWorkOrderQueryVo.getId());
         }
 
-        String studentJobId;
-        if ((studentJobId = adminWorkOrderQueryVo.getStudentJobId()) != null) {
+        String studentJobId= adminWorkOrderQueryVo.getStudentJobId();
+        if (!BeanUtils.isEmpty(studentJobId)) {
             DaoResult<List<JSONObject>> daoUserList = userDao.getUserListByWrapper(null,
                     new QueryWrapper<User>().like("job_id", studentJobId)
                             .or()
@@ -175,12 +177,13 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
         }
 
+
         String startDate = adminWorkOrderQueryVo.getStartDate();
         String endDate = adminWorkOrderQueryVo.getEndDate();
-        if (endDate != null) {
+        if (!BeanUtils.isEmpty(endDate)) {
             workOrderWrapper.lt("create_time", endDate);
         }
-        if (startDate != null) {
+        if (!BeanUtils.isEmpty(startDate)) {
             workOrderWrapper.gt("create_time", startDate);
         }
 

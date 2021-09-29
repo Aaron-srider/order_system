@@ -61,7 +61,7 @@ public class Pagination {
         //设置分页对象
         Page<T> resultPage = new Page<>();
         resultPage.setTotal(total);
-        resultPage.setSize(size);
+        resultPage.setSize(page.getSize());
         resultPage.setCurrent(current);
         resultPage.setRecords(resultList);
         return resultPage;

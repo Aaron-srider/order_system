@@ -29,7 +29,13 @@ public class CORSInterceptor implements HandlerInterceptor {
         // 如果是OPTIONS则结束请求
         if (HttpMethod.OPTIONS.toString().equals(request.getMethod())) {
             log.debug(request.getMethod() + " " + request.getServletPath() + " was blocked because it is an options request");
-            throw new HttpOptionsMethodException();
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+            response.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Max-Age", "86400");
+            response.setHeader("Access-Control-Allow-Headers", "*");
+            return false;
+            //throw new HttpOptionsMethodException("");
         }
 
         return true;
