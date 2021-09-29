@@ -1,5 +1,6 @@
 package cn.edu.bistu.admin.workOrder.rest;
 
+import cn.edu.bistu.admin.workOrder.service.AdminWorkOrderService;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
 import cn.edu.bistu.common.rest.BaseController;
@@ -22,6 +23,7 @@ import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +37,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -55,6 +58,9 @@ public class AdminWorkOrderController extends BaseController {
     @Autowired
     FlowNodeService flowNodeService;
 
+    @Autowired
+    AdminWorkOrderService adminWorkOrderService;
+
     @GetMapping("/admin/workOrders")
     public Result workOrders(Integer current,
                              Integer size,
@@ -66,6 +72,15 @@ public class AdminWorkOrderController extends BaseController {
         ServiceResult serviceResult = workOrderService.getAllWorkOrders(page, adminWorkOrderQueryVo);
         return Result.ok(serviceResult.getServiceResult());
     }
+
+    @DeleteMapping("/admin/workOrders")
+    public Result deleteWorkOrders(@RequestBody Map<String, List<Long>> listMap)  {
+        List<Long> workOrderIdList=listMap.get("idList");
+        adminWorkOrderService.deleteWorkOrdersByWorkOrderIdList(workOrderIdList);
+        return Result.ok();
+    }
+
+
 
 
 }

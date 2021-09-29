@@ -13,10 +13,9 @@ import org.springframework.stereotype.Repository;
 public interface WorkOrderMapper extends BaseMapper<WorkOrder>{
 
     /**
-     * 返回workOrderVo的page
-     * @return
+     * 工单真删除
+     * @param workOrderId 待删除的工单的工单id
      */
-    Page<WorkOrderVo> workOrderPages(Page<WorkOrder> page, @Param("workOrderVo") WorkOrderVo workOrderVo);
-
+    public void deleteWorkOrderByWorkOrderId(Long workOrderId);
 
 }
