@@ -79,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * 为登录接口提供服务。
+     * 为登录接口提供服务
      * 检查用户是否注册，若未注册，为用户自动注册；若已注册，认证用户身份
      *
      * @param code 微信临时登录凭证
@@ -92,7 +92,6 @@ public class AuthServiceImpl implements AuthService {
         String openId = "";
         String sessionKey = "";
         String unionId = "";
-
 
         try {
             //获取微信登录态
@@ -121,6 +120,7 @@ public class AuthServiceImpl implements AuthService {
         else {
             resultUser.setOpenId(null);
             resultUser.setSessionKey(null);
+            resultUser.setUnionId(null);
             Integer infoComplete = resultUser.getInfoComplete();
             //如果用户已经完善信息，返回登录token
             if (infoComplete.equals(1)) {
@@ -133,7 +133,10 @@ public class AuthServiceImpl implements AuthService {
             }
             //如果用户没有完善信息，就不返回登录token
             else {
-                throw new UserInfoNotCompleteException("user id:" + resultUser.getId(), ResultCodeEnum.USER_INFO_NOT_COMPLETE);
+                resultUser.setUnionId(null);
+                resultUser.setOpenId(null);
+                resultUser.setSessionKey(null);
+                throw new UserInfoNotCompleteException(resultUser, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
             }
         }
 
@@ -209,7 +212,12 @@ public class AuthServiceImpl implements AuthService {
             throw new UserNotRegisteredException("user id: " + userVo.getId(), ResultCodeEnum.USER_INFO_COMPLETED);
         }
 
+
+        userVo.setInfoComplete(1);
+
         ServiceResult<JSONObject> serviceResult = userService.updateUser(userVo);
+
+
 
         //向UserRole表中插入数据
         improveUserRoleInfo(roleId, userVo.getId());
@@ -274,7 +282,10 @@ public class AuthServiceImpl implements AuthService {
         user.setUnionId(unionId);
         user.setInfoComplete(0);
         userDao.getUserMapper().insert(user);
-        throw new UserInfoNotCompleteException("user id:" + user.getId(), ResultCodeEnum.USER_INFO_NOT_COMPLETE);
+        user.setUnionId(null);
+        user.setOpenId(null);
+        user.setSessionKey(null);
+        throw new UserInfoNotCompleteException(user, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
 
     }
 

@@ -1,7 +1,6 @@
 package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.auth.mapper.UserMapper;
-import cn.edu.bistu.common.config.ContextPathConfiguration;
 import cn.edu.bistu.flow.mapper.FlowMapper;
 import cn.edu.bistu.flow.mapper.FlowNodeMapper;
 import cn.edu.bistu.model.common.result.DaoResult;
@@ -27,8 +26,8 @@ public class WorkOrderHistoryServiceImpl extends ServiceImpl<WorkOrderHistoryMap
     @Value("${attachmentDownloadApi}")
     String attachmentDownloadApi;
 
-    @Autowired
-    ContextPathConfiguration contextPathConfiguration;
+    //@Autowired
+    //ContextPathConfiguration contextPathConfiguration;
 
     @Autowired
     UserMapper userMapper;

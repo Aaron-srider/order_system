@@ -2,7 +2,7 @@ package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.common.config.ContextPathConfiguration;
+//import cn.edu.bistu.common.config.ContextPathConfiguration;
 import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
@@ -52,8 +52,8 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     FlowNodeService flowNodeService;
 
-    @Autowired
-    ContextPathConfiguration contextPathConfiguration;
+    //@Autowired
+    //ContextPathConfiguration contextPathConfiguration;
 
     @Autowired
     UserDao userDao;

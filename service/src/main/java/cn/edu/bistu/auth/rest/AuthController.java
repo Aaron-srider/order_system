@@ -3,6 +3,7 @@ package cn.edu.bistu.auth.rest;
 
 import cn.edu.bistu.auth.service.AuthService;
 import cn.edu.bistu.common.exception.InterfaceAccessException;
+import cn.edu.bistu.common.exception.UserInfoNotCompleteException;
 import cn.edu.bistu.common.validation.UserRoleValue;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.CheckUserRole;
@@ -33,6 +34,7 @@ public class AuthController {
         userVo.setToken("0293i89jg89yghe893hefuhap");
         return Result.ok(userVo);
     }
+
     @GetMapping("/vue-admin-template/user/info")
     public Result vue_info() {
         JSONObject jsonObject = new JSONObject();
@@ -43,7 +45,14 @@ public class AuthController {
 
     @GetMapping("/auth/login")
     public Result login(@NotNull String code) {
-        ServiceResult<JSONObject> result = authService.authentication(code);
+        ServiceResult<JSONObject> result = null;
+        try {
+            result = authService.authentication(code);
+        } catch (UserInfoNotCompleteException ex) {
+            Object id = ex.getExceptionInfo();
+            ResultCodeEnum resultCode = ex.getCode();
+            return Result.build(id, resultCode);
+        }
         JSONObject serviceResult = result.getServiceResult();
         return Result.ok(serviceResult);
     }
@@ -51,7 +60,7 @@ public class AuthController {
     @PutMapping("/auth/userInfoCompletion")
     public Result completeUserInfo(
             @RequestBody @Validated UserVo userVo) {
-        ServiceResult<JSONObject> serviceResult=authService.userInfoCompletion(userVo);
+        ServiceResult<JSONObject> serviceResult = authService.userInfoCompletion(userVo);
         return Result.ok(serviceResult.getServiceResult());
     }
 
