@@ -2,8 +2,7 @@ package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.common.BeanUtils;
-//import cn.edu.bistu.common.config.ContextPathConfiguration;
-import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
+import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.flow.service.FlowNodeService;
@@ -52,9 +51,6 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     FlowNodeService flowNodeService;
 
-    //@Autowired
-    //ContextPathConfiguration contextPathConfiguration;
-
     @Autowired
     UserDao userDao;
 
@@ -75,19 +71,19 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
         //“撤回接口”访问者与工单发起者不是同一个用户，无权操作
         if (!workOrder.getInitiatorId().equals(initiator)) {
-            throw new WorkOrderBeenFinishedException("id " + initiator + " has no right",
+            throw new ResultCodeException("user: " + initiator + " has no right",
                     ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
         //工单已经结束，撤回操作非法
         if (workOrder.getIsFinished().equals(1)) {
-            throw new WorkOrderBeenFinishedException("workOrderId:" + workOrderId,
+            throw new ResultCodeException("workOrderId:" + workOrderId,
                     ResultCodeEnum.WORKORDER_BEEN_FINISHED);
         }
 
         //工单已经被审批过，撤回操作非法
         if (workOrder.getIsExamined().equals(1)) {
-            throw new WorkOrderBeenFinishedException("workOrderId:" + workOrderId,
+            throw new ResultCodeException("workOrderId:" + workOrderId,
                     ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
         }
 

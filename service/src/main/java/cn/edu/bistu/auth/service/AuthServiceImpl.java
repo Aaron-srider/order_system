@@ -10,6 +10,7 @@ import cn.edu.bistu.common.exception.*;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.WxLoginStatus;
+import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.auth.Permission;
@@ -98,9 +99,9 @@ public class AuthServiceImpl implements AuthService {
             unionId = wxLoginStatus.getUnionId();
         } catch (Jscode2sessionException ex) {
             if (ex.getErrcode().equals(40029)) {
-                throw new CodeInvalidException("code:" + code, ResultCodeEnum.OAUTH_CODE_INVALID);
+                throw new ResultCodeException("code:" + code, ResultCodeEnum.OAUTH_CODE_INVALID);
             } else if (ex.getErrcode().equals(40163)) {
-                throw new CodeBeenUsedException("code:" + code, ResultCodeEnum.OAUTH_CODE_BEEN_USED);
+                throw new ResultCodeException("code:" + code, ResultCodeEnum.OAUTH_CODE_BEEN_USED);
             }
         }
 
@@ -119,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
             //判断用户是否锁定
             Integer isLock = resultUser.getIsLock();
             if (isLock.equals(1)){
-                throw new UserLockException(resultUser, ResultCodeEnum.USER_LOCK);
+                throw new ResultCodeException(resultUser, ResultCodeEnum.USER_LOCK);
             }
 
             //判断用户信息是否已经完善
@@ -137,7 +138,7 @@ public class AuthServiceImpl implements AuthService {
                 resultUser.setUnionId(null);
                 resultUser.setOpenId(null);
                 resultUser.setSessionKey(null);
-                throw new UserInfoNotCompleteException(resultUser, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
+                throw new ResultCodeException(resultUser, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
             }
         }
 
@@ -204,13 +205,13 @@ public class AuthServiceImpl implements AuthService {
 
         //用户没注册
         if (user == null) {
-            throw new UserNotRegisteredException("user id: " + userVo.getId(), ResultCodeEnum.USER_NOT_REGISTERED);
+            throw new ResultCodeException(user, ResultCodeEnum.USER_NOT_REGISTERED);
         }
 
         Integer infoComplete = user.getInfoComplete();
         //用户已经完善过信息
         if (infoComplete.equals(1)) {
-            throw new UserNotRegisteredException("user id: " + userVo.getId(), ResultCodeEnum.USER_INFO_COMPLETED);
+            throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_COMPLETED);
         }
 
 
@@ -286,7 +287,7 @@ public class AuthServiceImpl implements AuthService {
         user.setUnionId(null);
         user.setOpenId(null);
         user.setSessionKey(null);
-        throw new UserInfoNotCompleteException(user, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
+        throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
 
     }
 

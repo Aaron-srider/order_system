@@ -44,18 +44,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理CORSInterceptor拦截器的返回请求
-     *
-     * @return
-     */
-    @ExceptionHandler({HttpOptionsMethodException.class})
-    @ResponseBody
-    public Result optionsMethod(HttpServletResponse req,HttpOptionsMethodException ex) {
-        cors(req);
-        return Result.ok().message("options request pass").code(204);
-    }
-
-    /**
      * 统一处理返回值
      *
      * @return

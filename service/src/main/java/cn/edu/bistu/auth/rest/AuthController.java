@@ -2,15 +2,9 @@ package cn.edu.bistu.auth.rest;
 
 
 import cn.edu.bistu.auth.service.AuthService;
-import cn.edu.bistu.common.exception.InterfaceAccessException;
-import cn.edu.bistu.common.exception.UserInfoNotCompleteException;
-import cn.edu.bistu.common.validation.UserRoleValue;
-import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.CheckUserRole;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +40,7 @@ public class AuthController {
     @GetMapping("/auth/login")
     public Result login(@NotNull String code) {
         ServiceResult<JSONObject> result = null;
-        try {
-            result = authService.authentication(code);
-        } catch (UserInfoNotCompleteException ex) {
-            Object id = ex.getExceptionInfo();
-            ResultCodeEnum resultCode = ex.getCode();
-            return Result.build(id, resultCode);
-        }
+        result = authService.authentication(code);
         JSONObject serviceResult = result.getServiceResult();
         return Result.ok(serviceResult);
     }
@@ -65,13 +53,5 @@ public class AuthController {
     }
 
 
-    private void checkUserRole(Integer role_id, String roleString) {
-        Long roleId = role_id.longValue();
 
-        String roleCase = CheckUserRole.checkUserRole(roleId);
-
-        if (!roleCase.equals(roleString)) {
-            throw new InterfaceAccessException(null, ResultCodeEnum.INTERFACE_ACCESS_ERRORS);
-        }
-    }
 }

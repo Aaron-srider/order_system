@@ -2,11 +2,11 @@ package cn.edu.bistu.approval.service;
 
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.common.exception.HaveNoRightException;
-import cn.edu.bistu.common.exception.WorkOrderBeenFinishedException;
+import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.common.result.DaoResult;
+import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.ApprovalRecord;
@@ -112,7 +112,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //若工单已结束，审批操作非法
         if (workOrder.getIsFinished().equals(1)) {
-            throw new WorkOrderBeenFinishedException("workOrderId: " + workOrderId,
+            throw new ResultCodeException(workOrder,
                     ResultCodeEnum.WORKORDER_BEEN_FINISHED);
         }
 
@@ -212,8 +212,8 @@ public class ApprovalServiceImpl implements ApprovalService {
         WorkOrder workOrder =  workOrderDao.getWorkOrderMapper().selectById(approvalRecord.getWorkOrderId());
         if (workOrder.getIsFinished().equals(1)) {
             throw new
-                    WorkOrderBeenFinishedException(
-                    "workOrderId: " + workOrder.getId(),
+                    ResultCodeException(
+                    workOrder,
                     ResultCodeEnum.WORKORDER_BEEN_FINISHED
             );
         }
@@ -260,7 +260,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         JSONObject detailInfo = daoWorkOrder.getDetailInfo();
         FlowNode currentFlowNode = detailInfo.getObject("currentFlowNode", FlowNode.class);
         if(!currentFlowNode.getApproverId().equals(userId)) {
-            throw new HaveNoRightException("user id:" + userId,
+            throw new ResultCodeException("user id:" + userId,
                     ResultCodeEnum.HAVE_NO_RIGHT);
         }
     }

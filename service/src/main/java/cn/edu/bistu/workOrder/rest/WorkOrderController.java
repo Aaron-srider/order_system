@@ -1,7 +1,7 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
+import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -9,7 +9,6 @@ import cn.edu.bistu.model.common.validation.Insert;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
-import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.config.ValidationWrapper;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
@@ -29,7 +28,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.net.URLEncoder;
 
@@ -152,7 +150,7 @@ public class WorkOrderController extends BaseController {
         //查询附件
         WorkOrder workOrder = workOrderService.getById(workOrderId);
         if (workOrder == null) {
-            throw new WorkOrderNotExistsException("workOrderId: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
+            throw new ResultCodeException("workOrderId: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
         byte[] attachmentBytes = workOrder.getAttachment();
 

@@ -1,15 +1,7 @@
 package cn.edu.bistu.common.interceptor;
 
-import cn.edu.bistu.auth.JwtHelper;
-import cn.edu.bistu.common.MapService;
-import cn.edu.bistu.common.ResponseHelper;
-import cn.edu.bistu.common.exception.HttpOptionsMethodException;
-import cn.edu.bistu.constants.ResultCodeEnum;
-import cn.edu.bistu.model.common.result.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -35,7 +27,6 @@ public class CORSInterceptor implements HandlerInterceptor {
             response.setHeader("Access-Control-Max-Age", "86400");
             response.setHeader("Access-Control-Allow-Headers", "*");
             return false;
-            //throw new HttpOptionsMethodException("");
         }
 
         return true;
