@@ -249,7 +249,6 @@ public class WorkOrderController extends BaseController {
     /**
      * 撤回工单
      * <p>
-     * //* @param json 撤回工单的id
      *
      * @param req
      * @return 如果工单未被审批，或撤回者不是工单发起者，都返回错误代码；否则撤回成功

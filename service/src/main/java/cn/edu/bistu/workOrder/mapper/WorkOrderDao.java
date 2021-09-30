@@ -2,7 +2,9 @@ package cn.edu.bistu.workOrder.mapper;
 
 import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.common.BeanUtils;
+import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.Pagination;
+import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.common.JsonUtils;
 import cn.edu.bistu.model.common.result.DaoResult;
@@ -267,14 +269,16 @@ public class WorkOrderDao {
     }
 
     /**
-     * 生成对应工单的历史记录，若工单没有结束，不予生成，抛出异常
+     * 生成对应工单的历史记录
      * @param workOrder 工单
      */
     public void generateWorkOrderHistory(WorkOrder workOrder) {
-
-        //if(workOrder.getIsFinished()) {
-        //
-        //}
+        //生成历史工单
+        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
+        BeanUtils.copyProperties(workOrder, workOrderHistory);
+        workOrderHistory.setWorkOrderId(workOrder.getId());
+        log.debug("workOrderHistory to be saved:" + workOrderHistory);
+        workOrderHistoryMapper.insert(workOrderHistory);
     }
 
 

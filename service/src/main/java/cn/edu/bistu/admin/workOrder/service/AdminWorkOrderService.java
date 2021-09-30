@@ -21,9 +21,9 @@ public interface AdminWorkOrderService {
 
 
     /**
-     * 将指定工单作废
+     * 将指定工单作废，并生成历史工单，注意，只有在审工单才能作废，作废工单进入结束状态
      * @param id 工单id
      */
-    public void invalidationWorkOrder(Long id);
+    public void invalidationWorkOrder(Long id) throws NoSuchFieldException, IllegalAccessException;
 
 }

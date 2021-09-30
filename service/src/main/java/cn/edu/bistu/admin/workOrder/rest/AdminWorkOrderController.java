@@ -74,7 +74,7 @@ public class AdminWorkOrderController extends BaseController {
 
     @PutMapping("/admin/workOrder/invalidation/{id}")
     public Result invalidWorkOrder(
-            @PathVariable @NotNull Long id)  {
+            @PathVariable @NotNull Long id) throws NoSuchFieldException, IllegalAccessException {
         adminWorkOrderService.invalidationWorkOrder(id);
         return Result.ok();
     }

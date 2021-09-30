@@ -142,11 +142,8 @@ public class ApprovalServiceImpl implements ApprovalService {
         log.debug("workOrder to be updated:" + workOrder);
 
         //生成历史工单
-        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
-        BeanUtils.copyProperties(workOrder, workOrderHistory);
-        workOrderHistory.setWorkOrderId(workOrder.getId());
-        log.debug("workOrderHistory to be saved:" + workOrderHistory);
-        workOrderHistoryService.save(workOrderHistory);
+        workOrderDao.generateWorkOrderHistory(workOrder);
+
 
         //发送微信通知
         //Long initiatorId = workOrder.getInitiatorId();
