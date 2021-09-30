@@ -21,7 +21,10 @@ public class ResponseHelper {
 
     public static void returnJson(HttpServletResponse resp, Object obj) throws IOException {
         resp.setContentType("application/json");
+
         String s = JSON.toJSONString(obj);
+        //JSONObject jsonObject = JSONObject.parseObject(s);
+
         returnJson(resp, s);
     }
 }

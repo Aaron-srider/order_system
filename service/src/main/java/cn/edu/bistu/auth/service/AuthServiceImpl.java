@@ -6,10 +6,7 @@ import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.auth.exception.Jscode2sessionException;
 import cn.edu.bistu.auth.mapper.AuthMapper;
 import cn.edu.bistu.auth.mapper.UserMapper;
-import cn.edu.bistu.common.exception.CodeBeenUsedException;
-import cn.edu.bistu.common.exception.CodeInvalidException;
-import cn.edu.bistu.common.exception.UserInfoNotCompleteException;
-import cn.edu.bistu.common.exception.UserNotRegisteredException;
+import cn.edu.bistu.common.exception.*;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.WxLoginStatus;
@@ -118,11 +115,15 @@ public class AuthServiceImpl implements AuthService {
         }
         //用户已经注册，判断是否完善了信息，是则返回token
         else {
-            resultUser.setOpenId(null);
-            resultUser.setSessionKey(null);
-            resultUser.setUnionId(null);
+
+            //判断用户是否锁定
+            Integer isLock = resultUser.getIsLock();
+            if (isLock.equals(1)){
+                throw new UserLockException(resultUser, ResultCodeEnum.USER_LOCK);
+            }
+
+            //判断用户信息是否已经完善
             Integer infoComplete = resultUser.getInfoComplete();
-            //如果用户已经完善信息，返回登录token
             if (infoComplete.equals(1)) {
                 Map<String, Object> claim = new HashMap<>();
                 Long id = resultUser.getId();

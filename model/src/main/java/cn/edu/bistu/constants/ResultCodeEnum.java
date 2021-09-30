@@ -30,6 +30,7 @@ public enum ResultCodeEnum {
     USER_NOT_REGISTERED(116, "用户没有注册"),
     INTERFACE_ACCESS_ERRORS(117, "接口访问错误"),
     FRONT_DATA_ERROR(118, "前端参数错误"),
+    USER_LOCK(119, "用户被锁定，无法登录"),
 
 
     SUCCESS(200,"成功"),

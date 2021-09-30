@@ -1,12 +1,18 @@
 package cn.edu.bistu.common.interceptor;
 
+import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.ResponseHelper;
 import cn.edu.bistu.constants.ResultCodeEnum;
+import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.Result;
+import cn.edu.bistu.model.entity.auth.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,10 +20,15 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Component
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    UserDao userDao;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -68,12 +79,18 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        //转发或放行
+
         Long id = JwtHelper.getClaim(token, "id", Integer.class).longValue();
 
-        Long studentId = JwtHelper.getClaim(token, "studentId", Long.class);
 
-        Long jobId = JwtHelper.getClaim(token, "jobId", Long.class);
+        DaoResult<User> oneUserById = userDao.getOneUserById(id);
+        Integer isLock = oneUserById.getResult().getIsLock();
+        if (isLock.equals(1)) {
+            ResponseHelper.returnJson(response, Result.build(oneUserById.getValue(), ResultCodeEnum.USER_LOCK));
+
+            log.error(ResultCodeEnum.USER_LOCK.toString());
+            return false;
+        }
 
         log.info("用户id:" + id);
 
@@ -90,6 +107,18 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+
+    }
+
+    public static void main(String[] args) {
+        User user = new User();
+
+        //user.setCreateTime(new Date());
+        SimpleDateFormat dateFormat = new SimpleDateFormat();
+        dateFormat.applyPattern("yyyy-MM-dd HH:mm:ss");
+        String format = dateFormat.format(user.getCreateTime());
+        System.out.println(format);
+        System.out.println(user.getCreateTime());
 
     }
 }

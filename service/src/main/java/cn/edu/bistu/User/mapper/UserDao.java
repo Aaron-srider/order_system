@@ -66,8 +66,6 @@ public class UserDao {
             detailInfo = improveUserInfo(user);
         }
 
-
-
         DaoResultImpl<User> result = new DaoResultImpl<>();
         result.setResult(user);
         result.setDetailInfo(detailInfo);
@@ -132,6 +130,7 @@ public class UserDao {
         //排除重要信息
         user.setOpenId(null);
         user.setSessionKey(null);
+        user.setUnionId(null);
 
         //完善附加信息
         JSONObject jsonObject = new JSONObject();
