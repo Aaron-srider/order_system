@@ -25,7 +25,7 @@ public class ApprovalRecord extends BaseEntity
     /**
      * 审批操作（无论是通过还是不通过）的时间戳
      */
-    private Date approvalDatetime;
+    private String approvalDatetime;
 
     /**
      * 审批留言

@@ -21,6 +21,17 @@ public class FlowDao {
     FlowMapper flowMapper;
 
     /**
+     * 返回指定审批节点的下一个节点id
+     * @param flowNodeId 指定审批节点的id
+     * @return 若指定节点没有下一个节点，返回null；否则返回下一个节点的id
+     */
+    public Long getNextFlowNode(Long flowNodeId) {
+        FlowNode currentFlowNode = flowNodeMapper.selectById(flowNodeId);
+        Long nextId = currentFlowNode.getNextId();
+        return nextId;
+    }
+
+    /**
      * 获取一个指定的流程信息，包括流程的所有流程节点信息。
      *
      * @param flowQueryWrapper

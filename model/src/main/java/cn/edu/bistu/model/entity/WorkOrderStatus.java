@@ -7,4 +7,5 @@ public class WorkOrderStatus {
     Long id;
     Integer value;
     String text;
+    String alias;
 }

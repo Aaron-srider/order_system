@@ -1,7 +1,9 @@
 package cn.edu.bistu.approval.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
+import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.rest.BaseController;
+import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -35,15 +37,8 @@ public class ApprovalController extends BaseController {
     @PutMapping("/approval/pass")
     public Result pass(@RequestBody @Validated(Update.class) ApprovalRecord approvalRecord,
                        HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
-        //获取审批者id
-        Long approverId = getVisitorId(req);
 
-        if (approvalRecord.getComment() == null) {
-            approvalRecord.setComment("");
-        }
-
-        //生成审批记录
-        approvalRecord.setApproverId(approverId);
+        setUpApprovalRecord(req, approvalRecord);
 
         approvalService.pass(approvalRecord);
 
@@ -53,15 +48,8 @@ public class ApprovalController extends BaseController {
     @PutMapping("/approval/reject")
     public Result reject(@RequestBody @Validated(Update.class) ApprovalRecord approvalRecord,
                          HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
-
-        //获取审批者id
-        Long approverId = getVisitorId(req);
-
-        if (approvalRecord.getComment() == null) {
-            approvalRecord.setComment("");
-        }
-
-        approvalRecord.setApproverId(approverId);
+        
+        setUpApprovalRecord(req, approvalRecord);
 
         approvalService.reject(approvalRecord);
 
@@ -73,13 +61,9 @@ public class ApprovalController extends BaseController {
                        WorkOrder workOrder,
                        HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        if (pageVo.getSize() == null) {
-            pageVo.setSize(10);
-        }
-        if (pageVo.getCurrent() == null) {
-            pageVo.setCurrent(1);
-        }
-        if (workOrder.getTitle() == null) {
+        pageVo = Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
+
+        if (BeanUtils.isEmpty(workOrder.getTitle())) {
             workOrder.setTitle("");
         }
 
@@ -88,6 +72,17 @@ public class ApprovalController extends BaseController {
         ServiceResult<Page<JSONObject>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), page, workOrder);
         Page<JSONObject> result = serviceResult.getServiceResult();
         return Result.ok(result);
+    }
+
+    public void setUpApprovalRecord(HttpServletRequest req, ApprovalRecord approvalRecord) {
+        //获取审批者id
+        Long approverId = getVisitorId(req);
+        approvalRecord.setApproverId(approverId);
+
+        //设置审批内容
+        if (BeanUtils.isEmpty(approvalRecord.getComment()) ) {
+            approvalRecord.setComment("");
+        }
     }
 
 
