@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -51,6 +52,7 @@ public class ApprovalServiceImpl implements ApprovalService {
      *
      * @param approvalRecord 审批记录
      */
+    @Transactional
     @Override
     public void pass(ApprovalRecord approvalRecord) throws NoSuchFieldException, IllegalAccessException {
         Long workOrderId = approvalRecord.getWorkOrderId();
@@ -165,6 +167,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         return serviceResult;
     }
 
+    @Transactional
     @Override
     public void reject(ApprovalRecord approvalRecord) throws NoSuchFieldException, IllegalAccessException {
         Long workOrderId = approvalRecord.getWorkOrderId();
