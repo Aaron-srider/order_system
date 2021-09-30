@@ -98,7 +98,6 @@ public class WorkOrderController extends BaseController {
     /**
      * 返回分页的历史工单列表，支持名称模糊搜索
      * 入参：size(10)，current(1)，title("")
-     *
      */
     @GetMapping("/workOrder/histories")
     public Result history(PageVo pageVo,
@@ -145,13 +144,21 @@ public class WorkOrderController extends BaseController {
     @GetMapping("/workOrder/attachment/{workOrderId}")
     public void downloadAttachment(
             @PathVariable("workOrderId") @NotNull Long workOrderId,
-                                   HttpServletResponse resp) throws IOException {
+            HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
 
         //查询附件
         WorkOrder workOrder = workOrderService.getById(workOrderId);
         if (workOrder == null) {
             throw new ResultCodeException("workOrderId: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
+
+        //代码级别的用户权限检测，只有工单发起者和管理员可以工单下载附件
+        Long visitorId = getVisitorId(req);
+        if (!visitorId.equals(workOrder.getInitiatorId()) && !isAdmin(req)) {
+            throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
         byte[] attachmentBytes = workOrder.getAttachment();
 
         //log.debug("" + attachmentBytes.length);
@@ -191,8 +198,6 @@ public class WorkOrderController extends BaseController {
             , HttpServletRequest req
     ) throws IOException {
 
-        //获取用户id
-        Long visitorId = getVisitorId(req);
 
         WorkOrder workOrder = workOrderService.getById(workOrderId);
 
@@ -202,10 +207,10 @@ public class WorkOrderController extends BaseController {
             return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
 
-        //接口访问者与工单发起者不同
-        if (!workOrder.getInitiatorId().equals(visitorId)) {
-            log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
-            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
+        //代码级别的用户权限检测，只有工单发起者和管理员可以工单下载附件
+        Long visitorId = getVisitorId(req);
+        if (!visitorId.equals(workOrder.getInitiatorId()) && !isAdmin(req)) {
+            throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
         //上传附件
@@ -231,11 +236,11 @@ public class WorkOrderController extends BaseController {
     @PostMapping("/workOrder")
     public Result submitWorkOrder(
             @Validated(Insert.class) @RequestBody WorkOrder workOrder,
-                                  HttpServletRequest req) {
+            HttpServletRequest req) {
 
         //获取工单提交用户id
         Long visitorId = getVisitorId(req);
-        workOrder.setInitiatorId(visitorId);                     //发起者id
+        workOrder.setInitiatorId(visitorId);
         workOrderService.submitWorkOrder(workOrder);
         return Result.ok();
     }
@@ -243,14 +248,15 @@ public class WorkOrderController extends BaseController {
 
     /**
      * 撤回工单
+     * <p>
+     * //* @param json 撤回工单的id
      *
-     //* @param json 撤回工单的id
      * @param req
      * @return 如果工单未被审批，或撤回者不是工单发起者，都返回错误代码；否则撤回成功
      */
     @PutMapping("/workOrder/revoke")
     public Result revoke(@NotNull Long workOrderId,
-                         HttpServletRequest req){
+                         HttpServletRequest req) {
         Long approverId = getVisitorId(req);
 
         workOrderService.revoke(workOrderId, approverId);
@@ -301,7 +307,6 @@ public class WorkOrderController extends BaseController {
      */
     @GetMapping("/workOrder/history/detail")
     public Result historyDetail(@NotNull Long workOrderHistoryId, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
-        Long visitorId = getVisitorId(req);
 
         WorkOrderHistory workOrderHistory = workOrderHistorService.getById(workOrderHistoryId);
 
@@ -310,6 +315,7 @@ public class WorkOrderController extends BaseController {
             return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
 
+        Long visitorId = getVisitorId(req);
         if (!workOrderHistory.getInitiatorId().equals(visitorId)) {
             log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
             return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
@@ -323,4 +329,19 @@ public class WorkOrderController extends BaseController {
         return Result.ok(result);
     }
 
+    @DeleteMapping("/workOrder/attachment/{id}")
+    public Result deleteAttachment(HttpServletRequest req
+            , @NotNull @PathVariable("id") Long id) {
+
+        WorkOrder workOrder = workOrderService.getById(id);
+
+        //代码级别的用户权限检测，只有工单发起者和管理员可以工单下载附件
+        Long visitorId = getVisitorId(req);
+        if (!visitorId.equals(workOrder.getInitiatorId()) && !isAdmin(req)) {
+            throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+        workOrderService.deleteAttachmentByWorkOrderId(id);
+        return Result.ok();
+    }
 }

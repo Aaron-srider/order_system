@@ -1,18 +1,21 @@
 package cn.edu.bistu.User.Service;
 
 import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.Major;
 import cn.edu.bistu.model.entity.SecondaryDept;
+import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.UserVo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.edu.bistu.common.BeanUtils;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     @Autowired
     UserDao userDao;
@@ -109,6 +112,22 @@ public class UserServiceImpl implements UserService {
         //返回更新后的用户
         DaoResult<User> updatedUser = userDao.getOneUserById(userVo.getId());
         return new ServiceResultImpl<>(updatedUser.getValue());
+    }
+
+    @Override
+    public boolean isAdmin(Long id) {
+        DaoResult<User> oneUserById = userDao.getOneUserById(id);
+        JSONObject userDetailInfo = oneUserById.getDetailInfo();
+        List<Role> roleList = (List<Role>)userDetailInfo.get("roleList");
+
+        for (Role role : roleList) {
+            if(role.getName().equals(cn.edu.bistu.constants.Role.ADMIN.toString()) ||
+                    role.getName().equals(cn.edu.bistu.constants.Role.OPERATOR.toString()) ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 

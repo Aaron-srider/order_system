@@ -61,6 +61,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/users/**")
                     .excludePathPatterns("/admin/**")
                     .excludePathPatterns("/lock/**")
+
             ;
 
             //用户授权
@@ -78,6 +79,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/users/**")
                     .excludePathPatterns("/admin/**")
                     .excludePathPatterns("/lock/**")
+
              ;
         }
     }

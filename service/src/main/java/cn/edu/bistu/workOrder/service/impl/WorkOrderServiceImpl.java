@@ -188,4 +188,10 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         return new ServiceResultImpl<JSONObject>(value);
     }
 
+    @Override
+    public void deleteAttachmentByWorkOrderId(Long workOrderId) {
+
+        workOrderDao.deleteWorkOrderAttachment(workOrderId);
+    }
+
 }

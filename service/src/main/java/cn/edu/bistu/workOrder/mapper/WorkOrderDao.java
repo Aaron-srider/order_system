@@ -13,7 +13,9 @@ import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.auth.User;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -273,6 +275,15 @@ public class WorkOrderDao {
         //if(workOrder.getIsFinished()) {
         //
         //}
+    }
+
+
+    public void deleteWorkOrderAttachment(Long workOrderId) {
+
+        workOrderMapper.update(null, new UpdateWrapper<WorkOrder>()
+                .set("attachment", null)
+                .set("attachment_name", null)
+                .eq("id", workOrderId));
 
     }
 

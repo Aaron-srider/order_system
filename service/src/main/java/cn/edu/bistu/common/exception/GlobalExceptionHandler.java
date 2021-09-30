@@ -6,7 +6,6 @@ import cn.edu.bistu.model.common.result.Result;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -15,9 +14,9 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
@@ -53,11 +52,24 @@ public class GlobalExceptionHandler {
     public Result frontDataMissingException(HttpServletResponse req, ResultCodeException ex) {
         if (!(ex.getExceptionInfo() == null)) {
             log.debug(ex.getCode().toString() + ":");
+            log.debug(ex.getExceptionInfo().toString());
         }
 
-        log.debug(ex.getExceptionInfo().toString());
         cors(req);
         return Result.build(ex.getExceptionInfo(), ex.getCode());
+    }
+
+    /**
+     * 统一处理返回值
+     *
+     * @return
+     */
+    @ExceptionHandler({MultipartException.class})
+    @ResponseBody
+    public Result multipartException(HttpServletResponse req, MultipartException ex) {
+        log.debug(ex.toString());
+        cors(req);
+        return Result.build(null, ResultCodeEnum.NOT_MULTIPART_REQUEST);
     }
 
     /**
