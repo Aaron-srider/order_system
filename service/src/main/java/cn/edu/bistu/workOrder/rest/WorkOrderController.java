@@ -171,13 +171,13 @@ public class WorkOrderController extends BaseController {
         String mimeType = MimeTypeUtils.getType(workOrder.getAttachmentName());
         //设置响应的MIME类型
         resp.setContentType(mimeType);
-
         log.debug("mimeType:" + mimeType);
 
         //让浏览器以附件形式处理响应数据
         resp.setHeader("Content-Disposition", "downloadAttachment; fileName=" + URLEncoder.encode(workOrder.getAttachmentName(), "UTF-8"));
-
         log.debug("attachmentName:" + workOrder.getAttachmentName());
+
+        resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
 
         //将二进制附件写入到http响应体中
         ServletOutputStream out = resp.getOutputStream();
@@ -213,6 +213,8 @@ public class WorkOrderController extends BaseController {
             throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
+
+
         //上传附件
         if (attachment.getSize() != 0 && !attachment.getOriginalFilename().equals("")) {
             byte[] bytes = attachment.getBytes();
@@ -220,6 +222,7 @@ public class WorkOrderController extends BaseController {
             workOrder.setId(workOrderId);
             workOrder.setAttachment(bytes);
             workOrder.setAttachmentName(attachment.getOriginalFilename());
+            workOrder.setAttachmentSize(String.format("%.2f", attachment.getSize() / 1024.0));
             workOrderService.updateById(workOrder);
             return Result.ok();
         } else {

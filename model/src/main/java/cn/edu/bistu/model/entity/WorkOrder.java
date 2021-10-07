@@ -54,6 +54,8 @@ public class WorkOrder extends BaseEntity{
     @Null(groups = {Insert.class})
     Integer isFinished;
 
+    String attachmentSize;
+
     /**
      * 判断工单是否已经完结
      * @return 若isFinished字段为1，返回true；否则返回false。

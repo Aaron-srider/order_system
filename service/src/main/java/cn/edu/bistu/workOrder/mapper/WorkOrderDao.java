@@ -287,6 +287,7 @@ public class WorkOrderDao {
         workOrderMapper.update(null, new UpdateWrapper<WorkOrder>()
                 .set("attachment", null)
                 .set("attachment_name", null)
+                .set("attachment_size", null)
                 .eq("id", workOrderId));
 
     }
