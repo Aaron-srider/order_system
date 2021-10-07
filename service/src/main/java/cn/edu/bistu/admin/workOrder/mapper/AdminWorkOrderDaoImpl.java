@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class AdminWorkOrderDaoImpl extends WorkOrderDao implements AdminWorkOrderDao{
+public class AdminWorkOrderDaoImpl extends WorkOrderDao implements AdminWorkOrderDao {
 
     @Autowired
     ApprovalRecordMapper approvalRecordMapper;
@@ -37,6 +37,7 @@ public class AdminWorkOrderDaoImpl extends WorkOrderDao implements AdminWorkOrde
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(id);
         workOrder.setStatus(4);
+        workOrder.setIsFinished(1);
         getWorkOrderMapper().updateById(workOrder);
     }
 }
