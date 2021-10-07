@@ -120,7 +120,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         JSONObject userDetailInfo = oneUserById.getDetailInfo();
         List<Role> roleList = (List<Role>)userDetailInfo.get("roleList");
 
+
+        log.debug("admin: " + cn.edu.bistu.constants.Role.ADMIN.toString());
+        log.debug("operator: " + cn.edu.bistu.constants.Role.OPERATOR.toString());
+
         for (Role role : roleList) {
+            log.debug("roleName: " + role.getName());
             if(role.getName().equals(cn.edu.bistu.constants.Role.ADMIN.toString()) ||
                     role.getName().equals(cn.edu.bistu.constants.Role.OPERATOR.toString()) ) {
                 return true;

@@ -52,6 +52,14 @@ public class AuthController {
         return Result.ok(serviceResult.getServiceResult());
     }
 
+    @GetMapping("/admin/login")
+    public Result adminLogin(
+            @NotNull String code) {
+        log.debug("code:" + code);
+        ServiceResult serviceResult = authService.adminSystemAuthentication(code);
+        return Result.ok(serviceResult.getServiceResult());
+    }
+
 
 
 }

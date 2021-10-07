@@ -42,6 +42,18 @@ public class WxMiniApiImpl implements WxMiniApi {
 
     }
 
+    @Override
+    public JSONObject GetUnionIdForThirdPartyWebSites(String appId, String secret, String code) {
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + appId + "&secret=" + secret + "&code=" + code + "&grant_type=authorization_code";
+        String str = WeChatUtil.httpRequest(url, "GET", null);
+        log.debug("access_token result", str);
+        if (StringUtils.isEmpty(str)) {
+            return null;
+        } else {
+            return JSONObject.parseObject(str);
+        }
+    }
+
     /**
      * 获取小程序的accessToken接口，如果本地缓存了access-token且没有过期，直接从本地获取，否则访问微信接口。
      * 之所以要缓存到本地，是因为每天请求微信接口的次数是有限制的。

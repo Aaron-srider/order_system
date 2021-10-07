@@ -18,6 +18,12 @@ public interface WxMiniApi {
     JSONObject authCode2Session(String appId, String secret, String jsCode);
 
     /**
+     * 由code换取用户openid和session_key以及unionid
+     * 请求参数   属性	     类型	   默认值	必填	 说明
+     */
+    JSONObject GetUnionIdForThirdPartyWebSites(String appId, String secret, String jsCode);
+
+    /**
      * 获取小程序的accessToken接口，如果本地缓存了access-token且没有过期，直接从本地获取，否则访问微信接口。
      * 之所以要缓存到本地，是因为每天请求微信接口的次数是有限制的。
      *

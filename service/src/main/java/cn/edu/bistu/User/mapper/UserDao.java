@@ -105,7 +105,7 @@ public class UserDao {
     private List<Role> getUserRole(Long id) {
         List<Role> roleList = new ArrayList<>();
         List<UserRole> userRoleList = userRoleMapper.selectList(new QueryWrapper<UserRole>().eq("user_id", id));
-        if(!userRoleList.isEmpty()) {
+        if (!userRoleList.isEmpty()) {
             for (UserRole userRole : userRoleList) {
                 Long roleId = userRole.getRoleId();
                 Role role = roleMapper.selectById(roleId);
@@ -152,5 +152,14 @@ public class UserDao {
         List<Role> userRoleList = getUserRole(user.getId());
         jsonObject.put("roleList", userRoleList);
         return jsonObject;
+    }
+
+    /**
+     * 根据unionId查询用户
+     * @return 如果用户注册过，无论用户是否完善信息，返回该用户信息；否则返回null
+     */
+    public DaoResult<User> getOneUserByUnionId(String unionId) {
+        DaoResult<User> user = getOneUserByWrapper(new QueryWrapper<User>().eq("union_id", unionId));
+        return user;
     }
 }

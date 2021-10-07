@@ -9,7 +9,7 @@ public class Role extends BaseEntity {
     /**
      * 角色名称
      */
-    cn.edu.bistu.constants.Role name;
+    String name;
 
     /**
      * 展示在前端的角色文本

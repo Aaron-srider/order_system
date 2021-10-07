@@ -61,39 +61,7 @@ public class DaoResultImpl<T> implements DaoResult<T>{
         return value.toJSONString();
     }
 
-    public static void main(String[] args) {
-        User user = new User();
-        user.setSessionKey("ja;lsdkjf");
-        user.setCollegeId(2);
 
-        Major major = new Major();
-        major.setId(1L);
-        major.setName("testMajor");
-
-        College college = new College();
-        college.setId(1L);
-        college.setName("testCollege");
-
-        JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("major", major);
-        jsonObject.put("college", college);
-
-        DaoResultImpl<User> userDaoResult = new DaoResultImpl<>();
-
-        userDaoResult.setResult(user);
-
-        userDaoResult.setDetailInfo(jsonObject);
-
-
-        System.out.println(userDaoResult);
-
-        Role role  = new Role();
-        role.setName(cn.edu.bistu.constants.Role.ADMIN);
-        userDaoResult.addDetailInfo("role", role);
-
-        System.out.println(userDaoResult);
-    }
 
 }
 

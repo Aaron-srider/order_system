@@ -18,24 +18,20 @@ import java.util.*;
 @RestController
 @Validated
 @CrossOrigin
+@RequestMapping("/test")
 public class TestController {
 
     @Autowired
     TestdbDao testdbDao;
 
-    @PostMapping("/test/receiveListFromBody")
+    @PostMapping("/receiveListFromBody")
     public Entity testPost(@RequestBody Map<String, Object> map, HttpServletRequest req) {
         System.out.println(map);
         return null;
     }
 
-    @GetMapping("/test")
-    public Entity testGet(UserVo userVo, HttpServletRequest req) {
-        System.out.println(userVo);
-
-        String token = req.getHeader("token");
-        System.out.println(token);
-
+    @GetMapping("/")
+    public Entity testGet() {
         Entity entity = new Entity();
         entity.setAge("12");
         entity.setId("1");

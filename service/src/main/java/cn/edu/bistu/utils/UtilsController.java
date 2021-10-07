@@ -1,5 +1,6 @@
 package cn.edu.bistu.utils;
 
+import cn.edu.bistu.auth.WeChatUtil;
 import cn.edu.bistu.dept.service.DeptService;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -22,5 +23,14 @@ public class UtilsController {
         JSONObject serviceResult = commonInfo.getServiceResult();
         return Result.ok(serviceResult);
     }
+
+    @GetMapping("/utils/wxLoginJsFile")
+    public Result wxLoginJsFile(String url) {
+        System.out.println(url);
+        String str = WeChatUtil.httpRequest(url, "GET", null);
+        return Result.ok(str);
+    }
+
+
 
 }

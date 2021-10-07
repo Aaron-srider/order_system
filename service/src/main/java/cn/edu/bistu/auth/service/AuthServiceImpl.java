@@ -10,7 +10,6 @@ import cn.edu.bistu.common.exception.*;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.WxLoginStatus;
-import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.auth.Permission;
@@ -26,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,14 +48,21 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     UserMapper userMapper;
 
-    @Value("${appId}")
-    String appId;
+    @Value("${mini-appId}")
+    String miniAppId;
 
-    @Value("${appSecret}")
-    String appSecret;
+    @Value("${mini-appSecret}")
+    String miniAppSecret;
+
+    @Value("${adminSystem-appId}")
+    String adminSystemAppId;
+
+    @Value("${adminSystem-appSecret}")
+    String adminSystemAppSecret;
+
 
     private WxLoginStatus getWxLoginStatus(String code) throws Jscode2sessionException {
-        JSONObject jsonObject = wxMiniApi.authCode2Session(appId, appSecret, code);
+        JSONObject jsonObject = wxMiniApi.authCode2Session(miniAppId, miniAppSecret, code);
         if (jsonObject == null) {
             throw new RuntimeException("调用微信端授权认证接口错误");
         } else if (jsonObject.get("errcode") != null) {
@@ -68,6 +73,26 @@ public class AuthServiceImpl implements AuthService {
         String openId = jsonObject.getString("openid");
         String sessionKey = jsonObject.getString("session_key");
         String unionId = jsonObject.getString("unionid");
+        WxLoginStatus wxLoginStatus = new WxLoginStatus();
+        wxLoginStatus.setOpenId(openId);
+        wxLoginStatus.setSessionKey(sessionKey);
+        wxLoginStatus.setUnionId(unionId);
+        return wxLoginStatus;
+    }
+
+    private WxLoginStatus getAdminWxLoginStatus(String code) throws Jscode2sessionException {
+        JSONObject jsonObject = wxMiniApi.GetUnionIdForThirdPartyWebSites(adminSystemAppId, adminSystemAppSecret, code);
+        if (jsonObject == null) {
+            throw new RuntimeException("调用微信端授权认证接口错误");
+        } else if (jsonObject.get("errcode") != null) {
+            throw new Jscode2sessionException((Integer) jsonObject.get("errcode")
+                    , (String) jsonObject.get("errmsg"));
+        }
+
+        String openId = jsonObject.getString("openid");
+        String sessionKey = jsonObject.getString("session_key");
+        String unionId = jsonObject.getString("unionid");
+        log.debug("access_token unionId: " + unionId);
         WxLoginStatus wxLoginStatus = new WxLoginStatus();
         wxLoginStatus.setOpenId(openId);
         wxLoginStatus.setSessionKey(sessionKey);
@@ -119,18 +144,14 @@ public class AuthServiceImpl implements AuthService {
 
             //判断用户是否锁定
             Integer isLock = resultUser.getIsLock();
-            if (isLock.equals(1)){
+            if (isLock.equals(1)) {
                 throw new ResultCodeException(resultUser, ResultCodeEnum.USER_LOCK);
             }
 
             //判断用户信息是否已经完善
             Integer infoComplete = resultUser.getInfoComplete();
             if (infoComplete.equals(1)) {
-                Map<String, Object> claim = new HashMap<>();
-                Long id = resultUser.getId();
-                claim.put("id", id);
-                String token = JwtHelper.createToken(claim);
-
+                String token = generateUserToken(resultUser.getId());
                 daoResult.addDetailInfo("token", token);
             }
             //如果用户没有完善信息，就不返回登录token
@@ -169,7 +190,7 @@ public class AuthServiceImpl implements AuthService {
             String allowedUrl = str[1];
 
             int index = allowedUrl.lastIndexOf("/*");
-            if(index != -1) {
+            if (index != -1) {
                 allowedUrl = allowedUrl.substring(0, index);
                 index = index > requestURL.length() ? requestURL.length() : index;
                 requestURL = requestURL.substring(0, index);
@@ -184,13 +205,18 @@ public class AuthServiceImpl implements AuthService {
         return false;
     }
 
-    public Map<Long, Object> forgeToken(Long[] userIds) {
-        Map<Long, Object> map = new HashMap<>();
+    private String generateUserToken(Long userId) {
+        Map<String, Object> claim = new HashMap<>();
+        claim.put("id", userId);
+        String token = JwtHelper.createToken(claim);
+        return token;
+    }
 
+
+    private Map<Long, Object> forgeToken(Long[] userIds) {
+        Map<Long, Object> map = new HashMap<>();
         for (Long userId : userIds) {
-            Map<String, Object> claim = new HashMap<>();
-            claim.put("id", userId);
-            String token = JwtHelper.createToken(claim);
+            String token = generateUserToken(userId);
             map.put(userId, token);
         }
         return map;
@@ -219,12 +245,85 @@ public class AuthServiceImpl implements AuthService {
 
         ServiceResult<JSONObject> serviceResult = userService.updateUser(userVo);
 
-
-
         //向UserRole表中插入数据
         improveUserRoleInfo(roleId, userVo.getId());
         return serviceResult;
     }
+
+
+    /**
+     * 后台管理系统用户认证，为登录接口提供服务。该接口不对数据库做任何修改（不提供注册服务）。
+     * 使用code换取unionid，直接根据unionid查表检查是否存在用户，若存在且完善信息且角色为管理员，返回用户信息和登录token（包含用户id）；
+     * 如果存在但是没有完善信息，返回错误代码；
+     * 若不存在，直接返回未注册错误码，不自动注册用户；
+     *
+     * @param code 第三方网站微信临时登录凭证
+     * @return 返回认证结果，若认证通过，返回用户信息和登录token（包含用户id）
+     */
+    @Override
+    public ServiceResult adminSystemAuthentication(String code) {
+        //获取用户微信openId
+        String unionId = "";
+
+        try {
+            //获取微信登录态
+            WxLoginStatus wxLoginStatus = getAdminWxLoginStatus(code);
+            unionId = wxLoginStatus.getUnionId();
+        } catch (Jscode2sessionException ex) {
+            if (ex.getErrcode().equals(40029)) {
+                throw new ResultCodeException("code:" + code, ResultCodeEnum.OAUTH_CODE_INVALID);
+            } else if (ex.getErrcode().equals(40163)) {
+                throw new ResultCodeException("code:" + code, ResultCodeEnum.OAUTH_CODE_BEEN_USED);
+            }
+        }
+
+        DaoResult<User> oneUserByUnionId = userDao.getOneUserByUnionId(unionId);
+
+
+        User user = oneUserByUnionId.getResult();
+
+        log.debug("result: " + oneUserByUnionId.getResult());
+
+        log.debug("result: " + oneUserByUnionId.getDetailInfo());
+
+        //用户没有注册
+        if(user==null) {
+            throw new ResultCodeException(user, ResultCodeEnum.USER_NOT_REGISTERED);
+        }
+
+        log.debug("userRegistered");
+
+        //用户是否完善信息
+        if (user.getInfoComplete().equals(0)) {
+            throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
+        }
+
+        log.debug("userInfoComplete");
+
+        //判断是否是管理员
+        boolean isAdmin = userService.isAdmin(user.getId());
+        if (!isAdmin) {
+            throw new ResultCodeException(user, ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+        log.debug("user is an admin");
+
+        //判断用户是否锁定
+        Integer isLock = user.getIsLock();
+        if (isLock.equals(1)) {
+            throw new ResultCodeException(user, ResultCodeEnum.USER_LOCK);
+        }
+
+        log.debug("user account valid");
+
+        String token = generateUserToken(user.getId());
+        oneUserByUnionId.addDetailInfo("token", token);
+
+        log.debug("token:" + token);
+
+        return new ServiceResultImpl(oneUserByUnionId.getValue());
+    }
+
 
     @Test
     public void getOpenIdAndUnionIdByTrick() {
@@ -264,7 +363,7 @@ public class AuthServiceImpl implements AuthService {
     @Test
     public void forgeToken() {
         Map<Long, Object> tokens = forgeToken(new Long[]{
-               2L, 3L
+                2L, 3L
         });
 
         System.out.println(tokens);
