@@ -54,7 +54,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/auth/login")
                     .excludePathPatterns("/auth/userInfoCompletion/**")
                     .excludePathPatterns("/wx")
-                    .excludePathPatterns("/test")
+                    .excludePathPatterns("/test/**")
                     //暂时登录测试接口不拦截
                     .excludePathPatterns("/vue-admin-template/**")
                     .excludePathPatterns("/utils/**")
@@ -70,7 +70,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/auth/login")
                     .excludePathPatterns("/auth/userInfoCompletion/**")
                     .excludePathPatterns("/wx")
-                    .excludePathPatterns("/test")
+                    .excludePathPatterns("/test/**")
                     .excludePathPatterns("/message/**")
                     //暂时登录测试接口不拦截
 
