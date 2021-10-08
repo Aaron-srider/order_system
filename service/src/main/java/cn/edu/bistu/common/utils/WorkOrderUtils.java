@@ -31,6 +31,8 @@ public class WorkOrderUtils {
 
         //判断是否需要保存审批记录
         if(finishStatus.equals(WorkOrderStatus.NOT_APPROVED) || finishStatus.equals(WorkOrderStatus.COMPLETED_SUCCESSFULLY)) {
+            //工单已经被审批过
+            workOrder.setIsExamined(1);
             //保存审批记录
             if (finishStatus.equals(WorkOrderStatus.NOT_APPROVED)) {
                 prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.REJECT);
@@ -48,7 +50,6 @@ public class WorkOrderUtils {
         cn.edu.bistu.model.entity.WorkOrderStatus workOrderStatus = workOrderDao.constantToEntity(finishStatus);
         workOrder.setStatus(workOrderStatus.getValue());
         workOrder.setIsFinished(1);     //工单结束
-        workOrder.setIsExamined(1);     //工单已经被审批过
         workOrderDao.getWorkOrderMapper().updateById(workOrder);
 
         //生成历史工单

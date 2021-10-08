@@ -56,12 +56,7 @@ public class AdminWorkOrderController extends BaseController {
         return Result.ok(serviceResult.getServiceResult());
     }
 
-    @DeleteMapping("/admin/workOrders")
-    public Result deleteWorkOrders(@RequestBody Map<String, List<Long>> listMap)  {
-        List<Long> workOrderIdList=listMap.get("idList");
-        adminWorkOrderService.deleteWorkOrdersByWorkOrderIdList(workOrderIdList);
-        return Result.ok();
-    }
+
 
     @PutMapping("/admin/workOrder/{id}")
     public Result updateWorkOrder(
@@ -72,13 +67,27 @@ public class AdminWorkOrderController extends BaseController {
         return Result.ok();
     }
 
-    @PutMapping("/admin/workOrder/cancellation/{id}")
-    public Result invalidWorkOrder(
-            @PathVariable @NotNull Long id
-    ) throws NoSuchFieldException, IllegalAccessException {
-        adminWorkOrderService.invalidationWorkOrder(id);
+    @DeleteMapping("/admin/workOrders")
+    public Result deleteWorkOrders(@RequestBody Map<String, List<Long>> listMap)  {
+        List<Long> workOrderIdList=listMap.get("idList");
+        adminWorkOrderService.deleteWorkOrdersByWorkOrderIdList(workOrderIdList);
         return Result.ok();
     }
+
+    @PutMapping("/admin/workOrder/cancellation")
+    public Result invalidWorkOrder(@RequestBody Map<String, List<Long>> listMap) throws NoSuchFieldException, IllegalAccessException {
+        List<Long> workOrderIdList=listMap.get("idList");
+        adminWorkOrderService.invalidationWorkOrder(workOrderIdList);
+        return Result.ok();
+    }
+
+    @PutMapping("/admin/workOrder/enablement")
+    public Result enableWorkOrder(@RequestBody Map<String, List<Long>> listMap) throws NoSuchFieldException, IllegalAccessException {
+        List<Long> workOrderIdList=listMap.get("idList");
+        adminWorkOrderService.enableWorkOrder(workOrderIdList);
+        return Result.ok();
+    }
+
 
 
 }

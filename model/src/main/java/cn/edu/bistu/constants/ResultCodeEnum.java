@@ -32,7 +32,7 @@ public enum ResultCodeEnum {
     FRONT_DATA_ERROR(118, "前端参数错误"),
     USER_LOCK(119, "用户被锁定，无法登录"),
     NOT_MULTIPART_REQUEST(120, "当前请求不是多段数据请求"),
-    //NOT_MULTIPART_REQUEST(121, "工单没有结束"),
+    WORKORDER_NOT_INVALIDATED(121, "工单没有被作废"),
 
 
     SUCCESS(200,"成功"),
