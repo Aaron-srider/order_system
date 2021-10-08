@@ -9,10 +9,7 @@ import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.common.JsonUtils;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
-import cn.edu.bistu.model.entity.Flow;
-import cn.edu.bistu.model.entity.FlowNode;
-import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.entity.WorkOrderHistory;
+import cn.edu.bistu.model.entity.*;
 import cn.edu.bistu.model.entity.auth.User;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -26,6 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,6 +48,7 @@ public class WorkOrderDao {
 
     @Autowired
     WorkOrderHistoryMapper workOrderHistoryMapper;
+
 
     /**
      * 获取工单分页数据，每个工单包括：工单发起者信息，工单对应的流程，工单当前所处流程节点。
@@ -272,11 +271,12 @@ public class WorkOrderDao {
      * 生成对应工单的历史记录
      * @param workOrder 工单
      */
-    public void generateWorkOrderHistory(WorkOrder workOrder) {
+    public void generateWorkOrderHistory(WorkOrderStatus beforeStatus, WorkOrder workOrder) {
         //生成历史工单
         WorkOrderHistory workOrderHistory = new WorkOrderHistory();
         BeanUtils.copyProperties(workOrder, workOrderHistory);
         workOrderHistory.setWorkOrderId(workOrder.getId());
+        workOrderHistory.setBeforeFinishedStatus(beforeStatus.getValue());
         log.debug("workOrderHistory to be saved:" + workOrderHistory);
         workOrderHistoryMapper.insert(workOrderHistory);
     }
@@ -290,6 +290,16 @@ public class WorkOrderDao {
                 .set("attachment_size", null)
                 .eq("id", workOrderId));
 
+    }
+
+    public WorkOrderStatus constantToEntity(cn.edu.bistu.constants.WorkOrderStatus statusConstant) {
+        List<WorkOrderStatus> workOrderStatusesFromDateBase = workOrderStatusMapper.selectList(null);
+        for (WorkOrderStatus statusFromDataBase : workOrderStatusesFromDateBase) {
+            if (statusFromDataBase.getAlias().equals(statusConstant.toString())) {
+                return statusFromDataBase;
+            }
+        }
+        return null;
     }
 
 }

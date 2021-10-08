@@ -1,8 +1,10 @@
 package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.ResultCodeException;
+import cn.edu.bistu.common.utils.WorkOrderUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.flow.service.FlowNodeService;
@@ -12,6 +14,7 @@ import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
+import cn.edu.bistu.model.entity.WorkOrderStatus;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.AdminWorkOrderQueryVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
@@ -54,6 +57,12 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     UserDao userDao;
 
+    @Autowired
+    ApprovalService approvalService;
+
+    @Autowired
+    WorkOrderUtils workOrderUtils;
+
     @Override
     public ServiceResult<JSONObject> listWorkOrder(WorkOrder workOrderVo, Page<WorkOrder> page) throws NoSuchFieldException, IllegalAccessException {
         QueryWrapper<WorkOrder> wrapper = new QueryWrapper<>();
@@ -87,16 +96,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
                     ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
         }
 
-        //更新工单状态
-        workOrder.setIsFinished(1);
-        workOrder.setStatus(3);
-        workOrderDao.getWorkOrderMapper().updateById(workOrder);
-
-        //生成历史工单
-        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
-        BeanUtils.copyProperties(workOrder, workOrderHistory);
-        workOrderHistory.setWorkOrderId(workOrderId);
-        workOrderDao.getWorkOrderHistoryMapper().insert(workOrderHistory);
+        workOrderUtils.workOrderFinish(workOrder, null, cn.edu.bistu.constants.WorkOrderStatus.BEEN_WITHDRAWN);
     }
 
     @Override

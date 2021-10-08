@@ -3,6 +3,7 @@ package cn.edu.bistu.approval.service;
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.ResultCodeException;
+import cn.edu.bistu.common.utils.WorkOrderUtils;
 import cn.edu.bistu.constants.ApprovalOperation;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
@@ -47,6 +48,9 @@ public class ApprovalServiceImpl implements ApprovalService {
     @Autowired
     WxMiniApi wxMiniApi;
 
+    @Autowired
+    WorkOrderUtils workOrderUtils;
+
     /**
      * 工单审批通过逻辑，若工单处于最后一个节点，触发工单结束逻辑；否则，触发工单流转逻辑。
      *
@@ -68,7 +72,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //工单处于最后一个审批节点，工单结束
         if (nextFlowNodeId==null) {
-            workOrderFinish(workOrder, approvalRecord, WorkOrderStatus.COMPLETED_SUCCESSFULLY);
+            workOrderUtils.workOrderFinish(workOrder, approvalRecord, WorkOrderStatus.COMPLETED_SUCCESSFULLY);
         }
         //工单流转
         else {
@@ -86,7 +90,7 @@ public class ApprovalServiceImpl implements ApprovalService {
     private void WorkOrderFlowToNext(WorkOrder workOrder, ApprovalRecord approvalRecord, Long nextFlowNodeId) {
 
         //保存审批记录
-        prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.PASS);
+        workOrderUtils.prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.PASS);
         approvalRecordMapper.insert(approvalRecord);
 
         //更新工单
@@ -96,63 +100,9 @@ public class ApprovalServiceImpl implements ApprovalService {
         workOrderDao.getWorkOrderMapper().updateById(workOrder);
     }
 
-    private void prepareApprovalRecord(ApprovalRecord approvalRecord, Long flowNodeId, ApprovalOperation approvalOperation) {
-        approvalRecord.setFlowNodeId(flowNodeId);
-        approvalRecord.setOperation(approvalOperation.getCode());
-    }
-
-    /**
-     * 工单结束逻辑，更新工单状态并保存，生成历史工单并保存，保存审批记录，将工单结束状态通过微信发送给工单发起者。
-     *
-     * @param workOrder      待结束的工单，待完善信息：工单状态，工单是否结束，工单是否被审批。
-     * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。
-     * @param finishStatus 工单结束时的状态（REJECT或PASS）
-     */
-    private void workOrderFinish(WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus) {
-        //保存审批记录
-        if (finishStatus.equals(WorkOrderStatus.NOT_APPROVED)) {
-            prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.REJECT);
-        } else {
-            prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.PASS);
-        }
-        approvalRecordMapper.insert(approvalRecord);
-
-        List<cn.edu.bistu.model.entity.WorkOrderStatus> workOrderStatusFromDateBase = workOrderDao.getWorkOrderStatusMapper().selectList(null);
-
-        //更新工单状态
-        if (finishStatus.equals(WorkOrderStatus.NOT_APPROVED)) {
-            for (cn.edu.bistu.model.entity.WorkOrderStatus workOrderStatus : workOrderStatusFromDateBase) {
-                if (workOrderStatus.getAlias().equals(WorkOrderStatus.NOT_APPROVED.toString())) {
-                    workOrder.setStatus(workOrderStatus.getValue());
-                    break;
-                }
-            }
-        } else if (finishStatus.equals(WorkOrderStatus.COMPLETED_SUCCESSFULLY)) {
-            for (cn.edu.bistu.model.entity.WorkOrderStatus workOrderStatus : workOrderStatusFromDateBase) {
-                if (workOrderStatus.getAlias().equals(WorkOrderStatus.COMPLETED_SUCCESSFULLY.toString())) {
-                    workOrder.setStatus(workOrderStatus.getValue());
-                    break;
-                }
-            }
-        }
-
-        workOrder.setIsFinished(1);     //工单结束
-        workOrder.setIsExamined(1);     //工单已经被审批过
-        workOrderDao.getWorkOrderMapper().updateById(workOrder);
-        log.debug("workOrder to be updated:" + workOrder);
-
-        //生成历史工单
-        workOrderDao.generateWorkOrderHistory(workOrder);
 
 
-        //发送微信通知
-        //Long initiatorId = workOrder.getInitiatorId();
-        //UserVo userVo = userMapper.getOneById(initiatorId);
-        //String openId = userVo.getOpenId();
-        ////模板还没选好，此步跳过
-        //wxMiniApi.sendSubscribeMsg(openId);
 
-    }
 
     @Override
     public ServiceResult<Page<JSONObject>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrder> page, WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
@@ -175,7 +125,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         //检查工单是否已经结束
         WorkOrder workOrder = checkIfWorkOrderHasFinished(workOrderId);
 
-        workOrderFinish(workOrder, approvalRecord, WorkOrderStatus.NOT_APPROVED);
+        workOrderUtils.workOrderFinish(workOrder, approvalRecord, WorkOrderStatus.NOT_APPROVED);
 
     }
 

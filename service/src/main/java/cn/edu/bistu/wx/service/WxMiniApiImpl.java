@@ -39,7 +39,6 @@ public class WxMiniApiImpl implements WxMiniApi {
         } else {
             return JSONObject.parseObject(str);
         }
-
     }
 
     @Override
