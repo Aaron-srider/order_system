@@ -1,6 +1,7 @@
 package cn.edu.bistu.test.rest;
 
 import cn.edu.bistu.Entity;
+import cn.edu.bistu.User.mapper.UserDao;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.test.Testtb;
@@ -23,6 +24,15 @@ public class TestController {
 
     @Autowired
     TestdbDao testdbDao;
+
+    @Autowired
+    UserDao userDao;
+
+    @GetMapping("/testDemoteUserFromAdmin")
+    public void testDemoteUserFromAdmin() {
+        userDao.demoteUserFromAdmin(1L);
+        return;
+    }
 
     @PostMapping("/receiveListFromBody")
     public Entity testPost(@RequestBody Map<String, Object> map, HttpServletRequest req) {

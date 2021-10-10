@@ -10,7 +10,6 @@ import cn.edu.bistu.common.exception.*;
 import cn.edu.bistu.common.utils.UserUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.Role;
-import cn.edu.bistu.model.common.CheckUserRole;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.WxLoginStatus;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -387,8 +386,8 @@ public class AuthServiceImpl implements AuthService {
         UserRole targetUserRole=null;
         List<UserRole> userRoleList = userDao.getUserRoleMapper().selectList(new QueryWrapper<UserRole>().eq("user_id", userId));
         for (UserRole userRole : userRoleList) {
-            if(userRole.getRoleId() != userUtils.convertConstant2Entity(Role.ADMIN).getId() &&
-                    userRole.getRoleId() != userUtils.convertConstant2Entity(Role.OPERATOR).getId() ) {
+            if(userRole.getRoleId() != userUtils.convertRoleConstant2Entity(Role.ADMIN).getId() &&
+                    userRole.getRoleId() != userUtils.convertRoleConstant2Entity(Role.OPERATOR).getId() ) {
                 flag=true;
                 targetUserRole=userRole;
                 break;

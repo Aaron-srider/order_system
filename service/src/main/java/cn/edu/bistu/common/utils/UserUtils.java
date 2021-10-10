@@ -17,7 +17,7 @@ public class UserUtils {
     @Autowired
     UserDao userDao;
 
-    public Role convertConstant2Entity(cn.edu.bistu.constants.Role constant) {
+    public Role convertRoleConstant2Entity(cn.edu.bistu.constants.Role constant) {
         DaoResult<JSONObject> allRoles = userDao.getAllRoles();
         JSONObject result = allRoles.getResult();
         List<Role> roleList = (List<Role>) result.get("roleList");

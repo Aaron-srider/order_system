@@ -44,4 +44,8 @@ public interface UserService extends IService<User>{
      * @return 是管理员则返回true；否则返回false
      */
     public boolean isAdmin(Long id);
+
+    public void promote(Long userId);
+
+    public void demote(Long userId);
 }

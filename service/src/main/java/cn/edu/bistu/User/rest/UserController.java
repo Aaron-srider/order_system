@@ -67,6 +67,19 @@ public class UserController extends BaseController{
         return Result.ok(serviceResult.getServiceResult());
     }
 
+    @PostMapping("/admin/user/promote/{userId}")
+    public Result promote(
+           @NotNull @PathVariable(name="userId") Long userId) {
+        userService.promote(userId);
+        return Result.ok();
+    }
+
+    @DeleteMapping("/admin/user/demote/{userId}")
+    public Result demote(
+            @NotNull @PathVariable(name="userId") Long userId) {
+        userService.demote(userId);
+        return Result.ok();
+    }
 
 
 }
