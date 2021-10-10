@@ -1,10 +1,10 @@
-package cn.edu.bistu.utils;
+package cn.edu.bistu.utils.rest;
 
 import cn.edu.bistu.auth.WeChatUtil;
 import cn.edu.bistu.dept.service.DeptService;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
-import com.alibaba.fastjson.JSONObject;
+import cn.edu.bistu.utils.service.CommonInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,11 +17,13 @@ public class UtilsController {
     @Autowired
     DeptService deptService;
 
+    @Autowired
+    CommonInfoService commonInfoService;
+
     @GetMapping("/utils/commonInfo")
     public Result commonInfo() {
-        ServiceResult<JSONObject> commonInfo = deptService.getAllDeptCollegeMajor();
-        JSONObject serviceResult = commonInfo.getServiceResult();
-        return Result.ok(serviceResult);
+        ServiceResult commonInfo = commonInfoService.getCommonInfo();
+        return Result.ok( commonInfo.getServiceResult());
     }
 
     @GetMapping("/utils/wxLoginJsFile")

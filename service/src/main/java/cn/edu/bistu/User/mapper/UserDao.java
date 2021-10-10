@@ -15,6 +15,7 @@ import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.entity.auth.UserRole;
 import cn.edu.bistu.model.vo.UserVo;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,6 +38,16 @@ public class UserDao {
     UserRoleMapper userRoleMapper;
     @Autowired
     DeptDao deptDao;
+
+    public DaoResult<JSONObject> getAllRoles() {
+        List<Role> roles = roleMapper.selectList(null);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("roleList",  roles);
+
+        DaoResult<JSONObject> objectDaoResult = new DaoResultImpl<>();
+        objectDaoResult.setResult(jsonObject);
+        return objectDaoResult;
+    }
 
     public DaoResult<User> getOneUserByOpenId(String openId) {
         QueryWrapper<User> wrapper = new QueryWrapper<>();

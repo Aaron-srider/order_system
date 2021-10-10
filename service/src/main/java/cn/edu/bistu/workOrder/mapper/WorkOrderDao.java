@@ -9,8 +9,11 @@ import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.common.JsonUtils;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
+import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.*;
+import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -49,6 +52,14 @@ public class WorkOrderDao {
     @Autowired
     WorkOrderHistoryMapper workOrderHistoryMapper;
 
+    public DaoResult<JSONObject> getAllWorkOrderStatus(){
+        List<WorkOrderStatus> workOrderStatusList = workOrderStatusMapper.selectList(null);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("workOrderStatusList",  workOrderStatusList);
+        DaoResult<JSONObject> objectDaoResult = new DaoResultImpl<>();
+        objectDaoResult.setResult(jsonObject);
+        return objectDaoResult;
+    }
 
     /**
      * 获取工单分页数据，每个工单包括：工单发起者信息，工单对应的流程，工单当前所处流程节点。

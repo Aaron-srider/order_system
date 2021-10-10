@@ -5,5 +5,5 @@ import cn.edu.bistu.model.common.result.ServiceResult;
 import com.alibaba.fastjson.JSONObject;
 
 public interface DeptService {
-    public ServiceResult<JSONObject> getAllDeptCollegeMajor();
+    //public ServiceResult<JSONObject> getAllDeptCollegeMajor();
 }

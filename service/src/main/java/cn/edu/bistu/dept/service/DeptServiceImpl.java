@@ -23,19 +23,19 @@ public class DeptServiceImpl implements DeptService {
     @Autowired
     WorkOrderDao workOrderDao;
 
-    @Override
-    public ServiceResult<JSONObject> getAllDeptCollegeMajor() {
-        List<Major> majorList = deptDao.getMajorMapper().selectList(null);
-        List<SecondaryDept> secondaryDeptList = deptDao.getSecondaryDeptMapper().selectList(null);
-        List<College> collegeList = deptDao.getCollegeMapper().selectList(null);
-        List<WorkOrderStatus> workOrderStatusList = workOrderDao.getWorkOrderStatusMapper().selectList(null);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("majorList", majorList);
-        jsonObject.put("secondaryDeptList", secondaryDeptList);
-        jsonObject.put("collegeList", collegeList);
-        jsonObject.put("workOrderStatusList", collegeList);
-
-        return new ServiceResultImpl<JSONObject>(jsonObject);
-    }
+    //@Override
+    //public ServiceResult<JSONObject> getAllDeptCollegeMajor() {
+    //    List<Major> majorList = deptDao.getMajorMapper().selectList(null);
+    //    List<SecondaryDept> secondaryDeptList = deptDao.getSecondaryDeptMapper().selectList(null);
+    //    List<College> collegeList = deptDao.getCollegeMapper().selectList(null);
+    //    List<WorkOrderStatus> workOrderStatusList = workOrderDao.getWorkOrderStatusMapper().selectList(null);
+    //
+    //    JSONObject jsonObject = new JSONObject();
+    //    jsonObject.put("majorList", majorList);
+    //    jsonObject.put("secondaryDeptList", secondaryDeptList);
+    //    jsonObject.put("collegeList", collegeList);
+    //    jsonObject.put("workOrderStatusList", collegeList);
+    //
+    //    return new ServiceResultImpl<JSONObject>(jsonObject);
+    //}
 }

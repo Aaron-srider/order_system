@@ -56,4 +56,5 @@ public interface AuthService{
      * @return 返回认证结果，若认证通过，返回用户信息和登录token（包含用户id）
      */
     public ServiceResult adminSystemAuthentication(String code);
+
 }

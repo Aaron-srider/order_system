@@ -7,7 +7,10 @@ import cn.edu.bistu.auth.exception.Jscode2sessionException;
 import cn.edu.bistu.auth.mapper.AuthMapper;
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.exception.*;
+import cn.edu.bistu.common.utils.UserUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
+import cn.edu.bistu.constants.Role;
+import cn.edu.bistu.model.common.CheckUserRole;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.WxLoginStatus;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -19,6 +22,7 @@ import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import cn.edu.bistu.wx.service.WxMiniApiImpl;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,9 @@ import java.util.Map;
 @Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    @Autowired
+    UserUtils userUtils;
 
     @Autowired
     UserDao userDao;
@@ -235,10 +242,10 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Integer infoComplete = user.getInfoComplete();
-        //用户已经完善过信息
-        if (infoComplete.equals(1)) {
-            throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_COMPLETED);
-        }
+        ////用户已经完善过信息
+        //if (infoComplete.equals(1)) {
+        //    throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_COMPLETED);
+        //}
 
 
         userVo.setInfoComplete(1);
@@ -328,7 +335,7 @@ public class AuthServiceImpl implements AuthService {
     @Test
     public void getOpenIdAndUnionIdByTrick() {
         Map<String, Object> map = new HashMap<>();
-        map.put("邢铖", "0033e7Ga1xsfOB0VNoGa1RHQtf43e7Gd");
+        map.put("韩欣怡", "053CEl100bsdAM1U6c200vkVwj3CEl1A");
         //map.put("姓名", "");
         //map.put("姓名", "");
 
@@ -369,11 +376,35 @@ public class AuthServiceImpl implements AuthService {
         System.out.println(tokens);
     }
 
+    /**
+     * 如果该用户没有角色，插入新的roleId，如果已有角色，更改该角色。上述角色中排除管理员和业务员。
+     * @param roleId 更新的角色id
+     * @param userId 更新的用户id
+     */
     private void improveUserRoleInfo(Long roleId, Long userId) {
-        UserRole userRole = new UserRole();
-        userRole.setRoleId(roleId);
-        userRole.setUserId(userId);
-        userDao.getUserRoleMapper().insert(userRole);
+        //找出不是管理员的角色关系，更新它
+        boolean flag=false;
+        UserRole targetUserRole=null;
+        List<UserRole> userRoleList = userDao.getUserRoleMapper().selectList(new QueryWrapper<UserRole>().eq("user_id", userId));
+        for (UserRole userRole : userRoleList) {
+            if(userRole.getRoleId() != userUtils.convertConstant2Entity(Role.ADMIN).getId() &&
+                    userRole.getRoleId() != userUtils.convertConstant2Entity(Role.OPERATOR).getId() ) {
+                flag=true;
+                targetUserRole=userRole;
+                break;
+            }
+        }
+        if(flag) {
+            targetUserRole.setRoleId(roleId);
+            userDao.getUserRoleMapper().updateById(targetUserRole);
+        } else {
+            //插入角色
+            UserRole userRole = new UserRole();
+            userRole.setRoleId(roleId);
+            userRole.setUserId(userId);
+            userDao.getUserRoleMapper().insert(userRole);
+        }
+
     }
 
     private void registerUser(String openid, String sessionkey, String unionId) {

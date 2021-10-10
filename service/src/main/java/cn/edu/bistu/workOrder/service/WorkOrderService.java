@@ -20,4 +20,6 @@ public interface WorkOrderService extends IService<WorkOrder>{
     ServiceResult getAllWorkOrders(Page<WorkOrder> page, AdminWorkOrderQueryVo adminWorkOrderQueryVo) throws NoSuchFieldException, IllegalAccessException;
 
     void deleteAttachmentByWorkOrderId(Long workOrderId);
+
+
 }

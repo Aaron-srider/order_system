@@ -49,7 +49,8 @@ public class WorkOrderUtils {
         //更新工单状态
         cn.edu.bistu.model.entity.WorkOrderStatus workOrderStatus = workOrderDao.constantToEntity(finishStatus);
         workOrder.setStatus(workOrderStatus.getValue());
-        workOrder.setIsFinished(1);     //工单结束
+        //工单结束
+        workOrder.setIsFinished(1);
         workOrderDao.getWorkOrderMapper().updateById(workOrder);
 
         //生成历史工单
