@@ -1,15 +1,11 @@
 package cn.edu.bistu.utils.service;
 
-import cn.edu.bistu.User.mapper.UserDao;
-import cn.edu.bistu.auth.service.AuthService;
+import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.dept.mapper.DeptDao;
-import cn.edu.bistu.dept.service.DeptService;
-import cn.edu.bistu.model.common.JsonUtils;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
-import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

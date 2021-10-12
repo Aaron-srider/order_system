@@ -1,6 +1,6 @@
-package cn.edu.bistu.User.rest;
+package cn.edu.bistu.admin.User.rest;
 
-import cn.edu.bistu.User.Service.UserService;
+import cn.edu.bistu.admin.User.Service.UserService;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;

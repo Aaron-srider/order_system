@@ -28,7 +28,6 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
 
 
-
         //跨域拦截优先
         HandlerInterceptor corsInterceptor = getMyInterceptors(CORSInterceptor.class);
         registry.addInterceptor(corsInterceptor)
@@ -51,34 +50,28 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
             //用户认证
             HandlerInterceptor authenticationInterceptor = getMyInterceptors(AuthenticationInterceptor.class);
             registry.addInterceptor(authenticationInterceptor)
+                    //用户登录不拦截
                     .excludePathPatterns("/auth/login")
+                    .excludePathPatterns("/admin/login")
                     .excludePathPatterns("/auth/userInfoCompletion/**")
                     .excludePathPatterns("/wx")
                     .excludePathPatterns("/test/**")
                     //暂时登录测试接口不拦截
-                    .excludePathPatterns("/vue-admin-template/**")
                     .excludePathPatterns("/utils/**")
-                    .excludePathPatterns("/users/**")
-                    .excludePathPatterns("/admin/**")
-                    .excludePathPatterns("/lock/**")
-
             ;
 
             //用户授权
             HandlerInterceptor authorizationInterceptor = getMyInterceptors(AuthorizationInterceptor.class);
             registry.addInterceptor(authorizationInterceptor)
+                    //用户登录不拦截
                     .excludePathPatterns("/auth/login")
                     .excludePathPatterns("/auth/userInfoCompletion/**")
+                    .excludePathPatterns("/admin/login")
                     .excludePathPatterns("/wx")
                     .excludePathPatterns("/test/**")
                     .excludePathPatterns("/message/**")
                     //暂时登录测试接口不拦截
-
-                    .excludePathPatterns("/vue-admin-template/**")
                     .excludePathPatterns("/utils/**")
-                    .excludePathPatterns("/users/**")
-                    .excludePathPatterns("/admin/**")
-                    .excludePathPatterns("/lock/**")
 
              ;
         }

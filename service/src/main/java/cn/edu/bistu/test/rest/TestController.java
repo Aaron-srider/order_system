@@ -1,9 +1,9 @@
 package cn.edu.bistu.test.rest;
 
 import cn.edu.bistu.Entity;
-import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.auth.mapper.AuthDao;
 import cn.edu.bistu.model.common.result.Result;
-import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.test.Testtb;
 import cn.edu.bistu.test.mapper.TestdbDao;
 import com.alibaba.fastjson.JSONObject;
@@ -28,9 +28,12 @@ public class TestController {
     @Autowired
     UserDao userDao;
 
-    @GetMapping("/testDemoteUserFromAdmin")
-    public void testDemoteUserFromAdmin() {
-        userDao.demoteUserFromAdmin(1L);
+    @Autowired
+    AuthDao authDao;
+
+    @GetMapping("/prepareAllPermission")
+    public void prepareAllPermission() {
+        authDao.prepareAllApiPermission();
         return;
     }
 

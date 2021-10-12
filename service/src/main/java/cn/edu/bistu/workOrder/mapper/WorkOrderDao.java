@@ -1,21 +1,15 @@
 package cn.edu.bistu.workOrder.mapper;
 
-import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.Pagination;
-import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.model.common.JsonUtils;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
-import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.*;
-import cn.edu.bistu.model.entity.auth.Role;
 import cn.edu.bistu.model.entity.auth.User;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -26,7 +20,6 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package cn.edu.bistu.User.mapper;
+package cn.edu.bistu.admin.User.mapper;
 
 import cn.edu.bistu.auth.mapper.RoleMapper;
 import cn.edu.bistu.auth.mapper.UserMapper;

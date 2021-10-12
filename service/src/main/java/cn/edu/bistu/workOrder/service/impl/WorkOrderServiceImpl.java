@@ -1,6 +1,6 @@
 package cn.edu.bistu.workOrder.service.impl;
 
-import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.ResultCodeException;
@@ -13,15 +13,12 @@ import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.entity.WorkOrderHistory;
-import cn.edu.bistu.model.entity.WorkOrderStatus;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.AdminWorkOrderQueryVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -29,11 +26,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j

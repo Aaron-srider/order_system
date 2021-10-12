@@ -1,13 +1,12 @@
-package cn.edu.bistu.User.Service;
+package cn.edu.bistu.admin.User.Service;
 
-import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.UserUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
-import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.Major;
@@ -21,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.edu.bistu.common.BeanUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.apache.ibatis.executor.ResultExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

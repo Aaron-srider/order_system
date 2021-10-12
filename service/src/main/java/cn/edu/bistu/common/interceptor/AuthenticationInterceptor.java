@@ -1,6 +1,6 @@
 package cn.edu.bistu.common.interceptor;
 
-import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.ResponseHelper;
@@ -8,8 +8,6 @@ import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.auth.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component
 @Slf4j

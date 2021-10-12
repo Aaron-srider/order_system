@@ -1,7 +1,7 @@
 package cn.edu.bistu.auth.service;
 
-import cn.edu.bistu.User.Service.UserService;
-import cn.edu.bistu.User.mapper.UserDao;
+import cn.edu.bistu.admin.User.Service.UserService;
+import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.auth.exception.Jscode2sessionException;
 import cn.edu.bistu.auth.mapper.AuthMapper;

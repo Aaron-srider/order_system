@@ -1,8 +1,7 @@
 package cn.edu.bistu.common.rest;
 
-import cn.edu.bistu.User.Service.UserService;
+import cn.edu.bistu.admin.User.Service.UserService;
 import cn.edu.bistu.common.MapService;
-import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 
