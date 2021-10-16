@@ -36,7 +36,7 @@
     </sql>
 
     <sql id="workOrderHistorySelect">
-        <include refid="rowWorkOrderHistorySelect"/>,
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistorySelect"/>,
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
     </sql>
 
@@ -75,9 +75,9 @@
 
     <select id="getOneWorkOrderHistoryById" resultMap="workOrderHistoryResultMap">
         select
-            <include refid="workOrderHistorySelect"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistorySelect"/>
         from work_order_history
-            <include refid="workOrderHistoryJoin"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
         where
             work_order_history.id=#{id}
         ;
