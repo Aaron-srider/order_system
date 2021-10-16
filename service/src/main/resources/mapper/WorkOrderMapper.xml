@@ -5,7 +5,6 @@
 <mapper namespace="cn.edu.bistu.workOrder.mapper.WorkOrderMapper">
 
 
-
     <sql id="workOrderJoin">
         left join user on work_order.initiator_id = user.id
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.userJoin"/>
@@ -15,8 +14,8 @@
 
     <sql id="workOrderSelect">
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.rowWorkOrderSelect"/>,
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.flowSelect"/>,
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.flowNodeSelect"/>,
+        <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowSelect"/>,
+        <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeSelect"/>,
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.userSelect"/>
     </sql>
 
@@ -40,26 +39,10 @@
     </sql>
 
 
-
-    <sql id="flowSelect">
-        flow.id as flow_id,
-        flow.description as flow_description,
-        flow.name as flow_name,
-        flow.deleted as flow_deleted
-    </sql>
-
-    <sql id="flowNodeSelect">
-        flow_node.id as flow_node_id ,
-        flow_node.flow_id as flow_node_flow_id ,
-        flow_node.approver_id as flow_node_approver_id ,
-        flow_node.node_order as flow_node_node_order ,
-        flow_node.next_id as flow_node_next_id
-    </sql>
-
     <sql id="workOrderConditions">
         <where>
-            <if test="approverId!=null and approverId!=''">
-                and flow_node.approver_id=#{approverId}
+            <if test="workOrderVo.flowNode!=null and workOrderVo.flowNode.approverId!=null and workOrderVo.flowNode.approverId!=''">
+                and flow_node.approver_id=#{workOrderVo.flowNode.approverId}
             </if>
             <if test="workOrderVo.id!=null">
                 and work_order.id=#{workOrderVo.id}

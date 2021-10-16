@@ -39,19 +39,19 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder>{
      */
     public WorkOrderVo getOneWorkOrderById(long id);
 
-    /**
-     * 获取指定审批者待审批的工单
-     * @param approverId 审批者id
-     * @param workOrderVo 筛选条件
-     */
-    public List<WorkOrderVo> getApprovalWorkOrderPageByApproverId(@Param("skip") long skip,@Param("size") long size,@Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
-
-    /**
-     * 获取指定审批者待审批的工单的总条数
-     * @param approverId 审批者id
-     * @param workOrderVo 筛选条件
-     */
-    public long getApprovalWorkOrderCountByApproverId(@Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
+    ///**
+    // * 获取指定审批者待审批的工单
+    // * @param approverId 审批者id
+    // * @param workOrderVo 筛选条件
+    // */
+    //public List<WorkOrderVo> getApprovalWorkOrderPageByApproverId(@Param("skip") long skip,@Param("size") long size,@Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
+    //
+    ///**
+    // * 获取指定审批者待审批的工单的总条数
+    // * @param approverId 审批者id
+    // * @param workOrderVo 筛选条件
+    // */
+    //public long getApprovalWorkOrderCountByApproverId(@Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
 
 
 }

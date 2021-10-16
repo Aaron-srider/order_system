@@ -1,20 +1,14 @@
 package cn.edu.bistu.workOrder.mapper;
 
 import cn.edu.bistu.admin.User.mapper.UserDao;
-import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.utils.Pagination;
-import cn.edu.bistu.flow.mapper.FlowDao;
-import cn.edu.bistu.model.common.JsonUtils;
+import cn.edu.bistu.flow.dao.FlowDaoImpl;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
 import cn.edu.bistu.model.common.result.SimpleDaoResultImpl;
 import cn.edu.bistu.model.entity.*;
-import cn.edu.bistu.model.entity.auth.User;
-import cn.edu.bistu.model.vo.UserVo;
-import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
@@ -22,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,7 +33,7 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
     UserDao userDao;
 
     @Autowired
-    FlowDao flowDao;
+    FlowDaoImpl flowDao;
 
     @Autowired
     WorkOrderMapper workOrderMapper;
@@ -80,9 +72,13 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
 
     @Override
     public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo) {
-        List<WorkOrderVo> workOrderVoList = workOrderMapper.getApprovalWorkOrderPageByApproverId(Pagination.getSkip(page), page.getSize(), approverId, workOrderVo);
+        FlowNode flowNode = new FlowNode();
+        flowNode.setApproverId(approverId);
+        workOrderVo.setFlowNode(flowNode);
+
+        List<WorkOrderVo> workOrderVoList = workOrderMapper.getWorkOrderPageByConditions(Pagination.getSkip(page), page.getSize(), workOrderVo);
         page.setRecords(workOrderVoList);
-        long workOrderCount = workOrderMapper.getApprovalWorkOrderCountByApproverId(approverId, workOrderVo);
+        long workOrderCount = workOrderMapper.getWorkOrderCountByConditions(workOrderVo);
         page.setTotal(workOrderCount);
         return new SimpleDaoResultImpl<Page<WorkOrderVo>>().setResult(page);
     }

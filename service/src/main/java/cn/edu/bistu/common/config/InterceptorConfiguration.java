@@ -58,6 +58,8 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/test/**")
                     //暂时登录测试接口不拦截
                     .excludePathPatterns("/utils/**")
+                    //关于流程的查询不需要权限和登录
+                    .excludePathPatterns("/flows/**")
             ;
 
             //用户授权
@@ -72,6 +74,8 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/message/**")
                     //暂时登录测试接口不拦截
                     .excludePathPatterns("/utils/**")
+                    //关于流程的查询不需要权限和登录
+                    .excludePathPatterns("/flows/**")
 
              ;
         }

@@ -6,7 +6,7 @@ import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ApprovalOperation;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
-import cn.edu.bistu.flow.mapper.FlowDao;
+import cn.edu.bistu.flow.dao.FlowDaoImpl;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApprovalServiceImpl implements ApprovalService {
 
     @Autowired
-    FlowDao flowDao;
+    FlowDaoImpl flowDao;
 
     @Qualifier("workOrderDaoImpl")
     @Autowired

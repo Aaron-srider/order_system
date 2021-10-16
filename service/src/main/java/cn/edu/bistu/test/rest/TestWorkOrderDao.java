@@ -2,13 +2,10 @@ package cn.edu.bistu.test.rest;
 
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.Result;
-import cn.edu.bistu.model.entity.WorkOrderHistory;
-import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
 import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryDao;
-import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,8 +27,6 @@ public class TestWorkOrderDao {
 
     @Autowired
     WorkOrderHistoryDao workOrderHistoryDao;
-
-
 
     @GetMapping("/testGetWorkOrderPageByConditions")
     public Result getWorkOrderPageByConditions() {

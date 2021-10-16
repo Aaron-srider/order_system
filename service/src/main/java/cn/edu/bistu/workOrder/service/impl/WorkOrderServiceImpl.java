@@ -5,7 +5,7 @@ import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
-import cn.edu.bistu.flow.mapper.FlowDao;
+import cn.edu.bistu.flow.dao.FlowDaoImpl;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -41,7 +40,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     WorkOrderDao workOrderDao;
 
     @Autowired
-    FlowDao flowDao;
+    FlowDaoImpl flowDao;
 
     @Value("${attachmentDownloadApi}")
     String attachmentDownloadApi;

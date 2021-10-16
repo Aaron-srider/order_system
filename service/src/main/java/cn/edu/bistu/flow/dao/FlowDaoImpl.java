@@ -1,9 +1,13 @@
-package cn.edu.bistu.flow.mapper;
+package cn.edu.bistu.flow.dao;
 
+import cn.edu.bistu.flow.mapper.FlowMapper;
+import cn.edu.bistu.flow.mapper.FlowNodeMapper;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
+import cn.edu.bistu.model.common.result.SimpleDaoResultImpl;
 import cn.edu.bistu.model.entity.Flow;
 import cn.edu.bistu.model.entity.FlowNode;
+import cn.edu.bistu.model.vo.FlowVo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.Data;
@@ -14,7 +18,7 @@ import java.util.List;
 
 @Data
 @Repository
-public class FlowDao {
+public class FlowDaoImpl implements FlowDao{
     @Autowired
     FlowNodeMapper flowNodeMapper;
     @Autowired
@@ -63,5 +67,11 @@ public class FlowDao {
             return daoResult;
         }
         return null;
+    }
+
+    @Override
+    public DaoResult getFlowListByRoleId(long roleId) {
+        List<FlowVo> flowListByRoleId = flowMapper.getAllFlowListByRoleId(roleId);
+        return new SimpleDaoResultImpl<>().setResult(flowListByRoleId);
     }
 }
