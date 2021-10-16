@@ -32,37 +32,37 @@
     <update id="userInfoComplete">
         update user
         set
-            name=#{name},
-            college_id=(select id from college where name=#{collegeName}),
-            major_id=(select id from major where name=#{majorName}),
-            class_id=(select id from class where name=#{clazzName}),
-            secondary_dept_id=(select id from secondary_dept where name=#{secondaryDeptName}),
-            grade=#{grade},
-            student_id=#{studentId},
-            job_id=#{jobId},
-            update_time=#{updateTime},
-            info_complete=1
+        name=#{name},
+        college_id=(select id from college where name=#{collegeName}),
+        major_id=(select id from major where name=#{majorName}),
+        class_id=(select id from class where name=#{clazzName}),
+        secondary_dept_id=(select id from secondary_dept where name=#{secondaryDeptName}),
+        grade=#{grade},
+        student_id=#{studentId},
+        job_id=#{jobId},
+        update_time=#{updateTime},
+        info_complete=1
         where id=#{id}
-</update>
+    </update>
 
     <select id="getOneById" resultType="cn.edu.bistu.model.vo.UserVo">
         select
-            u.id,
-            u.open_id,
-            student_id,
-            job_id,
-            r.name role,
-            ma.name majorName,
-            u.create_time,
-            u.update_time,
-            col.name collegeName,
-            se.name secondaryDeptName,
-            cl.name className,
-            grade,
-            u.name,
-            avatar_url,
-            gender,
-            nick_name
+        u.id,
+        u.open_id,
+        student_id,
+        job_id,
+        r.name role,
+        ma.name majorName,
+        u.create_time,
+        u.update_time,
+        col.name collegeName,
+        se.name secondaryDeptName,
+        cl.name className,
+        grade,
+        u.name,
+        avatar_url,
+        gender,
+        nick_name
         from user u left join class cl on u.class_id=cl.id
         left join college col on u.college_id=col.id
         left join major ma on u.major_id=ma.id
@@ -71,7 +71,7 @@
         left join role r on ur.role_id=r.id
         where u.id=#{id}
         and u.deleted=0 and r.deleted=0 and ur.deleted=0;
-</select>
+    </select>
 
     <select id="getApprovalWorkOrders" resultType="cn.edu.bistu.model.vo.WorkOrderVo">
         select
@@ -103,6 +103,182 @@
                 and wo.title like '%' #{workOrderVo.title} '%'
             </if>
         </where>
+    </select>
+
+
+    <resultMap id="userResultMap" type="cn.edu.bistu.model.vo.UserVo">
+        <id property="id" column="user_id"/>
+        <result property="openId" column="user_open_id"/>
+        <result property="sessionKey" column="user_session_key"/>
+        <result property="name" column="user_name"/>
+        <result property="collegeId" column="user_college_id"/>
+        <result property="majorId" column="user_major_id"/>
+        <result property="secondaryDeptId" column="user_secondary_dept_id"/>
+        <result property="clazzName" column="user_clazz_name"/>
+        <result property="grade" column="user_grade"/>
+        <result property="gender" column="user_gender"/>
+        <result property="avatarUrl" column="user_avatar_url"/>
+        <result property="nickName" column="user_nick_name"/>
+        <result property="infoComplete" column="user_info_complete"/>
+        <result property="studentJobId" column="user_student_job_id"/>
+        <result property="deleted" column="user_deleted"/>
+        <result property="createTime" column="user_create_time"/>
+        <result property="updateTime" column="user_update_time"/>
+        <result property="isLock" column="user_is_lock"/>
+        <result property="unionId" column="user_union_id"/>
+
+        <association property="major" javaType="cn.edu.bistu.model.entity.Major">
+            <id property="id" column="college_id"/>
+            <result property="name" column="college_name"/>
+        </association>
+
+        <association property="secondaryDept" javaType="cn.edu.bistu.model.entity.SecondaryDept">
+            <id property="id" column="secondary_dept_id"/>
+            <result property="name" column="secondary_dept_name"/>
+        </association>
+
+        <association property="college" javaType="cn.edu.bistu.model.entity.College">
+            <id property="id" column="college_id"/>
+            <result property="name" column="college_name"/>
+        </association>
+
+        <collection property="roleList" ofType="cn.edu.bistu.model.entity.auth.Role">
+            <id property="id" column="role_id"/>
+            <result property="name" column="role_name"/>
+            <result property="text" column="role_text"/>
+        </collection>
+    </resultMap>
+
+    <sql id="userSelect">
+        user.id as user_id,
+--         user.open_id as user_open_id,
+--         user.session_key as user_session_key,
+        user.name as user_name,
+        user.college_id as user_college_id,
+        user.major_id as user_major_id,
+        user.secondary_dept_id as user_secondary_dept_id,
+        user.clazz_name as user_clazz_name,
+        user.grade as user_grade,
+        user.gender as user_gender,
+        user.avatar_url as user_avatar_url,
+        user.nick_name as user_nick_name,
+        user.student_job_id as user_student_job_id,
+        user.info_complete as user_info_complete,
+        user.deleted as user_deleted,
+        user.create_time as user_create_time,
+        user.update_time as user_update_time,
+        user.is_lock as user_is_lock,
+--         user.union_id as user_union_id,
+        college.id as college_id,
+        college.name as college_name,
+        major.id as major_id,
+        major.name as major_name,
+        secondary_dept.id as secondary_dept_id,
+        secondary_dept.name as secondary_dept_name,
+        role.id as role_id,
+        role.name as role_name,
+        role.text as role_text
+    </sql>
+
+    <sql id="userJoin">
+        left join college on user.college_id = college.id
+        left join major on user.major_id = major.id
+        left join secondary_dept on user.secondary_dept_id = secondary_dept.id
+        left join user_role on user.id = user_role.user_id
+        left join role on user_role.role_id = role.id
+    </sql>
+
+    <sql id="basicUserSelect">
+        select
+        <include refid="userSelect"/>
+        from user
+        <include refid="userJoin"/>
+    </sql>
+
+    <sql id="page">
+        limit #{skip}, #{size}
+    </sql>
+
+
+    <!--
+    admin查询所有用户的筛选条件：
+
+    筛选条件的构成：
+    根据  userVo.roleCategory  判断采用哪个筛选条件组，具体筛选条件组如下：
+       RoleCategory:  student
+       筛选条件组：studentId,clazzName,majorName
+
+       RoleCategory:  teacher
+       筛选条件组：jobId,secondaryDeptName
+
+       RoleCategory:  all
+      筛选条件组：jobId(或studentId)
+
+    注意:
+        1.使用<choose>结构实现筛选条件组的选择
+        2.userVo.name是所有筛选条件组共有的
+        3.所有筛选条件组内部，使用<if/>拼接的方式拼接筛选条件
+    -->
+    <sql id="userConditions">
+        <where>
+            <if test="userVo.name!=null and userVo.name !=''">
+                and user.name like "%" #{userVo.name} "%"
+            </if>
+            <if test="userVo.studentJobId!=null and userVo.studentJobId !=''">
+                and user.student_job_id like "%" #{userVo.studentJobId} "%"
+            </if>
+            <choose>
+                <when test="userVo.roleCategory == 'student'">
+                    and role.id in (6, 7)
+                    <if test="userVo.clazzName!=null and userVo.clazzName !=''">
+                        and user.clazz_name like "%" #{userVo.clazzName} "%"
+                    </if>
+                    <if test="userVo.majorName!=null and userVo.majorName !=''">
+                        and major.name like "%" #{userVo.majorName} "%"
+                    </if>
+                </when>
+                <when test="userVo.roleCategory == 'teacher'">
+                    and role.id in (3, 4, 5)
+                    <if test="userVo.majorName!=null and userVo.majorName !=''">
+                        and secondary_dept.name like "%" #{userVo.secondaryDeptName} "%"
+                    </if>
+                </when>
+                <when test="userVo.roleCategory == 'all'">
+                </when>
+            </choose>
+        </where>
+    </sql>
+
+    <select id="getOneUserById" resultMap="userResultMap">
+        <include refid="basicUserSelect"/>
+        where user.id = #{id}
+        ;
+    </select>
+
+    <select id="getOneUserByOpenId" resultMap="userResultMap">
+        <include refid="basicUserSelect"/>
+        where user.open_id = #{openId}
+        ;
+    </select>
+
+    <select id="getOneUserByUnionId" resultMap="userResultMap">
+        <include refid="basicUserSelect"/>
+        where user.unionId = #{unionId}
+        ;
+    </select>
+
+    <select id="getUserListByConditions" resultMap="userResultMap">
+        <include refid="basicUserSelect"/>
+        <include refid="userConditions"/>
+        <include refid="page"/>
+        ;
+    </select>
+
+    <select id="getUserCountByConditions" resultType="long">
+        select count(distinct user.id)
+        from user
+        <include refid="userJoin"/>
+        <include refid="userConditions"/>
     </select>
 
 </mapper>

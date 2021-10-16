@@ -11,7 +11,7 @@ public interface AuthService{
      * @param code 小程序微信临时登录凭证
      * @return 返回认证结果，若认证通过，返回用户信息和登录token（包含用户id）
      */
-    ServiceResult<JSONObject> authentication(String code);
+    ServiceResult authentication(String code);
 
     /**
      * 用户授权，为授权拦截器提供服务。
@@ -44,7 +44,7 @@ public interface AuthService{
      *                      studentId       ：学号（字符串）
      *                      roleId          ：user的角色id，由于role与user是多对多的关系，所以需要将roleId和userId插入到关系user_role表中
      */
-    public ServiceResult<JSONObject> userInfoCompletion(UserVo userVo);
+    public ServiceResult<UserVo> userInfoCompletion(UserVo userVo);
 
 
     /**

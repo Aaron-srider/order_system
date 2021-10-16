@@ -106,7 +106,6 @@ public class AuthServiceImpl implements AuthService {
         return wxLoginStatus;
     }
 
-
     /**
      * 为登录接口提供服务
      * 检查用户是否注册，若未注册，为用户自动注册；若已注册，认证用户身份
@@ -115,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
      * @return 返回认证结果，若认证通过，返回用户信息和登录token（包含用户id）
      */
     @Override
-    public ServiceResult<JSONObject> authentication(String code) {
+    public ServiceResult authentication(String code) {
 
         //获取用户微信openId
         String openId = "";
@@ -137,9 +136,9 @@ public class AuthServiceImpl implements AuthService {
         }
 
         //判断用户表中是否存在该用户，不存在则进行解密得到用户信息，并进行新增用户
-        DaoResult<User> daoResult = userDao.getOneUserByOpenId(openId);
+        DaoResult<UserVo> daoResult = userDao.getOneUserByOpenId(openId);
 
-        User resultUser = daoResult.getResult();
+        UserVo resultUser = daoResult.getResult();
 
         //用户没有注册，向数据库插入新用户，不返回token
         if (resultUser == null) {
@@ -158,7 +157,7 @@ public class AuthServiceImpl implements AuthService {
             Integer infoComplete = resultUser.getInfoComplete();
             if (infoComplete.equals(1)) {
                 String token = generateUserToken(resultUser.getId());
-                daoResult.addDetailInfo("token", token);
+                resultUser.setToken(token);
             }
             //如果用户没有完善信息，就不返回登录token
             else {
@@ -169,9 +168,7 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        ServiceResult<JSONObject> serviceResult = new ServiceResultImpl<>((JSONObject) daoResult.getValue());
-
-        return serviceResult;
+        return new ServiceResultImpl<>(resultUser);
     }
 
 
@@ -196,13 +193,16 @@ public class AuthServiceImpl implements AuthService {
             String allowedUrl = str[1];
 
             int index = allowedUrl.lastIndexOf("/*");
+            String processedRequestURL = null;
             if (index != -1) {
                 allowedUrl = allowedUrl.substring(0, index);
                 index = index > requestURL.length() ? requestURL.length() : index;
-                requestURL = requestURL.substring(0, index);
+                processedRequestURL = requestURL.substring(0, index);
+            } else {
+                processedRequestURL = requestURL;
             }
 
-            if (allowedUrl.equals(requestURL) && allowedMethod.toLowerCase().equals(requestMethod.toLowerCase())) {
+            if (allowedUrl.equals(processedRequestURL) && allowedMethod.toLowerCase().equals(requestMethod.toLowerCase())) {
                 return true;
             }
         }
@@ -218,7 +218,6 @@ public class AuthServiceImpl implements AuthService {
         return token;
     }
 
-
     private Map<Long, Object> forgeToken(Long[] userIds) {
         Map<Long, Object> map = new HashMap<>();
         for (Long userId : userIds) {
@@ -229,10 +228,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ServiceResult<JSONObject> userInfoCompletion(UserVo userVo) {
+    public ServiceResult<UserVo> userInfoCompletion(UserVo userVo) {
         Long roleId = userVo.getRoleId();
 
-        DaoResult<User> daoResult = userDao.getOneUserById(userVo.getId());
+        DaoResult<UserVo> daoResult = userDao.getOneUserById(userVo.getId());
         User user = daoResult.getResult();
 
         //用户没注册
@@ -241,18 +240,19 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Integer infoComplete = user.getInfoComplete();
-        ////用户已经完善过信息
-        //if (infoComplete.equals(1)) {
-        //    throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_COMPLETED);
-        //}
-
+        //用户已经完善过信息
+        if (infoComplete.equals(1)) {
+            throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_COMPLETED);
+        }
 
         userVo.setInfoComplete(1);
 
-        ServiceResult<JSONObject> serviceResult = userService.updateUser(userVo);
-
         //向UserRole表中插入数据
         improveUserRoleInfo(roleId, userVo.getId());
+
+        //更新用户
+        ServiceResult<UserVo> serviceResult = userService.updateUser(userVo);
+
         return serviceResult;
     }
 
@@ -283,53 +283,47 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        DaoResult<User> oneUserByUnionId = userDao.getOneUserByUnionId(unionId);
+        DaoResult<UserVo> oneUserByUnionId = userDao.getOneUserByUnionId(unionId);
 
 
-        User user = oneUserByUnionId.getResult();
+        UserVo userVo = oneUserByUnionId.getResult();
 
-        log.debug("result: " + oneUserByUnionId.getResult());
-
-        log.debug("result: " + oneUserByUnionId.getDetailInfo());
 
         //用户没有注册
-        if(user==null) {
-            throw new ResultCodeException(user, ResultCodeEnum.USER_NOT_REGISTERED);
+        if(userVo==null) {
+            throw new ResultCodeException(userVo, ResultCodeEnum.USER_NOT_REGISTERED);
         }
 
         log.debug("userRegistered");
 
         //用户是否完善信息
-        if (user.getInfoComplete().equals(0)) {
-            throw new ResultCodeException(user, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
+        if (userVo.getInfoComplete().equals(0)) {
+            throw new ResultCodeException(userVo, ResultCodeEnum.USER_INFO_NOT_COMPLETE);
         }
 
         log.debug("userInfoComplete");
 
         //判断是否是管理员
-        boolean isAdmin = userService.isAdmin(user.getId());
+        boolean isAdmin = userService.isAdmin(userVo.getId());
         if (!isAdmin) {
-            throw new ResultCodeException(user, ResultCodeEnum.HAVE_NO_RIGHT);
+            throw new ResultCodeException(userVo, ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
-        log.debug("user is an admin");
+        log.debug("userVo is an admin");
 
         //判断用户是否锁定
-        Integer isLock = user.getIsLock();
+        Integer isLock = userVo.getIsLock();
         if (isLock.equals(1)) {
-            throw new ResultCodeException(user, ResultCodeEnum.USER_LOCK);
+            throw new ResultCodeException(userVo, ResultCodeEnum.USER_LOCK);
         }
 
-        log.debug("user account valid");
+        log.debug("userVo account valid");
 
-        String token = generateUserToken(user.getId());
-        oneUserByUnionId.addDetailInfo("token", token);
+        String token = generateUserToken(userVo.getId());
+        userVo.setToken(token);
 
-        log.debug("token:" + token);
-
-        return new ServiceResultImpl(oneUserByUnionId.getValue());
+        return new ServiceResultImpl(userVo);
     }
-
 
     @Test
     public void getOpenIdAndUnionIdByTrick() {
@@ -369,7 +363,7 @@ public class AuthServiceImpl implements AuthService {
     @Test
     public void forgeToken() {
         Map<Long, Object> tokens = forgeToken(new Long[]{
-                2L, 3L
+                2L
         });
 
         System.out.println(tokens);
@@ -384,7 +378,7 @@ public class AuthServiceImpl implements AuthService {
         //找出不是管理员的角色关系，更新它
         boolean flag=false;
         UserRole targetUserRole=null;
-        List<UserRole> userRoleList = userDao.getUserRoleMapper().selectList(new QueryWrapper<UserRole>().eq("user_id", userId));
+        List<UserRole> userRoleList = userDao.getUserRoleByUserId(userId);
         for (UserRole userRole : userRoleList) {
             if(userRole.getRoleId() != userUtils.convertRoleConstant2Entity(Role.ADMIN).getId() &&
                     userRole.getRoleId() != userUtils.convertRoleConstant2Entity(Role.OPERATOR).getId() ) {
@@ -395,13 +389,13 @@ public class AuthServiceImpl implements AuthService {
         }
         if(flag) {
             targetUserRole.setRoleId(roleId);
-            userDao.getUserRoleMapper().updateById(targetUserRole);
+            userDao.updateUserRoleByUserRoleId(targetUserRole);
         } else {
             //插入角色
             UserRole userRole = new UserRole();
             userRole.setRoleId(roleId);
             userRole.setUserId(userId);
-            userDao.getUserRoleMapper().insert(userRole);
+            userDao.insertUserRole(userRole);
         }
 
     }
@@ -412,7 +406,7 @@ public class AuthServiceImpl implements AuthService {
         user.setSessionKey(sessionkey);
         user.setUnionId(unionId);
         user.setInfoComplete(0);
-        userDao.getUserMapper().insert(user);
+        userDao.insertUser(user);
         user.setUnionId(null);
         user.setOpenId(null);
         user.setSessionKey(null);

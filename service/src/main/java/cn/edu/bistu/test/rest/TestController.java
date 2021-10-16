@@ -4,9 +4,11 @@ import cn.edu.bistu.Entity;
 import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.auth.mapper.AuthDao;
 import cn.edu.bistu.model.common.result.Result;
+import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.test.Testtb;
 import cn.edu.bistu.test.mapper.TestdbDao;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +32,23 @@ public class TestController {
 
     @Autowired
     AuthDao authDao;
+
+
+    @GetMapping("/testNewGetAllUsers")
+    public Result testNewGetAllUsers() {
+        Page<UserVo> userVoPage = new Page<>();
+        userVoPage.setSize(10).setCurrent(1);
+        UserVo userVo = new UserVo();
+        //userVo.setJobId("");
+        userVo.setRoleCategory("all");
+        userVo.setName("test");
+        return Result.ok(userDao.getUserListByConditions(userVoPage, userVo).getResult());
+    }
+
+    @GetMapping("/testNewUserDao")
+    public Result testNewUserDao() {
+        return Result.ok(userDao.getOneUserById(1L).getResult());
+    }
 
     @GetMapping("/prepareAllPermission")
     public void prepareAllPermission() {

@@ -81,17 +81,6 @@ public class Pagination {
         return false;
     }
 
-    public static void main(String[] args) {
-        ArrayList<String> objects = new ArrayList<>();
-        objects.add("ajlsd");
-        objects.add("ajlsd");
-        objects.add("ajlsd");
-        objects.add("ajlsd");
-
-        List<String> strings = objects.subList(8, 0);
-
-    }
-
     public static PageVo setDefault(Integer current, Integer size) {
         PageVo pageVo = new PageVo();
         if(current == null) {
@@ -106,5 +95,9 @@ public class Pagination {
         }
 
         return pageVo;
+    }
+
+    public static long getSkip(Page page) {
+        return (page.getCurrent() - 1) * page.getSize();
     }
 }

@@ -11,8 +11,8 @@ import cn.edu.bistu.model.common.validation.Update;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.PageVo;
+import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,23 +58,18 @@ public class ApprovalController extends BaseController {
 
     @GetMapping("/approval/workOrders")
     public Result list(PageVo pageVo,
-                       WorkOrder workOrder,
+                       WorkOrderVo workOrderVo,
                        HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
         pageVo = Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
 
-        if (BeanUtils.isEmpty(workOrder.getTitle())) {
-            workOrder.setTitle("");
-        }
+        Page<WorkOrderVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
 
-        Page<WorkOrder> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-
-        ServiceResult<Page<JSONObject>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), page, workOrder);
-        Page<JSONObject> result = serviceResult.getServiceResult();
-        return Result.ok(result);
+        ServiceResult<Page<WorkOrderVo>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), page, workOrderVo);
+        return Result.ok(serviceResult.getServiceResult());
     }
 
-    public void setUpApprovalRecord(HttpServletRequest req, ApprovalRecord approvalRecord) {
+    private void setUpApprovalRecord(HttpServletRequest req, ApprovalRecord approvalRecord) {
         //获取审批者id
         Long approverId = getVisitorId(req);
         approvalRecord.setApproverId(approverId);

@@ -1,18 +1,9 @@
 package cn.edu.bistu.dept.service;
 
 import cn.edu.bistu.dept.mapper.DeptDao;
-import cn.edu.bistu.model.common.result.ServiceResult;
-import cn.edu.bistu.model.common.result.ServiceResultImpl;
-import cn.edu.bistu.model.entity.College;
-import cn.edu.bistu.model.entity.Major;
-import cn.edu.bistu.model.entity.SecondaryDept;
-import cn.edu.bistu.model.entity.WorkOrderStatus;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
-import com.alibaba.fastjson.JSONObject;
+import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class DeptServiceImpl implements DeptService {
@@ -21,7 +12,7 @@ public class DeptServiceImpl implements DeptService {
     DeptDao deptDao;
 
     @Autowired
-    WorkOrderDao workOrderDao;
+    WorkOrderDaoImpl workOrderDaoImpl;
 
     //@Override
     //public ServiceResult<JSONObject> getAllDeptCollegeMajor() {

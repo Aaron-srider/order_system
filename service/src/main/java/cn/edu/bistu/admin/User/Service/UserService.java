@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 public interface UserService extends IService<User>{
     /**
      * 根据userVo对象中的属性设置user的查询条件，根据前端传来的角色查询类型不同，分为以下几种情况：
@@ -31,11 +33,11 @@ public interface UserService extends IService<User>{
      * @param userVo
      * @return
      */
-    public ServiceResult<JSONObject> getAllUsers(Page<UserVo> page, UserVo userVo);
+    public ServiceResult getAllUsers(Page<UserVo> page, UserVo userVo);
 
     public void lock(User user);
 
-    public ServiceResult<JSONObject> updateUser(UserVo userVo);
+    public ServiceResult<UserVo> updateUser(UserVo userVo);
 
 
     /**

@@ -2,10 +2,9 @@ package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.ResultCodeException;
-import cn.edu.bistu.common.utils.WorkOrderUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
+import cn.edu.bistu.constants.WorkOrderStatus;
 import cn.edu.bistu.flow.mapper.FlowDao;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.DaoResult;
@@ -13,18 +12,18 @@ import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.entity.auth.User;
-import cn.edu.bistu.model.vo.AdminWorkOrderQueryVo;
+import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
+import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +36,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     WxMiniApi wxMiniApi;
 
+    @Qualifier("workOrderDaoImpl")
     @Autowired
     WorkOrderDao workOrderDao;
 
@@ -55,23 +55,16 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     ApprovalService approvalService;
 
-    @Autowired
-    WorkOrderUtils workOrderUtils;
-
     @Override
-    public ServiceResult<JSONObject> listWorkOrder(WorkOrder workOrderVo, Page<WorkOrder> page) throws NoSuchFieldException, IllegalAccessException {
-        QueryWrapper<WorkOrder> wrapper = new QueryWrapper<>();
-        wrapper.like("title", workOrderVo.getTitle());
-        DaoResult<Page<JSONObject>> daoResultPage = workOrderDao.getWorkOrderPageByWrapper(page, wrapper);
-        JSONObject value = daoResultPage.getValue();
-
-        return new ServiceResultImpl<JSONObject>(value);
+    public ServiceResult listWorkOrder(WorkOrderVo workOrderVo, Page<WorkOrderVo> page) {
+        DaoResult<Page<WorkOrderVo>> daoResultPage = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo);
+        return new ServiceResultImpl<>(daoResultPage.getResult());
     }
 
     @Override
     public void revoke(Long workOrderId, Long initiator) {
 
-        WorkOrder workOrder = workOrderDao.getWorkOrderMapper().selectById(workOrderId);
+        WorkOrder workOrder = ((WorkOrderDaoImpl)workOrderDao).getWorkOrderMapper().selectById(workOrderId);
 
         //“撤回接口”访问者与工单发起者不是同一个用户，无权操作
         if (!workOrder.getInitiatorId().equals(initiator)) {
@@ -91,16 +84,28 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
                     ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
         }
 
-        workOrderUtils.workOrderFinish(workOrder, null, cn.edu.bistu.constants.WorkOrderStatus.BEEN_WITHDRAWN);
+        approvalService.workOrderFinish(workOrder, null, WorkOrderStatus.BEEN_WITHDRAWN);
     }
 
     @Override
-    public ServiceResult<JSONObject> detail(WorkOrder workOrder) throws NoSuchFieldException, IllegalAccessException {
-        QueryWrapper<WorkOrder> wrapper = new QueryWrapper<>();
-        wrapper.eq("id", workOrder.getId());
-        DaoResult<WorkOrder> daoResultPage = workOrderDao.getOneWorkOrderByWrapper(wrapper);
-        new ServiceResultImpl<>(daoResultPage.getValue());
-        return new ServiceResultImpl<>(daoResultPage.getValue());
+    public ServiceResult<WorkOrderVo> detail(WorkOrder workOrder) {
+
+        WorkOrder inspectWorkOrder = ((WorkOrderDaoImpl) workOrderDao).getWorkOrderMapper().selectOne(new QueryWrapper<WorkOrder>().select("id", "initiator_id").eq("id", workOrder.getId()));
+
+        //工单不存在
+        if (inspectWorkOrder == null) {
+            throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.WORKORDER_NOT_EXISTS);
+        }
+
+        //来访者不是工单的属主
+        if (!inspectWorkOrder.getInitiatorId().equals(workOrder.getInitiatorId())) {
+            throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.HAVE_NO_RIGHT);
+        }
+
+        DaoResult<WorkOrderVo> daoResultPage = workOrderDao.getOneWorkOrderById(workOrder.getId());
+        WorkOrderVo result = daoResultPage.getResult();
+        result.setAttachment(null);
+        return new ServiceResultImpl<>(result);
     }
 
     @Override
@@ -126,67 +131,15 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     @Override
-    public ServiceResult getAllWorkOrders(Page<WorkOrder> page, AdminWorkOrderQueryVo adminWorkOrderQueryVo) throws NoSuchFieldException, IllegalAccessException {
-
-        //构造查询条件
-        QueryWrapper<WorkOrder> workOrderWrapper = new QueryWrapper<>();
-
-        Long workOrderId = adminWorkOrderQueryVo.getId();
-        if (workOrderId!=null) {
-            workOrderWrapper.eq("id", adminWorkOrderQueryVo.getId());
-        }
-
-        String studentJobId= adminWorkOrderQueryVo.getStudentJobId();
-        if (!BeanUtils.isEmpty(studentJobId)) {
-            DaoResult<List<JSONObject>> daoUserList = userDao.getUserListByWrapper(null,
-                    new QueryWrapper<User>().like("job_id", studentJobId)
-                            .or()
-                            .like("student_id", studentJobId)
-            );
-            List<JSONObject> userList = daoUserList.getResult();
-            List<Long> idList = new ArrayList<>();
-            if (!userList.isEmpty()) {
-                for (JSONObject userJson : userList) {
-                    User user = (User) userJson.get("result");
-                    idList.add(user.getId());
-                }
-                workOrderWrapper.in("initiator_id", idList);
-            } else {
-
-                JSONObject jsonObject = new JSONObject();
-                Page page1 = new Page();
-
-                page1.setTotal(0);
-                page1.setSize(0);
-                page1.setCurrent(1);
-                page1.setPages(0);
-                page1.setRecords(new ArrayList());
-
-                jsonObject.put("result", page1);
-                return new ServiceResultImpl<JSONObject>(jsonObject);
-            }
-
-        }
-
-        String startDate = adminWorkOrderQueryVo.getStartDate();
-        String endDate = adminWorkOrderQueryVo.getEndDate();
-        if (!BeanUtils.isEmpty(endDate)) {
-            workOrderWrapper.lt("create_time", endDate);
-        }
-        if (!BeanUtils.isEmpty(startDate)) {
-            workOrderWrapper.gt("create_time", startDate);
-        }
-
-        DaoResult<Page<JSONObject>> daoResultPage = workOrderDao.getWorkOrderPageByWrapper(page, workOrderWrapper);
-        JSONObject value = daoResultPage.getValue();
-
-        return new ServiceResultImpl<JSONObject>(value);
+    public ServiceResult getAllWorkOrders(Page<WorkOrderVo> page, WorkOrderVo workOrderVo) {
+        DaoResult<Page<WorkOrderVo>> workOrderPageByConditions = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo);
+        Page<WorkOrderVo> result = workOrderPageByConditions.getResult();
+        return new ServiceResultImpl<>(result);
     }
 
     @Override
     public void deleteAttachmentByWorkOrderId(Long workOrderId) {
-
-        workOrderDao.deleteWorkOrderAttachment(workOrderId);
+        ((WorkOrderDaoImpl)workOrderDao).deleteWorkOrderAttachment(workOrderId);
     }
 
 }

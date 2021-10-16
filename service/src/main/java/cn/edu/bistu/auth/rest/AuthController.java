@@ -39,16 +39,14 @@ public class AuthController {
 
     @GetMapping("/auth/login")
     public Result login(@NotNull String code) {
-        ServiceResult<JSONObject> result = null;
-        result = authService.authentication(code);
-        JSONObject serviceResult = result.getServiceResult();
-        return Result.ok(serviceResult);
+        ServiceResult result = authService.authentication(code);
+        return Result.ok(result.getServiceResult());
     }
 
     @PutMapping("/auth/userInfoCompletion")
     public Result completeUserInfo(
             @RequestBody @Validated UserVo userVo) {
-        ServiceResult<JSONObject> serviceResult = authService.userInfoCompletion(userVo);
+        ServiceResult<UserVo> serviceResult = authService.userInfoCompletion(userVo);
         return Result.ok(serviceResult.getServiceResult());
     }
 

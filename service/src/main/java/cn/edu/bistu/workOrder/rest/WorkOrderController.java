@@ -3,11 +3,14 @@ package cn.edu.bistu.workOrder.rest;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.rest.BaseController;
+import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.validation.Insert;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.PageVo;
+import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
+import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import cn.edu.bistu.common.config.ValidationWrapper;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
@@ -16,7 +19,6 @@ import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,47 +55,28 @@ public class WorkOrderController extends BaseController {
     ValidationWrapper globalValidator;
 
     /**
-     * 返回分页的工单列表，支持名称模糊搜索
+     * 返回分页的工单列表，支持工单标题模糊搜索
      * 入参：size(10)，current(1)，title(NULL)
-     *
-     * @return
      */
     @GetMapping("/workOrders")
     public Result list(PageVo pageVo,
-                       WorkOrder workOrder,
+                       WorkOrderVo workOrderVo,
                        HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
+        pageVo = Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
 
-        if (pageVo.getSize() == null) {
-            pageVo.setSize(10);
+        if (workOrderVo.getTitle() == null) {
+            workOrderVo.setTitle("");
         }
-        if (pageVo.getCurrent() == null) {
-            pageVo.setCurrent(1);
-        }
-        if (workOrder.getTitle() == null) {
-            workOrder.setTitle("");
-        }
-        //paramIntegrityChecker.setOptionalPropsName(MapService.map()
-        //        .putMap("size", 10)
-        //        .putMap("current", 1)
-        //);
-        //paramIntegrityChecker.checkMapParamIntegrity(workOrderMap);
 
-        //封装工单对象
-        workOrder.setInitiatorId(getVisitorId(req));
-        //String title = workOrderMap.getVal("title", String.class);
+        workOrderVo.setInitiatorId(getVisitorId(req));
 
-        //封装分页对象
-        Page<WorkOrder> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        //Integer size = (Integer) workOrderMap.get("size");
-        //Integer current = (Integer) workOrderMap.get("current");
+        Page<WorkOrderVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
 
         //获取结果
-        ServiceResult<JSONObject> serviceResult = workOrderService.listWorkOrder(workOrder, page);
-        JSONObject result = serviceResult.getServiceResult();
-        return Result.ok(result);
+        ServiceResult serviceResult = workOrderService.listWorkOrder(workOrderVo, page);
+        return Result.ok(serviceResult.getServiceResult());
     }
-
 
     /**
      * 返回分页的历史工单列表，支持名称模糊搜索
@@ -101,38 +84,24 @@ public class WorkOrderController extends BaseController {
      */
     @GetMapping("/workOrder/histories")
     public Result history(PageVo pageVo,
-                          WorkOrderHistory workOrderHistory,
+                          WorkOrderHistoryVo workOrderHistoryVo ,
                           HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        if (pageVo.getSize() == null) {
-            pageVo.setSize(10);
-        }
-        if (pageVo.getCurrent() == null) {
-            pageVo.setCurrent(1);
-        }
-        if (workOrderHistory.getTitle() == null) {
-            workOrderHistory.setTitle("");
-        }
+        Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
 
-        //paramIntegrityChecker.setOptionalPropsName(MapService.map()
-        //        .putMap("size", 10)
-        //        .putMap("current", 1)
-        //        .putMap("title", "")
-        //);
-        //paramIntegrityChecker.checkMapParamIntegrity(workOrderHistoryMap);
+        if (workOrderHistoryVo.getWorkOrderVo().getTitle() == null) {
+            workOrderHistoryVo.getWorkOrderVo().setTitle("");
+        }
 
         //封装工单对象
-        workOrderHistory.setInitiatorId(getVisitorId(req));
-        //String title = workOrderHistoryMap.getVal("title", String.class);
+        workOrderHistoryVo.getWorkOrderVo().setInitiatorId(getVisitorId(req));
 
         //封装分页对象
-        Page<WorkOrderHistory> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        //Integer size = workOrderHistoryMap.getVal("size", Integer.class);
-        //Integer current = workOrderHistoryMap.getVal("current", Integer.class);
+        Page<WorkOrderHistoryVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
 
-        Page<JSONObject> result = workOrderHistorService.listWorkOrderHistory(workOrderHistory, page);
+        ServiceResult result = workOrderHistorService.listWorkOrderHistory(workOrderHistoryVo, page);
 
-        return Result.ok(result);
+        return Result.ok(result.getServiceResult());
     }
 
     /**
@@ -145,7 +114,6 @@ public class WorkOrderController extends BaseController {
     public void downloadAttachment(
             @PathVariable("workOrderId") @NotNull Long workOrderId,
             HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
 
         //查询附件
         WorkOrder workOrder = workOrderService.getById(workOrderId);
@@ -213,8 +181,6 @@ public class WorkOrderController extends BaseController {
             throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
-
-
         //上传附件
         if (attachment.getSize() != 0 && !attachment.getOriginalFilename().equals("")) {
             byte[] bytes = attachment.getBytes();
@@ -278,57 +244,27 @@ public class WorkOrderController extends BaseController {
     public Result detail(@NotNull Long workOrderId, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
         Long visitorId = getVisitorId(req);
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setInitiatorId(visitorId);
+        workOrder.setId(workOrderId);
 
-        WorkOrder workOrder = workOrderService.getById(workOrderId);
+        ServiceResult<WorkOrderVo> detail = workOrderService.detail(workOrder);
 
-        if (workOrder == null) {
-            log.debug("workOrderId：" + ResultCodeEnum.WORKORDER_NOT_EXISTS.toString());
-            return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
-        }
-
-        if (!workOrder.getInitiatorId().equals(visitorId)) {
-            log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
-            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
-        }
-
-        workOrder.setAttachment(null);
-
-        //获取结果
-        ServiceResult<JSONObject> serviceResult = workOrderService.detail(workOrder);
-        JSONObject result = serviceResult.getServiceResult();
-        return Result.ok(result);
+        return Result.ok(detail.getServiceResult());
     }
 
     /**
      * 查看历史工单详情
-     * <p>
-     * //* @param json 查询工单的id
-     *
-     * @param req
-     * @return
      */
     @GetMapping("/workOrder/history/detail")
     public Result historyDetail(@NotNull Long workOrderHistoryId, HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
 
-        WorkOrderHistory workOrderHistory = workOrderHistorService.getById(workOrderHistoryId);
-
-        if (workOrderHistory == null) {
-            log.debug("workOrderId：" + ResultCodeEnum.WORKORDER_NOT_EXISTS.toString());
-            return Result.build(null, ResultCodeEnum.WORKORDER_NOT_EXISTS);
-        }
-
-        Long visitorId = getVisitorId(req);
-        if (!workOrderHistory.getInitiatorId().equals(visitorId)) {
-            log.debug("id " + visitorId + "：" + ResultCodeEnum.HAVE_NO_RIGHT.toString());
-            return Result.build(null, ResultCodeEnum.HAVE_NO_RIGHT);
-        }
-
-        workOrderHistory.setAttachment(null);
+        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
+        workOrderHistory.setId(workOrderHistoryId);
 
         //获取结果
-        ServiceResult<JSONObject> serviceResult = workOrderHistorService.detail(workOrderHistory);
-        JSONObject result = serviceResult.getServiceResult();
-        return Result.ok(result);
+        ServiceResult<WorkOrderHistoryVo> serviceResult = workOrderHistorService.detail(workOrderHistory, getVisitorId(req));
+        return Result.ok(serviceResult.getServiceResult());
     }
 
     @DeleteMapping("/workOrder/attachment/{id}")

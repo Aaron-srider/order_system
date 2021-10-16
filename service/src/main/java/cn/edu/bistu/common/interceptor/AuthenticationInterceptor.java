@@ -8,6 +8,7 @@ import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.auth.User;
+import cn.edu.bistu.model.vo.UserVo;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         Long id = JwtHelper.getClaim(token, "id", Integer.class).longValue();
 
 
-        DaoResult<User> oneUserById = userDao.getOneUserById(id);
+        DaoResult<UserVo> oneUserById = userDao.getOneUserById(id);
         Integer isLock = oneUserById.getResult().getIsLock();
         if (isLock.equals(1)) {
             ResponseHelper.returnJson(response, Result.build(oneUserById.getValue(), ResultCodeEnum.USER_LOCK));

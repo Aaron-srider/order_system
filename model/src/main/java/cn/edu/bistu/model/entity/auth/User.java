@@ -36,8 +36,10 @@ public class User extends BaseEntity {
 
     //wx信息
     private Integer gender;
+
     @TableField("avatar_url")
     private String avatarUrl;
+
     @TableField("nick_name")
     private String nickName;
 
@@ -50,17 +52,14 @@ public class User extends BaseEntity {
     @NotNull(groups = {WhenStudent.class})
     @Null(groups = {WhenTeacher.class})
     private Integer majorId;
+
     @TableField("clazz_name")
     @NotNull(groups = {WhenStudent.class})
     @Null(groups = {WhenTeacher.class})
     private String clazzName;
-    @NotNull(groups = {WhenStudent.class})
-    private Integer grade;
-    @TableField("student_id")
 
     @NotNull(groups = {WhenStudent.class})
-    @Null(groups = {WhenTeacher.class})
-    private String studentId;
+    private Integer grade;
 
     //教师领导属性
     @TableField("secondary_dept_id")
@@ -68,12 +67,12 @@ public class User extends BaseEntity {
     @Null(groups = {WhenStudent.class})
     private Long secondaryDeptId;
 
-    @TableField("job_id")
-    @NotNull(groups = {WhenTeacher.class})
-    @Null(groups = {WhenStudent.class})
-    private String jobId;
-
     @TableField(fill= FieldFill.INSERT)
     private Integer isLock;
+
+    @TableField("student_job_id")
+    @NotNull(groups = {WhenTeacher.class})
+    @NotNull(groups = {WhenStudent.class})
+    private String StudentJobId;
 
 }

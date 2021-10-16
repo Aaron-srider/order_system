@@ -2,12 +2,16 @@ package cn.edu.bistu.admin.workOrder.mapper;
 
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
+import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+
+/**
+ * 继承WorkOrderDaoImpl类是为了复用相关的Mapper
+ */
 @Repository
-public class AdminWorkOrderDaoImpl extends WorkOrderDao implements AdminWorkOrderDao {
+public class AdminWorkOrderDaoImpl extends WorkOrderDaoImpl implements AdminWorkOrderDao {
 
     @Autowired
     ApprovalRecordMapper approvalRecordMapper;

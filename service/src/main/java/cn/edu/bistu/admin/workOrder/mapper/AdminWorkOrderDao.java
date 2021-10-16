@@ -4,6 +4,9 @@ import cn.edu.bistu.model.entity.WorkOrder;
 
 import java.util.List;
 
+/**
+ * 负责后台管理工单的Dao操作
+ */
 public interface AdminWorkOrderDao {
 
     /**

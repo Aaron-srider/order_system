@@ -11,6 +11,7 @@ import cn.edu.bistu.model.vo.AdminWorkOrderQueryVo;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -47,12 +48,12 @@ public class AdminWorkOrderController extends BaseController {
     @GetMapping("/admin/workOrders")
     public Result workOrders(Integer current,
                              Integer size,
-                             AdminWorkOrderQueryVo adminWorkOrderQueryVo
+                             WorkOrderVo workOrderVo
                              ) throws NoSuchFieldException, IllegalAccessException {
 
         PageVo pageVo = Pagination.setDefault(current, size);
-        Page<WorkOrder> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult serviceResult = workOrderService.getAllWorkOrders(page, adminWorkOrderQueryVo);
+        Page<WorkOrderVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
+        ServiceResult serviceResult = workOrderService.getAllWorkOrders(page, workOrderVo);
         return Result.ok(serviceResult.getServiceResult());
     }
 
