@@ -195,11 +195,6 @@
         <include refid="userJoin"/>
     </sql>
 
-    <sql id="page">
-        limit #{skip}, #{size}
-    </sql>
-
-
     <!--
     admin查询所有用户的筛选条件：
 
@@ -249,28 +244,28 @@
         </where>
     </sql>
 
-    <select id="getOneUserById" resultMap="userResultMap">
+    <select id="getOneUserById" resultMap="cn.edu.bistu.auth.mapper.UserMapper.userResultMap">
         <include refid="basicUserSelect"/>
         where user.id = #{id}
         ;
     </select>
 
-    <select id="getOneUserByOpenId" resultMap="userResultMap">
+    <select id="getOneUserByOpenId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.userResultMap">
         <include refid="basicUserSelect"/>
         where user.open_id = #{openId}
         ;
     </select>
 
-    <select id="getOneUserByUnionId" resultMap="userResultMap">
+    <select id="getOneUserByUnionId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.userResultMap">
         <include refid="basicUserSelect"/>
         where user.unionId = #{unionId}
         ;
     </select>
 
-    <select id="getUserListByConditions" resultMap="userResultMap">
+    <select id="getUserListByConditions" resultMap="cn.edu.bistu.auth.mapper.UserMapper.userResultMap">
         <include refid="basicUserSelect"/>
         <include refid="userConditions"/>
-        <include refid="page"/>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
         ;
     </select>
 

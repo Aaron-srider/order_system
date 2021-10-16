@@ -41,10 +41,6 @@
     </sql>
 
 
-    <sql id="page">
-        limit #{skip}, #{size}
-    </sql>
-
     <sql id="workOrderHistoryJoin">
         left join work_order on work_order_history.work_order_id = work_order.id
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
@@ -66,7 +62,7 @@
         from work_order_history
             <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
             <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryConditions"/>
-            <include refid="page"/>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
     </select>
 
     <select id="getWorkOrderHistoryCountByConditions" resultType="long">
