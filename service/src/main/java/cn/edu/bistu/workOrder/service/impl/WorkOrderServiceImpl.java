@@ -1,6 +1,7 @@
 package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
@@ -13,8 +14,8 @@ import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
+import cn.edu.bistu.workOrder.dao.WorkOrderDao;
+import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
@@ -54,6 +55,9 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     ApprovalService approvalService;
 
+    @Autowired
+    WorkOrderFinisherFactory workOrderFinisherFactory;
+
     @Override
     public ServiceResult listWorkOrder(WorkOrderVo workOrderVo, Page<WorkOrderVo> page) {
         DaoResult<Page<WorkOrderVo>> daoResultPage = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo);
@@ -83,7 +87,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
                     ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
         }
 
-        approvalService.workOrderFinish(workOrder, null, WorkOrderStatus.BEEN_WITHDRAWN);
+        approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher("notApprovalType"), workOrder, null, WorkOrderStatus.BEEN_WITHDRAWN, null);
     }
 
     @Override

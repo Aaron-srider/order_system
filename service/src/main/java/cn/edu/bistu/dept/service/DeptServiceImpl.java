@@ -1,7 +1,7 @@
 package cn.edu.bistu.dept.service;
 
 import cn.edu.bistu.dept.mapper.DeptDao;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
+import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,5 +1,7 @@
 package cn.edu.bistu.approval.service;
 
+import cn.edu.bistu.approval.WorkOrderFinisher;
+import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.exception.ResultCodeException;
@@ -14,9 +16,9 @@ import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderVo;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
-import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryDao;
+import cn.edu.bistu.workOrder.dao.WorkOrderDao;
+import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
+import cn.edu.bistu.workOrder.dao.WorkOrderHistoryDao;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,6 +52,9 @@ public class ApprovalServiceImpl implements ApprovalService {
     @Autowired
     WorkOrderHistoryDao workOrderHistoryDao;
 
+    @Autowired
+    WorkOrderFinisherFactory workOrderFinisherFactory;
+
 
     /**
      * 工单审批通过逻辑，若工单处于最后一个节点，触发工单结束逻辑；否则，触发工单流转逻辑。
@@ -79,7 +84,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //工单处于最后一个审批节点，工单结束
         if (nextFlowNodeId==null) {
-            workOrderFinish(workOrderVo, approvalRecord, WorkOrderStatus.COMPLETED_SUCCESSFULLY);
+            workOrderFinish(workOrderFinisherFactory.getFinisher("approvalType"), workOrderVo, approvalRecord, WorkOrderStatus.COMPLETED_SUCCESSFULLY, ApprovalOperation.PASS);
         }
         //工单流转
         else {
@@ -132,7 +137,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         //检查工单是否已经结束
         checkIfWorkOrderHasFinished(workOrderVo);
 
-        workOrderFinish(workOrderVo, approvalRecord, WorkOrderStatus.NOT_APPROVED);
+        workOrderFinish(workOrderFinisherFactory.getFinisher("approvalType"), workOrderVo, approvalRecord, WorkOrderStatus.NOT_APPROVED, ApprovalOperation.REJECT);
 
     }
 
@@ -183,46 +188,17 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     /**
      * 工单结束逻辑:如果是因为审批结束的，需要保存审批记录，更新工单状态并保存，生成历史工单并保存，将工单结束状态通过微信发送给工单发起者。
-     *
+     * @param workOrderFinisher 工单结束的任务委托给对应的Finisher即可
      * @param workOrder      待结束的工单，待完善信息：工单状态，工单是否结束，工单是否被审批。
      * @param approvalRecord 造成工单结束的审批记录，待完善信息：审批操作，审批节点id，审批时间。如果不是因为审批结束的工单，传入null
      * @param finishStatus 工单结束的原因（REJECT或PASS或revoke或invalidation），以及工单结束后的状态
+     * @param approvalOperation 如果工单结束是因为审批操作，那么传入对应的审批操作枚举值，否则传入null即可
      */
-    public void workOrderFinish(WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus) {
+    @Transactional
+    public void workOrderFinish(WorkOrderFinisher workOrderFinisher, WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus,
+                                ApprovalOperation approvalOperation) {
 
-        //判断是否需要保存审批记录
-        if(finishStatus.equals(WorkOrderStatus.NOT_APPROVED) || finishStatus.equals(WorkOrderStatus.COMPLETED_SUCCESSFULLY)) {
-            //工单已经被审批过
-            workOrder.setIsExamined(1);
-            //保存审批记录
-            if (finishStatus.equals(WorkOrderStatus.NOT_APPROVED)) {
-                prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.REJECT);
-            } else {
-                prepareApprovalRecord(approvalRecord, workOrder.getFlowNodeId(), ApprovalOperation.PASS);
-            }
-            approvalRecordMapper.insert(approvalRecord);
-        }
-
-        //记录工单结束前的状态
-        cn.edu.bistu.model.entity.WorkOrderStatus beforeFinished = new cn.edu.bistu.model.entity.WorkOrderStatus();
-        beforeFinished.setValue(workOrder.getStatus());
-
-        //更新工单状态
-        cn.edu.bistu.model.entity.WorkOrderStatus workOrderStatus = workOrderDao.constantToEntity(finishStatus);
-        workOrder.setStatus(workOrderStatus.getValue());
-        //工单结束
-        workOrder.setIsFinished(1);
-        workOrderDao.updateById(workOrder);
-
-        //生成历史工单
-        generateWorkOrderHistory(beforeFinished, workOrder);
-
-        //发送微信通知
-        //Long initiatorId = workOrder.getInitiatorId();
-        //UserVo userVo = userMapper.getOneById(initiatorId);
-        //String openId = userVo.getOpenId();
-        ////模板还没选好，此步跳过
-        //wxMiniApi.sendSubscribeMsg(openId);
+        workOrderFinisher.finishWorkOrder(workOrder, approvalRecord, finishStatus, approvalOperation);
 
     }
 

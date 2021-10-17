@@ -1,4 +1,4 @@
-package cn.edu.bistu.workOrder.mapper;
+package cn.edu.bistu.workOrder.dao;
 
 import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.common.utils.Pagination;
@@ -8,6 +8,9 @@ import cn.edu.bistu.model.common.result.DaoResultImpl;
 import cn.edu.bistu.model.common.result.SimpleDaoResultImpl;
 import cn.edu.bistu.model.entity.*;
 import cn.edu.bistu.model.vo.WorkOrderVo;
+import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
+import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
+import cn.edu.bistu.workOrder.mapper.WorkOrderStatusMapper;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

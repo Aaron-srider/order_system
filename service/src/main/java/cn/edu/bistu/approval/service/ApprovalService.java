@@ -1,5 +1,7 @@
 package cn.edu.bistu.approval.service;
 
+import cn.edu.bistu.approval.WorkOrderFinisher;
+import cn.edu.bistu.constants.ApprovalOperation;
 import cn.edu.bistu.constants.WorkOrderStatus;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.ApprovalRecord;
@@ -9,7 +11,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface ApprovalService {
 
-    public void workOrderFinish(WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus);
+    public void workOrderFinish(WorkOrderFinisher workOrderFinisher, WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus,
+                                ApprovalOperation approvalOperation);
 
     /**
      * 工单审批通过逻辑，若工单处于最后一个节点，触发工单结束逻辑；否则，触发工单流转逻辑。

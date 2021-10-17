@@ -2,7 +2,7 @@ package cn.edu.bistu.admin.workOrder.mapper;
 
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
+import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -8,15 +8,13 @@ import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDao;
-import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryDao;
+import cn.edu.bistu.workOrder.dao.WorkOrderHistoryDao;
 import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

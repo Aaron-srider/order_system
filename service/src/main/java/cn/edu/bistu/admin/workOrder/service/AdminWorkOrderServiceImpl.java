@@ -1,6 +1,7 @@
 package cn.edu.bistu.admin.workOrder.service;
 
 import cn.edu.bistu.admin.workOrder.mapper.AdminWorkOrderDao;
+import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
@@ -9,7 +10,7 @@ import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.entity.WorkOrderStatus;
 import cn.edu.bistu.model.vo.WorkOrderVo;
-import cn.edu.bistu.workOrder.mapper.WorkOrderDaoImpl;
+import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
 
     @Autowired
     ApprovalService approvalService;
+
+    @Autowired
+    WorkOrderFinisherFactory workOrderFinisherFactory;
 
     @Override
     @Transactional
@@ -56,7 +60,7 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
                 throw new ResultCodeException("workOrder id:" + workOrderVo.getId(), ResultCodeEnum.WORKORDER_BEEN_FINISHED);
             }
 
-            approvalService.workOrderFinish(workOrderVo, null, cn.edu.bistu.constants.WorkOrderStatus.INVALIDATION);
+            approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher("notApprovalType"), workOrderVo, null, cn.edu.bistu.constants.WorkOrderStatus.INVALIDATION, null);
         }
 
     }

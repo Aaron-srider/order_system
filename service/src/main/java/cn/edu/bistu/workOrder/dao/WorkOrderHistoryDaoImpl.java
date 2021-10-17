@@ -1,10 +1,11 @@
-package cn.edu.bistu.workOrder.mapper;
+package cn.edu.bistu.workOrder.dao;
 
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.SimpleDaoResultImpl;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
+import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package cn.edu.bistu.workOrder.mapper;
+package cn.edu.bistu.workOrder.dao;
 
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.model.common.result.DaoResult;
