@@ -28,7 +28,7 @@ public class WorkOrderFinisherFactory implements InitializingBean, ApplicationCo
         return WORK_ORDER_FINISHER_MAP.get(finisherType);
     }
 
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet()  {
         // 将 Spring 容器中所有的 Finisher 注册到 WORK_ORDER_FINISHER_MAP
         applicationContext.getBeansOfType(WorkOrderFinisher.class).values()
                 .forEach(finisher -> WORK_ORDER_FINISHER_MAP.put(finisher.getType(), finisher));

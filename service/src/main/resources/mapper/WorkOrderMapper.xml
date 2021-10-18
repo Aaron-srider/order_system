@@ -91,7 +91,6 @@
         <association property="flowNode" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeResultMap"/>
     </resultMap>
 
-
     <delete id="deleteWorkOrderByWorkOrderId" >
         delete from work_order where id=#{workOrderId}
     </delete>

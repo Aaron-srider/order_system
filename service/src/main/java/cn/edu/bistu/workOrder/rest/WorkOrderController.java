@@ -21,7 +21,9 @@ import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -85,11 +87,15 @@ public class WorkOrderController extends BaseController {
     @GetMapping("/workOrder/histories")
     public Result history(PageVo pageVo,
                           WorkOrderHistoryVo workOrderHistoryVo ,
-                          HttpServletRequest req) throws NoSuchFieldException, IllegalAccessException {
+                          HttpServletRequest req)  {
 
-        Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
+        pageVo = Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
 
-        if (workOrderHistoryVo.getWorkOrderVo().getTitle() == null) {
+        if(workOrderHistoryVo.getWorkOrderVo() == null) {
+            workOrderHistoryVo.setWorkOrderVo(new WorkOrderVo());
+        }
+
+        if (StringUtils.isEmpty(workOrderHistoryVo.getWorkOrderVo().getTitle())) {
             workOrderHistoryVo.getWorkOrderVo().setTitle("");
         }
 

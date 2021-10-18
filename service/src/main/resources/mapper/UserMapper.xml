@@ -6,7 +6,6 @@
 
 
     <select id="queryByCondition" resultType="long">
-
         select u.id from user u
         <if test="secondaryDeptName!=null and secondaryDeptName!=''">
             join secondary_dept sd on sd.id=u.secondary_dept_id
@@ -23,7 +22,7 @@
                 and student_id=#{studentId}
             </if>
             <if test="jobId!=null and jobId!=''">
-                and job_id=#{jobId}X
+                and job_id=#{jobId}
             </if>
         </where>
     </select>
@@ -142,12 +141,25 @@
             <result property="name" column="college_name"/>
         </association>
 
-        <collection property="roleList" ofType="cn.edu.bistu.model.entity.auth.Role">
-            <id property="id" column="role_id"/>
-            <result property="name" column="role_name"/>
-            <result property="text" column="role_text"/>
-        </collection>
+        <collection property="roleList" javaType="ArrayList" column="user_id" ofType="cn.edu.bistu.model.entity.auth.Role" select="getUserRoleListByUserId"/>
     </resultMap>
+
+    <resultMap id="roleResultMap" type="cn.edu.bistu.model.entity.auth.Role">
+        <id property="id" column="role_id"/>
+        <result property="name" column="role_name"/>
+        <result property="text" column="role_text"/>
+    </resultMap>
+
+    <select id="getUserRoleListByUserId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.roleResultMap">
+        select
+            role.name role_name,
+            role.id role_id,
+            role.text role_text
+        from user
+            join user_role on user.id = user_role.user_id
+            join role on user_role.role_id=role.id
+        where user.id=#{user_id};
+    </select>
 
     <sql id="userSelect">
         user.id as user_id,
@@ -174,18 +186,18 @@
         major.id as major_id,
         major.name as major_name,
         secondary_dept.id as secondary_dept_id,
-        secondary_dept.name as secondary_dept_name,
-        role.id as role_id,
-        role.name as role_name,
-        role.text as role_text
+        secondary_dept.name as secondary_dept_name
+--         role.id as role_id,
+--         role.name as role_name,
+--         role.text as role_text
     </sql>
 
     <sql id="userJoin">
         left join college on user.college_id = college.id
         left join major on user.major_id = major.id
         left join secondary_dept on user.secondary_dept_id = secondary_dept.id
-        left join user_role on user.id = user_role.user_id
-        left join role on user_role.role_id = role.id
+--         left join user_role on user.id = user_role.user_id
+--         left join role on user_role.role_id = role.id
     </sql>
 
     <sql id="basicUserSelect">
@@ -258,7 +270,7 @@
 
     <select id="getOneUserByUnionId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.userResultMap">
         <include refid="basicUserSelect"/>
-        where user.unionId = #{unionId}
+        where user.union_id = #{unionId}
         ;
     </select>
 
