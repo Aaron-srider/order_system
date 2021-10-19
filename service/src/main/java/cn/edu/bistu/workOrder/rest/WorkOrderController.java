@@ -81,7 +81,7 @@ public class WorkOrderController extends BaseController {
     }
 
     /**
-     * 返回分页的历史工单列表，支持名称模糊搜索
+     * 返回对应用户分页的历史工单列表，支持名称模糊搜索
      * 入参：size(10)，current(1)，title("")
      */
     @GetMapping("/workOrder/histories")

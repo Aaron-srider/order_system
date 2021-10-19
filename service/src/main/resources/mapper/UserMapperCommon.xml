@@ -51,7 +51,7 @@
     </resultMap>
 
     <!--用户表查询列-->
-    <sql id="userColumns">
+    <sql id="rowUserColumns">
         user.id as user_id,
 --         user.open_id as user_open_id,
 --         user.session_key as user_session_key,
@@ -73,8 +73,8 @@
 --         user.union_id as user_union_id,
     </sql>
 
-    <sql id="userSelect">
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userColumns"/>,
+    <sql id="combinationUserColumns">
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.rowUserColumns"/>,
         college.id as college_id,
         college.name as college_name,
         major.id as major_id,
@@ -86,6 +86,7 @@
 --         role.text as role_text
     </sql>
 
+    <!--角色查询连接如下表：学院表、专业表、部门表-->
     <sql id="userJoin">
         left join college on user.college_id = college.id
         left join major on user.major_id = major.id
@@ -94,10 +95,10 @@
 --         left join role on user_role.role_id = role.id
     </sql>
 
-    <!--user表的基本查询语句-->
-    <sql id="basicUserSelect">
+    <!--user表的基本查询语句片段，没有筛选语句-->
+    <sql id="basicUserSelectStatementFragment">
         select
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userSelect"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.combinationUserColumns"/>
         from user
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"/>
     </sql>

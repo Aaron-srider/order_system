@@ -16,25 +16,25 @@
     </select>
 
     <select id="getOneUserById" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelect"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
         where user.id = #{id}
         ;
     </select>
 
     <select id="getOneUserByOpenId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelect"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
         where user.open_id = #{openId}
         ;
     </select>
 
     <select id="getOneUserByUnionId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelect"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
         where user.union_id = #{unionId}
         ;
     </select>
 
     <select id="getUserListByConditions" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelect"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userConditions"/>
         <include refid="cn.edu.bistu.mapper.Common.page"/>
         ;

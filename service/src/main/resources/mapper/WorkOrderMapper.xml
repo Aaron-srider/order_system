@@ -4,105 +4,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.workOrder.mapper.WorkOrderMapper">
 
-    <sql id="workOrderJoin">
-        left join user on work_order.initiator_id = user.id
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"/>
-        left join flow on work_order.flow_id = flow.id
-        left join flow_node on work_order.flow_node_id=flow_node.id
-    </sql>
-
-    <sql id="workOrderSelect">
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.rowWorkOrderSelect"/>,
-        <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowSelect"/>,
-        <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeSelect"/>,
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userSelect"/>
-    </sql>
-
-    <sql id="rowWorkOrderSelect">
-        work_order.id as work_order_id,
-        work_order.is_examined as work_order_is_examined,
-        work_order.initiator_id as work_order_initiator_id,
-        work_order.flow_id as work_order_flow_id,
-        work_order.create_time as work_order_create_time,
-        work_order.update_time as work_order_update_time,
-        work_order.attachment as work_order_attachment,
-        work_order.status as work_order_status,
-        work_order.content as work_order_content,
-        work_order.deleted as work_order_deleted,
-        work_order.title as work_order_title,
-        work_order.attachment_name as work_order_attachment_name,
-        work_order.flow_node_id as work_order_flow_node_id,
-        work_order.is_finished as work_order_is_finished,
-        work_order.attachment_size as work_order_attachment_size
-    </sql>
-
-    <sql id="workOrderConditions">
-        <where>
-            <if test="workOrderVo.flowNode!=null and workOrderVo.flowNode.approverId!=null and workOrderVo.flowNode.approverId!=''">
-                and flow_node.approver_id=#{workOrderVo.flowNode.approverId}
-            </if>
-            <if test="workOrderVo.id!=null">
-                and work_order.id=#{workOrderVo.id}
-            </if>
-            <if test="workOrderVo.title!=null and workOrderVo.title!=''">
-                and work_order.title like "%" #{workOrderVo.title} "%"
-            </if>
-            <if test="workOrderVo.initiatorId!=null">
-                and work_order.initiator_id=#{workOrderVo.initiatorId}
-            </if>
-            <if test="workOrderVo.studentJobId!=null and workOrderVo.studentJobId!=''">
-                and user.student_job_id like "%" #{workOrderVo.studentJobId} "%"
-            </if>
-            <if test="workOrderVo.startDate!=null and workOrderVo.startDate!=''">
-                and work_order.create_time &gt; #{workOrderVo.startDate}
-            </if>
-            <if test="workOrderVo.endDate!=null and workOrderVo.endDate!=''">
-                and work_order.create_time &lt; #{workOrderVo.startDate}
-            </if>
-            <if test="condition=='user'">
-                and work_order.is_finished = 0
-            </if>
-        </where>
-    </sql>
-
-    <resultMap id="workOrderResultMap" type="cn.edu.bistu.model.vo.WorkOrderVo">
-        <id property="id" column="work_order_id"/>
-        <result property="isExamined" column="work_order_is_examined"/>
-        <result property="initiatorId" column="work_order_initiator_id"/>
-        <result property="flowId" column="work_order_flow_id"/>
-        <result property="createTime" column="work_order_create_time"/>
-        <result property="updateTime" column="work_order_update_time"/>
-        <!--<result property="attachment" column="work_order_attachment"/>-->
-        <result property="status" column="work_order_status"/>
-        <result property="content" column="work_order_content"/>
-        <result property="deleted" column="work_order_deleted"/>
-        <result property="title" column="work_order_title"/>
-        <result property="attachmentName" column="work_order_attachment_name"/>
-        <result property="flowNodeId" column="work_order_flow_node_id"/>
-        <result property="isFinished" column="work_order_is_finished"/>
-        <result property="attachmentSize" column="work_order_attachment_size"/>
-
-        <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap"/>
-
-        <association property="flow" javaType="cn.edu.bistu.model.entity.Flow">
-            <id property="id" column="flow_id"/>
-            <result property="description" column="flow_description"/>
-            <result property="name" column="flow_name"/>
-        </association>
-
-        <association property="flowNode" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeResultMap"/>
-    </resultMap>
-
     <delete id="deleteWorkOrderByWorkOrderId" >
         delete from work_order where id=#{workOrderId}
     </delete>
 
-    <select id="getWorkOrderPageByConditions" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderResultMap">
-        select
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
-        from work_order
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderConditions"/>
+    <select id="getWorkOrderPageByConditions" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
         <include refid="cn.edu.bistu.mapper.Common.page"/>
         ;
     </select>
@@ -110,34 +18,28 @@
     <select id="getWorkOrderCountByConditions" resultType="long">
         select count(distinct work_order.id)
         from work_order
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderConditions"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
         ;
     </select>
 
-    <select id="getOneWorkOrderById" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderResultMap">
-        select
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
-        from work_order
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
+    <select id="getOneWorkOrderById" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
         where work_order.id = #{id}
         ;
     </select>
 
-    <select id="getApprovalWorkOrderPageByApproverId" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderResultMap">
-        select
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
-        from work_order
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderConditions"/>
+    <select id="getApprovalWorkOrderPageByApproverId" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
         <include refid="cn.edu.bistu.mapper.Common.page"/>
     </select>
 
     <select id="getApprovalWorkOrderCountByApproverId" resultType="long">
         select count(distinct work_order.id)
         from work_order
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderConditions"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
     </select>
 
 </mapper>

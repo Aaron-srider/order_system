@@ -28,22 +28,21 @@
         </where>
     </sql>
 
-    <sql id="rowWorkOrderHistorySelect">
+    <sql id="rowWorkOrderHistoryColumns">
         work_order_history.id as work_order_history_id,
         work_order_history.work_order_id as work_order_history_work_order_id,
         work_order_history.before_finished_flow_node_id as work_order_history_before_finished_flow_node_id,
         work_order_history.before_finished_status as work_order_history_before_finished_status
     </sql>
 
-    <sql id="workOrderHistorySelect">
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistorySelect"/>,
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
+    <sql id="combinationWorkOrderHistoryColumns">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistoryColumns"/>,
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.combinationWorkOrderColumns"/>
     </sql>
-
 
     <sql id="workOrderHistoryJoin">
         left join work_order on work_order_history.work_order_id = work_order.id
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
     </sql>
 
     <resultMap id="workOrderHistoryResultMap" type="cn.edu.bistu.model.vo.WorkOrderHistoryVo">
@@ -52,13 +51,13 @@
         <result property="beforeFinishedFlowNodeId" column="work_order_history_before_finished_flow_node_id"/>
         <result property="beforeFinishedStatus" column="work_order_history_before_finished_status"/>
         <association property="workOrderVo"
-                     resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderResultMap"/>
+                     resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap"/>
     </resultMap>
 
     <select id="getWorkOrderHistoryPageByConditions" resultMap="workOrderHistoryResultMap">
         select
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistorySelect"/>,
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistoryColumns"/>,
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.combinationWorkOrderColumns"/>
         from work_order_history
             <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
             <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryConditions"/>
@@ -75,7 +74,7 @@
 
     <select id="getOneWorkOrderHistoryById" resultMap="workOrderHistoryResultMap">
         select
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistorySelect"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.combinationWorkOrderHistoryColumns"/>
         from work_order_history
             <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
         where

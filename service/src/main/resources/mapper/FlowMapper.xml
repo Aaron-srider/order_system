@@ -18,14 +18,14 @@
         <result property="nextId" column="flow_node_next_id"/>
     </resultMap>
 
-    <sql id="flowSelect">
+    <sql id="flowColumns">
         flow.id as flow_id,
         flow.description as flow_description,
         flow.name as flow_name,
         flow.deleted as flow_deleted
     </sql>
 
-    <sql id="flowNodeSelect">
+    <sql id="flowNodeColumns">
         flow_node.id as flow_node_id ,
         flow_node.flow_id as flow_node_flow_id ,
         flow_node.approver_id as flow_node_approver_id ,
@@ -35,8 +35,8 @@
 
     <select id="getAllFlowListByRoleId" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowResultMap">
         select
-            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowSelect"/>,
-            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeSelect"/>
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowColumns"/>,
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeColumns"/>
         from flow
                  left join flow_node on flow.id = flow_node.flow_id
                  left join role_flow on role_flow.flow_id=flow.id
