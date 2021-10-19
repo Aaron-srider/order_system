@@ -115,7 +115,7 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     @Override
     public ServiceResult<Page<WorkOrderVo>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrderVo> page, WorkOrderVo workOrderVo) {
-        DaoResult<Page<WorkOrderVo>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
+        DaoResult<Page<WorkOrderVo>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo, "user" );
         return new ServiceResultImpl<>(pageData.getResult());
     }
 

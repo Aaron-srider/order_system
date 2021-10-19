@@ -34,7 +34,7 @@ public class TestWorkOrderDao {
         WorkOrderVo workOrderVo = new WorkOrderVo();
         workOrderVo.setId(4L);
 
-        DaoResult<Page<WorkOrderVo>> workOrderPageByConditions = workOrderDao.getWorkOrderPageByConditions(workOrderVoPage, workOrderVo);
+        DaoResult<Page<WorkOrderVo>> workOrderPageByConditions = workOrderDao.getWorkOrderPageByConditions(workOrderVoPage, workOrderVo,"user" );
         Page<WorkOrderVo> result = workOrderPageByConditions.getResult();
         return Result.ok(result);
     }

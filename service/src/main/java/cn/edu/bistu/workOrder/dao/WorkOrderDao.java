@@ -3,7 +3,6 @@ package cn.edu.bistu.workOrder.dao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.WorkOrderStatus;
-import cn.edu.bistu.model.vo.WorkOrderHistoryVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -14,8 +13,9 @@ public interface WorkOrderDao {
     /**
      * 根据筛选条件查询工单分页数据
      * @param page 分页信息
+     * @param condition
      */
-    public DaoResult<Page<WorkOrderVo>> getWorkOrderPageByConditions(Page<WorkOrderVo> page, WorkOrderVo workOrderVo);
+    public DaoResult<Page<WorkOrderVo>> getWorkOrderPageByConditions(Page<WorkOrderVo> page, WorkOrderVo workOrderVo, String condition);
 
 
 
@@ -36,9 +36,10 @@ public interface WorkOrderDao {
      * @param approverId  审批者id
      * @param workOrderVo 包含有效数据:
      *                    title
+     * @param condition
      * @return
      */
-    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo);
+    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo, String condition);
 
 
     public void updateById(WorkOrder workOrder);

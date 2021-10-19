@@ -60,7 +60,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     @Override
     public ServiceResult listWorkOrder(WorkOrderVo workOrderVo, Page<WorkOrderVo> page) {
-        DaoResult<Page<WorkOrderVo>> daoResultPage = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo);
+        DaoResult<Page<WorkOrderVo>> daoResultPage = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo, "user");
         return new ServiceResultImpl<>(daoResultPage.getResult());
     }
 
@@ -135,7 +135,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     @Override
     public ServiceResult getAllWorkOrders(Page<WorkOrderVo> page, WorkOrderVo workOrderVo) {
-        DaoResult<Page<WorkOrderVo>> workOrderPageByConditions = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo);
+        DaoResult<Page<WorkOrderVo>> workOrderPageByConditions = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo, "admin");
         Page<WorkOrderVo> result = workOrderPageByConditions.getResult();
         return new ServiceResultImpl<>(result);
     }

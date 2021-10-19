@@ -59,6 +59,9 @@
             <if test="workOrderVo.endDate!=null and workOrderVo.endDate!=''">
                 and work_order.create_time &lt; #{workOrderVo.startDate}
             </if>
+            <if test="condition=='user'">
+                and work_order.is_finished = 0
+            </if>
         </where>
     </sql>
 

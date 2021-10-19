@@ -23,14 +23,15 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder>{
      * 获取分页的工单数据
      * @param workOrderVo 过滤条件
      */
-    public List<WorkOrderVo> getWorkOrderPageByConditions(@Param("skip") long skip,@Param("size") long size,@Param("workOrderVo") WorkOrderVo workOrderVo);
+    public List<WorkOrderVo> getWorkOrderPageByConditions(@Param("skip") long skip,@Param("size") long size,@Param("workOrderVo") WorkOrderVo workOrderVo
+    ,@Param("condition") String condition);
 
 
     /**
      * 获取分页的工单数据
      * @param workOrderVo 过滤条件
      */
-    public long getWorkOrderCountByConditions(@Param("workOrderVo") WorkOrderVo workOrderVo);
+    public long getWorkOrderCountByConditions(@Param("workOrderVo") WorkOrderVo workOrderVo, @Param("condition")  String condition);
 
 
     /**

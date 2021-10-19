@@ -54,10 +54,10 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
     }
 
     @Override
-    public DaoResult<Page<WorkOrderVo>> getWorkOrderPageByConditions(Page<WorkOrderVo> page, WorkOrderVo workOrderVo) {
-        List<WorkOrderVo> workOrderList = workOrderMapper.getWorkOrderPageByConditions(Pagination.getSkip(page), page.getSize(), workOrderVo);
+    public DaoResult<Page<WorkOrderVo>> getWorkOrderPageByConditions(Page<WorkOrderVo> page, WorkOrderVo workOrderVo, String condition) {
+        List<WorkOrderVo> workOrderList = workOrderMapper.getWorkOrderPageByConditions(Pagination.getSkip(page), page.getSize(), workOrderVo, condition);
         page.setRecords(workOrderList);
-        long workOrderCount = workOrderMapper.getWorkOrderCountByConditions(workOrderVo);
+        long workOrderCount = workOrderMapper.getWorkOrderCountByConditions(workOrderVo, condition);
         page.setTotal(workOrderCount);
         return new SimpleDaoResultImpl<Page<WorkOrderVo>>().setResult(page);
     }
@@ -74,14 +74,14 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
     }
 
     @Override
-    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo) {
+    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo, String condition) {
         FlowNode flowNode = new FlowNode();
         flowNode.setApproverId(approverId);
         workOrderVo.setFlowNode(flowNode);
 
-        List<WorkOrderVo> workOrderVoList = workOrderMapper.getWorkOrderPageByConditions(Pagination.getSkip(page), page.getSize(), workOrderVo);
+        List<WorkOrderVo> workOrderVoList = workOrderMapper.getWorkOrderPageByConditions(Pagination.getSkip(page), page.getSize(), workOrderVo, condition);
         page.setRecords(workOrderVoList);
-        long workOrderCount = workOrderMapper.getWorkOrderCountByConditions(workOrderVo);
+        long workOrderCount = workOrderMapper.getWorkOrderCountByConditions(workOrderVo, condition);
         page.setTotal(workOrderCount);
         return new SimpleDaoResultImpl<Page<WorkOrderVo>>().setResult(page);
     }
