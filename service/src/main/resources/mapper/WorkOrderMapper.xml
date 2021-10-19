@@ -6,7 +6,7 @@
 
     <sql id="workOrderJoin">
         left join user on work_order.initiator_id = user.id
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.userJoin"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"/>
         left join flow on work_order.flow_id = flow.id
         left join flow_node on work_order.flow_node_id=flow_node.id
     </sql>
@@ -15,7 +15,7 @@
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.rowWorkOrderSelect"/>,
         <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowSelect"/>,
         <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeSelect"/>,
-        <include refid="cn.edu.bistu.auth.mapper.UserMapper.userSelect"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userSelect"/>
     </sql>
 
     <sql id="rowWorkOrderSelect">
@@ -83,7 +83,7 @@
         <result property="isFinished" column="work_order_is_finished"/>
         <result property="attachmentSize" column="work_order_attachment_size"/>
 
-        <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.userResultMap"/>
+        <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap"/>
 
         <association property="flow" javaType="cn.edu.bistu.model.entity.Flow">
             <id property="id" column="flow_id"/>
