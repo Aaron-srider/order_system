@@ -65,7 +65,6 @@
         </where>
     </sql>
 
-
     <resultMap id="workOrderResultMap" type="cn.edu.bistu.model.vo.WorkOrderVo">
         <id property="id" column="work_order_id"/>
         <result property="isExamined" column="work_order_is_examined"/>

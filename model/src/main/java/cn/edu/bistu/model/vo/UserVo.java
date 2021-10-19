@@ -49,6 +49,10 @@ public class UserVo extends User {
     @NotNull(groups = {ConditionQuery.class})
     private String roleCategory;
 
+    private String majorName;
+
+    private String secondaryDeptName;
+
     //下面增加表查询的改进字段
     private Major major;
     private SecondaryDept secondaryDept;

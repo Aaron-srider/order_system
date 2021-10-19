@@ -4,6 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.auth.mapper.UserMapper.Common">
 
+    <!--用户查询列与javaBean映射表-->
     <resultMap id="userResultMap" type="cn.edu.bistu.model.vo.UserVo">
         <id property="id" column="user_id"/>
         <result property="openId" column="user_open_id"/>
@@ -49,6 +50,7 @@
         <result property="text" column="role_text"/>
     </resultMap>
 
+    <!--用户表查询列-->
     <sql id="userColumns">
         user.id as user_id,
 --         user.open_id as user_open_id,
@@ -92,6 +94,7 @@
 --         left join role on user_role.role_id = role.id
     </sql>
 
+    <!--user表的基本查询语句-->
     <sql id="basicUserSelect">
         select
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userSelect"/>
@@ -129,7 +132,13 @@
             </if>
             <choose>
                 <when test="userVo.roleCategory == 'student'">
-                    and role.id in (6, 7)
+                    and user.id in (select
+                                        user_role.user_id
+                                    from user_role
+                                        join role on user_role.role_id = role.id
+                                    where
+                                        role.id in (6, 7)
+                                    )
                     <if test="userVo.clazzName!=null and userVo.clazzName !=''">
                         and user.clazz_name like "%" #{userVo.clazzName} "%"
                     </if>
@@ -138,7 +147,13 @@
                     </if>
                 </when>
                 <when test="userVo.roleCategory == 'teacher'">
-                    and role.id in (3, 4, 5)
+                    and user.id in (select
+                                        user_role.user_id
+                                    from user_role
+                                        join role on user_role.role_id = role.id
+                                    where
+                                        role.id in (3, 4, 5)
+                                    )
                     <if test="userVo.majorName!=null and userVo.majorName !=''">
                         and secondary_dept.name like "%" #{userVo.secondaryDeptName} "%"
                     </if>
