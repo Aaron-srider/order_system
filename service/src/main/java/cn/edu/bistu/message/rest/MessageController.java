@@ -2,7 +2,6 @@ package cn.edu.bistu.message.rest;
 
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.exception.ResultCodeException;
-import cn.edu.bistu.common.exception.WorkOrderNotExistsException;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.message.exception.MessageException;
@@ -11,13 +10,11 @@ import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.Message;
 
-import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.MessageVo;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sun.deploy.net.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -38,6 +34,7 @@ import java.net.URLEncoder;
  **/
 @RequestMapping("/message")
 @RestController
+@CrossOrigin
 public class MessageController {
 
     @Autowired

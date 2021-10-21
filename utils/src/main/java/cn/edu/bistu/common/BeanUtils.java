@@ -14,8 +14,9 @@ public class BeanUtils {
      * 该静态方法用于代替Class类的getDeclaredField方法，在目标类及其所有父类中查找一个属性，
      * 方法中委托目标类及其父类的getDeclaredField方法，在各层级查找指定属性，使用while循环
      * 和接口Class.getSuperclass()沿着继承树依次向上遍历所有父类。
+     *
      * @param clazz 目标类
-     * @param name 属性名字符串
+     * @param name  属性名字符串
      * @return 返回找到的属性Field对象
      * @throws NoSuchFieldException 若目标类中及其所有父类都找不到该属性，抛出该异常
      */
@@ -25,7 +26,7 @@ public class BeanUtils {
                 !clazz.getName().toLowerCase().equals("java.lang.object")) {//当父类为null的时候说明到达了最上层的父类(Object类).
 
             try {
-                declaredField  = clazz.getDeclaredField(name);
+                declaredField = clazz.getDeclaredField(name);
             } catch (NoSuchFieldException e) {
                 log.debug(clazz.getTypeName() + " has no such field called " + name);
                 //得到父类,然后赋给自己
@@ -62,7 +63,8 @@ public class BeanUtils {
 
     /**
      * 将属性从source拷贝到map中，只拷贝非空属性。如果bean的表层属性有Date，那么格式化成String类型
-     * @param source 源对象
+     *
+     * @param source         源对象
      * @param exceptionNames 不拷贝属性名单，如果没有不拷贝的属性，那么传入null
      * @return 返回拷贝后的map
      */
@@ -74,7 +76,7 @@ public class BeanUtils {
         Map<String, Object> result = new HashMap<>();
 
         List<String> list = null;
-        if(exceptionNames != null) {
+        if (exceptionNames != null) {
             list = Arrays.asList(exceptionNames);
         }
 
@@ -85,7 +87,7 @@ public class BeanUtils {
 
                 //检查当前属性是否需要排除
                 boolean isRemoved = false;
-                if(list != null) {
+                if (list != null) {
                     isRemoved = list.contains(sourceFiledName);
                 }
 
@@ -93,7 +95,7 @@ public class BeanUtils {
                 if (!isRemoved) {
                     sourceFiled.setAccessible(true);
                     //如果是日期类型，将其转换成指定格式
-                    if(sourceFiled.getType().getTypeName().equals("java.util.Date")) {
+                    if (sourceFiled.getType().getTypeName().equals("java.util.Date")) {
                         String formatDate = formatDate(source, sourceFiled);
                         result.put(sourceFiledName, formatDate);
                     } else {
@@ -169,5 +171,18 @@ public class BeanUtils {
             clazz = clazz.getSuperclass(); //得到父类,然后赋给自己
         }
         return fieldList;
+    }
+
+    /**
+     * 判断字符串是否为空
+     * @param str 待判断的字符串
+     */
+    public static boolean isEmpty(String str) {
+        if ("".equals(str) || str == null) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 }

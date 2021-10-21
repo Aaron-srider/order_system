@@ -19,6 +19,7 @@ public class LogInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.debug("get into LogInterceptor");
         String ipAddress = IpGetter.getIpAddress(request);
         log.info("来访ip(可能不是真实ip)：" + ipAddress);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

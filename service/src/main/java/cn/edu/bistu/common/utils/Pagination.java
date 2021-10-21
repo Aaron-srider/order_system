@@ -1,5 +1,6 @@
 package cn.edu.bistu.common.utils;
 
+import cn.edu.bistu.model.vo.PageVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class Pagination {
         //设置分页对象
         Page<T> resultPage = new Page<>();
         resultPage.setTotal(total);
-        resultPage.setSize(size);
+        resultPage.setSize(page.getSize());
         resultPage.setCurrent(current);
         resultPage.setRecords(resultList);
         return resultPage;
@@ -74,20 +75,29 @@ public class Pagination {
     private static boolean getAll(Page page) {
         if (page == null) {
             return true;
-        } else if (page.offset() == 0) {
+        } else if (page.getCurrent() <= 0) {
             return true;
         }
         return false;
     }
 
-    public static void main(String[] args) {
-        ArrayList<String> objects = new ArrayList<>();
-        objects.add("ajlsd");
-        objects.add("ajlsd");
-        objects.add("ajlsd");
-        objects.add("ajlsd");
+    public static PageVo setDefault(Integer current, Integer size) {
+        PageVo pageVo = new PageVo();
+        if(current == null) {
+            pageVo.setCurrent(1);
+        } else {
+            pageVo.setCurrent(current);
+        }
+        if(size == null) {
+            pageVo.setSize(10);
+        } else {
+            pageVo.setSize(size);
+        }
 
-        List<String> strings = objects.subList(8, 0);
+        return pageVo;
+    }
 
+    public static long getSkip(Page page) {
+        return (page.getCurrent() - 1) * page.getSize();
     }
 }

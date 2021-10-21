@@ -21,6 +21,9 @@ public class User extends BaseEntity {
     @TableField("open_id")
     private String openId;
 
+    @TableField("union_id")
+    private String unionId;
+
     @TableField("session_key")
     private String sessionKey;
 
@@ -33,36 +36,43 @@ public class User extends BaseEntity {
 
     //wx信息
     private Integer gender;
+
     @TableField("avatar_url")
     private String avatarUrl;
+
     @TableField("nick_name")
     private String nickName;
 
     @TableField("college_id")
+    @NotNull(groups = {WhenStudent.class, WhenTeacher.class})
     private Integer collegeId;
 
     //学生属性
     @TableField("major_id")
-    private Integer majorId;
-    @TableField("class_id")
-    private Integer classId;
-    @NotNull(groups = {WhenStudent.class})
-    private Integer grade;
-    @TableField("student_id")
-
     @NotNull(groups = {WhenStudent.class})
     @Null(groups = {WhenTeacher.class})
-    private String studentId;
+    private Integer majorId;
+
+    @TableField("clazz_name")
+    @NotNull(groups = {WhenStudent.class})
+    @Null(groups = {WhenTeacher.class})
+    private String clazzName;
+
+    @NotNull(groups = {WhenStudent.class})
+    private Integer grade;
 
     //教师领导属性
     @TableField("secondary_dept_id")
-    private Long secondaryDeptId;
-
-    @TableField("job_id")
     @NotNull(groups = {WhenTeacher.class})
     @Null(groups = {WhenStudent.class})
-    private String jobId;
+    private Long secondaryDeptId;
 
+    @TableField(fill= FieldFill.INSERT)
+    private Integer isLock;
 
+    @TableField("student_job_id")
+    @NotNull(groups = {WhenTeacher.class})
+    @NotNull(groups = {WhenStudent.class})
+    private String StudentJobId;
 
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.bistu.flow.mapper.FlowMapper">
+
+    <resultMap id="flowResultMap" type="cn.edu.bistu.model.vo.FlowVo">
+        <id property="id" column="flow_id"/>
+        <result property="description" column="flow_description"/>
+        <result property="name" column="flow_name"/>
+        <collection property="flowNodeList" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeResultMap"/>
+    </resultMap>
+
+    <resultMap id="flowNodeResultMap" type="cn.edu.bistu.model.entity.FlowNode">
+        <id property="id" column="flow_node_id"/>
+        <result property="flowId" column="flow_node_flow_id"/>
+        <result property="approverId" column="flow_node_approver_id"/>
+        <result property="nodeOrder" column="flow_node_node_order"/>
+        <result property="nextId" column="flow_node_next_id"/>
+    </resultMap>
+
+    <sql id="flowColumns">
+        flow.id as flow_id,
+        flow.description as flow_description,
+        flow.name as flow_name,
+        flow.deleted as flow_deleted
+    </sql>
+
+    <sql id="flowNodeColumns">
+        flow_node.id as flow_node_id ,
+        flow_node.flow_id as flow_node_flow_id ,
+        flow_node.approver_id as flow_node_approver_id ,
+        flow_node.node_order as flow_node_node_order ,
+        flow_node.next_id as flow_node_next_id
+    </sql>
+
+    <select id="getAllFlowListByRoleId" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowResultMap">
+        select
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowColumns"/>,
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeColumns"/>
+        from flow
+                 left join flow_node on flow.id = flow_node.flow_id
+                 left join role_flow on role_flow.flow_id=flow.id
+                 left join role on role_flow.role_id=role.id
+        where
+            role.id=#{roleId};
+        ;
+    </select>
+
+</mapper>

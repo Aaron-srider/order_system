@@ -1,27 +1,32 @@
 package cn.edu.bistu.wx.rest;
 
+import cn.edu.bistu.auth.service.AuthService;
+import cn.edu.bistu.auth.service.AuthServiceImpl;
 import cn.edu.bistu.model.wx.JsonMiniTemplateMessageNotification;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Slf4j
+@CrossOrigin
 @RestController
 public class WxController {
 
     @Autowired
     WxMiniApi wxMiniApi;
 
+
+    @Autowired
+    AuthService authService;
+
+
     /**
-     * 用于开发者服务器接入微信服务器，微信服务器发送接入信息到此接口，
+     * 用于开发者服务器接入微信小程序服务器，微信服务器发送接入信息到此接口，
      * 接口验证信息并返回信息给微信服务器
      * @return 如果验证成功，返回随机数echostr；否则返回"fail"
      */
@@ -56,5 +61,15 @@ public class WxController {
 
         log.debug(msgMap.toString());
         return null;
+    }
+
+    @PostMapping(value = "/manuallyRegister", consumes = "application/json", produces = "application/json")
+    public void register(@RequestBody String json) {
+
+        JSONObject jsonObject = JSONObject.parseObject(json);
+
+        String code = (String) jsonObject.get("code");
+
+        authService.authentication(code);
     }
 }

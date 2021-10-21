@@ -4,79 +4,47 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.auth.mapper.UserMapper">
 
-    <update id="userInfoComplete">
-        update user
-        set
-            name=#{name},
-            college_id=(select id from college where name=#{collegeName}),
-            major_id=(select id from major where name=#{majorName}),
-            class_id=(select id from class where name=#{className}),
-            secondary_dept_id=(select id from secondary_dept where name=#{secondaryDeptName}),
-            grade=#{grade},
-            student_id=#{studentId},
-            job_id=#{jobId},
-            update_time=#{updateTime},
-            info_complete=1
-        where id=#{id}
-</update>
-
-    <select id="getOneById" resultType="cn.edu.bistu.model.vo.UserVo">
+    <select id="getUserRoleListByUserId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.roleResultMap">
         select
-            u.id,
-            u.open_id,
-            student_id,
-            job_id,
-            r.name role,
-            ma.name majorName,
-            u.create_time,
-            u.update_time,
-            col.name collegeName,
-            se.name secondaryDeptName,
-            cl.name className,
-            grade,
-            u.name,
-            avatar_url,
-            gender,
-            nick_name
-        from user u left join class cl on u.class_id=cl.id
-        left join college col on u.college_id=col.id
-        left join major ma on u.major_id=ma.id
-        left join secondary_dept se on u.secondary_dept_id=se.id
-        left join user_role ur on u.id=ur.user_id
-        left join role r on ur.role_id=r.id
-        where u.id=#{id}
-        and u.deleted=0 and r.deleted=0 and ur.deleted=0;
-</select>
+            role.name role_name,
+            role.id role_id,
+            role.text role_text
+        from user
+            join user_role on user.id = user_role.user_id
+            join role on user_role.role_id=role.id
+        where user.id=#{user_id};
+    </select>
 
-    <select id="getApprovalWorkOrders" resultType="cn.edu.bistu.model.vo.WorkOrderVo">
-        select
-            wo.id,
-            wo.is_examined,
-            wo.flow_id,
-            wo.create_time,
-            wo.update_time,
-            wo.attachment_name,
-            wo.status,
-            wo.title,
-            wo.content,
-            initiator.student_id ,
-            initiator.job_id ,
-            f.name flowName,
-            initiator.name initiatorName,
-            r.name role
-        from work_order wo left join flow_node fn on wo.flow_node_id=fn.id
-        left join user approver on fn.approver_id=approver.id
-        left join flow f on wo.flow_id = f.id
-        left join user initiator on wo.initiator_id = initiator.id
-        left join user_role ur on ur.user_id = initiator.id
-        left join role r on r.id=ur.role_id
-        <where>
-            approver.id=#{approverId} and wo.deleted=0 and fn.deleted=0 and approver.deleted=0 and f.deleted=0 and initiator.deleted=0
-            and r.deleted = 0 and ur.deleted=0
-            <if test="workOrderVo.title!=null and workOrderVo.title!=''">
-                and wo.title like '%' #{workOrderVo.title} '%'
-            </if>
-        </where>
+    <select id="getOneUserById" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
+        where user.id = #{id}
+        ;
+    </select>
+
+    <select id="getOneUserByOpenId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
+        where user.open_id = #{openId}
+        ;
+    </select>
+
+    <select id="getOneUserByUnionId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
+        where user.union_id = #{unionId}
+        ;
+    </select>
+
+    <select id="getUserListByConditions" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userConditions"/>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
+        ;
+    </select>
+
+    <select id="getUserCountByConditions" resultType="long">
+        select count(distinct user.id)
+        from user
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"/>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userConditions"/>
     </select>
 
 </mapper>

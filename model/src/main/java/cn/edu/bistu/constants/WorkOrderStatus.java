@@ -1,6 +1,7 @@
 package cn.edu.bistu.constants;
 
 public enum WorkOrderStatus {
+
     /**
      * 在审批
      */
@@ -19,6 +20,11 @@ public enum WorkOrderStatus {
     /**
      * 被撤回
      */
-    BEEN_WITHDRAWN
+    BEEN_WITHDRAWN,
+
+    /**
+     * 作废
+     */
+    INVALIDATION
 
 }

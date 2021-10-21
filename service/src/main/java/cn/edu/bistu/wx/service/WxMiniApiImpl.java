@@ -39,7 +39,18 @@ public class WxMiniApiImpl implements WxMiniApi {
         } else {
             return JSONObject.parseObject(str);
         }
+    }
 
+    @Override
+    public JSONObject GetUnionIdForThirdPartyWebSites(String appId, String secret, String code) {
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + appId + "&secret=" + secret + "&code=" + code + "&grant_type=authorization_code";
+        String str = WeChatUtil.httpRequest(url, "GET", null);
+        log.debug("access_token result", str);
+        if (StringUtils.isEmpty(str)) {
+            return null;
+        } else {
+            return JSONObject.parseObject(str);
+        }
     }
 
     /**

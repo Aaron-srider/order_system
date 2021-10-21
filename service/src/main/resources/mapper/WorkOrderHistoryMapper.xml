@@ -4,32 +4,85 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper">
 
+    <delete id="deleteWorkOrderHistoryByWorkOrderId">
+        delete from work_order_history where work_order_id=#{workOrderId}
+    </delete>
 
-    <select id="workOrderHistoryPages" resultType="cn.edu.bistu.model.vo.WorkOrderHistoryVo">
-        select
-            wo.id,
-            flow_id,
-            wo.create_time,
-            wo.last_modified_time,
-            status,
-            content,
-            title,
-            u.student_id ,
-            u.job_id ,
-            f.name flow_name,
-            u.name initiator_name,
-            wo.attachment_name
-        from work_order_history wo
-            left join user u on wo.initiator_id = u.id
-            left join flow f on wo.flow_id = f.id
+    <sql id="workOrderHistoryConditions">
         <where>
-            wo.deleted = 0 and f.deleted = 0 and u.deleted = 0
-            and wo.initiator_id = #{workOrderHistoryVo.initiatorId}
-            <if test="workOrderHistoryVo.title!=null and workOrderHistoryVo.title!=''">
-                and wo.title like '%' #{workOrderHistoryVo.title} '%'
+            <if test="workOrderHistoryVo.workOrderVo.id!=null">
+                work_order.id=#{workOrderHistoryVo.workOrderVo.id}
+            </if>
+            <if test="workOrderHistoryVo.workOrderVo.initiatorId!=null">
+                work_order.initiator_id=#{workOrderHistoryVo.workOrderVo.initiatorId}
+            </if>
+            <if test="workOrderHistoryVo.workOrderVo.studentJobId!=null and workOrderHistoryVo.workOrderVo.studentJobId!=''">
+                user.student_job_id like "%" #{workOrderHistoryVo.workOrderVo.studentJobId} "%"
+            </if>
+            <if test="workOrderHistoryVo.workOrderVo.startDate!=null and workOrderHistoryVo.workOrderVo.startDate!=''">
+                work_order.create_time &gt; #{workOrderHistoryVo.workOrderVo.createTime}
+            </if>
+            <if test="workOrderHistoryVo.workOrderVo.endDate!=null and workOrderHistoryVo.workOrderVo.endDate!=''">
+                work_order.create_time &lt; #{workOrderHistoryVo.workOrderVo.createTime}
             </if>
         </where>
+    </sql>
 
+    <sql id="rowWorkOrderHistoryColumns">
+        work_order_history.id as work_order_history_id,
+        work_order_history.work_order_id as work_order_history_work_order_id,
+        work_order_history.before_finished_flow_node_id as work_order_history_before_finished_flow_node_id,
+        work_order_history.before_finished_status as work_order_history_before_finished_status
+    </sql>
+
+    <sql id="combinationWorkOrderHistoryColumns">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistoryColumns"/>,
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.combinationWorkOrderColumns"/>
+    </sql>
+
+    <sql id="workOrderHistoryJoin">
+        left join work_order on work_order_history.work_order_id = work_order.id
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
+    </sql>
+
+    <resultMap id="workOrderHistoryResultMap" type="cn.edu.bistu.model.vo.WorkOrderHistoryVo">
+        <id property="id" column="work_order_history_id"/>
+        <result property="workOrderId" column="work_order_history_work_order_id"/>
+        <result property="beforeFinishedFlowNodeId" column="work_order_history_before_finished_flow_node_id"/>
+        <result property="beforeFinishedStatus" column="work_order_history_before_finished_status"/>
+        <association property="workOrderVo"
+                     resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap"/>
+    </resultMap>
+
+    <select id="getWorkOrderHistoryPageByConditions" resultMap="workOrderHistoryResultMap">
+        select
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.rowWorkOrderHistoryColumns"/>,
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.combinationWorkOrderColumns"/>
+        from work_order_history
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryConditions"/>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
     </select>
+
+    <select id="getWorkOrderHistoryCountByConditions" resultType="long">
+        select
+            count(distinct work_order_history.id)
+        from work_order_history
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryConditions"/>
+    </select>
+
+    <select id="getOneWorkOrderHistoryById" resultMap="workOrderHistoryResultMap">
+        select
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.combinationWorkOrderHistoryColumns"/>
+        from work_order_history
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper.workOrderHistoryJoin"/>
+        where
+            work_order_history.id=#{id}
+        ;
+    </select>
+
+
+
 
 </mapper>

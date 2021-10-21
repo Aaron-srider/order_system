@@ -1,8 +1,7 @@
 package cn.edu.bistu.common.config;
 
 import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.common.exception.ParameterMissingException;
-import cn.edu.bistu.common.exception.ParameterRedundentException;
+import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -137,8 +136,6 @@ public class ValidationWrapper {
      * 检查对象的属性完整性，以异常形式抛出多余属性或缺失属性，若不抛出异常，说明对象属性完整。
      *
      * @param object 待检测的对象
-     * @throws ParameterMissingException   若缺失属性，则抛出ParameterMissing异常
-     * @throws ParameterRedundentException 若缺失属性，则抛出ParameterMissing异常
      * @throws IllegalAccessException
      */
     public void checkParamIntegrity(Object object) throws IllegalAccessException {
@@ -146,13 +143,13 @@ public class ValidationWrapper {
         //获取缺失属性列表
         List<String> missingParam = checkMissingParam(object);
         if (!missingParam.isEmpty()) {
-            throw new ParameterMissingException(missingParam, ResultCodeEnum.FRONT_DATA_MISSING);
+            throw new ResultCodeException(missingParam, ResultCodeEnum.FRONT_DATA_MISSING);
         }
 
         //获取多余属性列表
         List<String> redundantParams = this.checkRedundantParam(object);
         if (!redundantParams.isEmpty()) {
-            throw new ParameterRedundentException(redundantParams, ResultCodeEnum.FRONT_DATA_REDUNDANT);
+            throw new ResultCodeException(redundantParams, ResultCodeEnum.FRONT_DATA_REDUNDANT);
         }
 
         //清空必需列表和可选列表，不要阻碍下次使用该对象。

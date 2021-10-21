@@ -1,6 +1,5 @@
 package cn.edu.bistu.auth.mapper;
 
-import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
@@ -92,4 +91,19 @@ public interface UserMapper extends BaseMapper<User> {
      * @return
      */
     Page<WorkOrderVo> getApprovalWorkOrders(Page<WorkOrderVo> page, @Param("approverId") Long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
+
+    List<Long> queryByCondition(UserVo userVo);
+
+
+
+    //调整mapper策略
+    UserVo getOneUserById(Long id);
+
+    UserVo getOneUserByOpenId(String openId);
+
+    UserVo getOneUserByUnionId(String unionId);
+
+    List<UserVo> getUserListByConditions(@Param("skip") Long skip, @Param("size")Long size, @Param("userVo")UserVo userVo);
+
+    long getUserCountByConditions(@Param("userVo") UserVo userVo);
 }

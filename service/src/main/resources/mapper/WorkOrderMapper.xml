@@ -4,35 +4,42 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.edu.bistu.workOrder.mapper.WorkOrderMapper">
 
+    <delete id="deleteWorkOrderByWorkOrderId" >
+        delete from work_order where id=#{workOrderId}
+    </delete>
 
-    <select id="workOrderPages" resultType="cn.edu.bistu.model.vo.WorkOrderVo">
-        select
-        wo.id,
-        is_examined,
-        flow_id,
-        wo.create_time,
-        wo.update_time,
-        status,
-        content,
-        title,
-        u.student_id ,
-        u.job_id ,
-        f.name flow_name,
-        u.name initiator_name,
-        wo.attachment_name
-        from work_order wo left join user u on wo.initiator_id = u.id
-        left join flow f on wo.flow_id = f.id
-        <where>
-            wo.deleted = 0 and f.deleted = 0 and u.deleted = 0
-            and wo.initiator_id = #{workOrderVo.initiatorId}
-            <if test="workOrderVo.title!=null and workOrderVo.title!=''">
-                and wo.title like '%' #{workOrderVo.title} '%'
-            </if>
-        </where>
-
+    <select id="getWorkOrderPageByConditions" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
+        ;
     </select>
 
+    <select id="getWorkOrderCountByConditions" resultType="long">
+        select count(distinct work_order.id)
+        from work_order
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
+        ;
+    </select>
 
+    <select id="getOneWorkOrderById" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
+        where work_order.id = #{id}
+        ;
+    </select>
 
+    <select id="getApprovalWorkOrderPageByApproverId" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
+    </select>
+
+    <select id="getApprovalWorkOrderCountByApproverId" resultType="long">
+        select count(distinct work_order.id)
+        from work_order
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
+        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
+    </select>
 
 </mapper>

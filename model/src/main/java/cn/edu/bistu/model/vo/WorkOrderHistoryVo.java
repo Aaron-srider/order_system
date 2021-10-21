@@ -8,14 +8,18 @@ import lombok.Data;
 @Data
 public class WorkOrderHistoryVo extends WorkOrderHistory {
 
-    String studentId;
-    String jobId;
-    String initiatorName;
-    String flowName;
+    //String studentId;
+    //String jobId;
+    //String initiatorName;
+    //String flowName;
+    //
+    //String attachmentUrl;
 
-    String attachmentUrl;
+    //Long size;
+    //Long current;
 
-    Long size;
-    Long current;
+
+
+    WorkOrderVo workOrderVo;
 }
 
