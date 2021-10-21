@@ -120,6 +120,9 @@ public class MessageController {
 
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long sender = userInfo.getVal("id", Long.class);
+        if (sender == message.getReceiver()) {
+            return Result.build(null,ResultCodeEnum.SENDER_IS_RECEIVER);
+        }
         message.setSender(sender);
         Long id = messageService.sendMessageById(message);
         return Result.ok(id);

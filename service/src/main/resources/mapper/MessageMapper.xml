@@ -48,7 +48,7 @@
         SELECT
             <include refid="combinationMsgAndUser"></include>
         FROM message
-        LEFT JOIN user ON user.id=message.sender
+        LEFT JOIN user ON user.id=message.receiver
             <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
     </sql>
 
@@ -56,7 +56,7 @@
         select
             <include refid="combinationMsgAndUser"></include>
         from message
-        LEFT JOIN user ON u.id=message.receiver
+        LEFT JOIN user ON user.id=message.sender
             <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
     </sql>
 
@@ -80,8 +80,8 @@
 
     <sql id="msgSelectCondition">
         <where>
-            <if test="title ！= null and title != ''">
-                and message.title like #{title}
+            <if test=" title != null and title != '' ">
+                and message.title like "%" #{title} "%"
             </if>
         </where>
         ORDER BY message.create_time DESC

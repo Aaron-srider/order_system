@@ -51,9 +51,8 @@ public enum ResultCodeEnum {
     MESSAGE_NOT_EXIST(306,"消息不存在"),
     USER_SENDMSG_NOT_CONSISTENT(307,"发送消息和上传附件的用户不一致"),
     USER_MESSAGE_NOT_CONSISTENT(308,"用户和消息不匹配"),
-
+    SENDER_IS_RECEIVER(309,"发送者和接受者一样"),
     BACKEND_ERROR(500, "后端错误");
-
 
 
     private Integer code;
