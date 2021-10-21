@@ -3,6 +3,7 @@ package cn.edu.bistu.workOrder.mapper;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +18,6 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder>{
      * @param workOrderId 待删除的工单的工单id
      */
     public void deleteWorkOrderByWorkOrderId(Long workOrderId);
-
 
     /**
      * 获取分页的工单数据
@@ -55,4 +55,7 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder>{
     //public long getApprovalWorkOrderCountByApproverId(@Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
 
 
+    public List<WorkOrderVo> getApprovalWorkOrderPageByApproverId(@Param("skip") long skip, @Param("size") long size, @Param("approverId") long approverId);
+
+    public long getApprovalWorkOrderPageCountByApproverId(@Param("approverId") long approverId);
 }

@@ -210,14 +210,13 @@ public class WorkOrderController extends BaseController {
      */
     @PostMapping("/workOrder")
     public Result submitWorkOrder(
-            @Validated(Insert.class) @RequestBody WorkOrder workOrder,
+            @Validated(Insert.class) @RequestBody WorkOrderVo workOrderVo,
             HttpServletRequest req) {
-
         //获取工单提交用户id
         Long visitorId = getVisitorId(req);
-        workOrder.setInitiatorId(visitorId);
-        workOrderService.submitWorkOrder(workOrder);
-        return Result.ok();
+        workOrderVo.setInitiatorId(visitorId);
+        ServiceResult result = workOrderService.submitWorkOrder(workOrderVo);
+        return Result.ok(result.getServiceResult());
     }
 
 

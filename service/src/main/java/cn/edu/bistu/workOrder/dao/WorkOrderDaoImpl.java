@@ -68,20 +68,17 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
      * @param id 工单id
      * @return 返回指定工单
      */
+    @Override
     public DaoResult<WorkOrderVo> getOneWorkOrderById(Long id) {
         WorkOrderVo oneWorkOrderById = workOrderMapper.getOneWorkOrderById(id);
         return new SimpleDaoResultImpl<WorkOrderVo>().setResult(oneWorkOrderById);
     }
 
     @Override
-    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo, String condition) {
-        FlowNode flowNode = new FlowNode();
-        flowNode.setApproverId(approverId);
-        workOrderVo.setFlowNode(flowNode);
-
-        List<WorkOrderVo> workOrderVoList = workOrderMapper.getWorkOrderPageByConditions(Pagination.getSkip(page), page.getSize(), workOrderVo, condition);
+    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId) {
+        List<WorkOrderVo> workOrderVoList = workOrderMapper.getApprovalWorkOrderPageByApproverId(Pagination.getSkip(page), page.getSize(), approverId);
         page.setRecords(workOrderVoList);
-        long workOrderCount = workOrderMapper.getWorkOrderCountByConditions(workOrderVo, condition);
+        long workOrderCount = workOrderMapper.getApprovalWorkOrderPageCountByApproverId(approverId);
         page.setTotal(workOrderCount);
         return new SimpleDaoResultImpl<Page<WorkOrderVo>>().setResult(page);
     }
@@ -102,6 +99,7 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
 
     }
 
+    @Override
     public WorkOrderStatus constantToEntity(cn.edu.bistu.constants.WorkOrderStatus statusConstant) {
         List<WorkOrderStatus> workOrderStatusesFromDateBase = workOrderStatusMapper.selectList(null);
         for (WorkOrderStatus statusFromDataBase : workOrderStatusesFromDateBase) {

@@ -30,6 +30,8 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
     @Autowired
     WorkOrderFinisherFactory workOrderFinisherFactory;
 
+
+
     @Override
     @Transactional
     public void deleteWorkOrdersByWorkOrderIdList(List<Long> workOrderIdList) {
@@ -52,15 +54,18 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
     public void invalidationWorkOrder(List<Long> idList){
 
         for (Long id : idList) {
-            DaoResult<WorkOrderVo> oneWorkOrderById = ((WorkOrderDaoImpl) adminWorkOrderDao).getOneWorkOrderById(id);
-            WorkOrderVo workOrderVo = oneWorkOrderById.getResult();
+            WorkOrderVo workOrderVo = adminWorkOrderDao.getOneWorkOrderById(id).getResult();
 
             //如果工单已经结束，不予作废
             if(workOrderVo.getIsFinished().equals(1)) {
                 throw new ResultCodeException("workOrder id:" + workOrderVo.getId(), ResultCodeEnum.WORKORDER_BEEN_FINISHED);
             }
 
-            approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher("notApprovalType"), workOrderVo, null, cn.edu.bistu.constants.WorkOrderStatus.INVALIDATION, null);
+            approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher(
+                    "notApprovalTypeV2"),
+                    workOrderVo, null,
+                    cn.edu.bistu.constants.WorkOrderStatus.INVALIDATION,
+                    null);
         }
 
     }

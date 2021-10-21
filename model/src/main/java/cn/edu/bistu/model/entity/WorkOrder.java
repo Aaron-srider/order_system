@@ -56,13 +56,9 @@ public class WorkOrder extends BaseEntity{
 
     String attachmentSize;
 
-    /**
-     * 判断工单是否已经完结
-     * @return 若isFinished字段为1，返回true；否则返回false。
-     */
-    public boolean workOrderFinished() {
-        return isFinished.equals(1);
-    }
 
+    //本次更新新开字段
+    Long actualApproverId;
+    Long userSpecifiedId;
 
 }

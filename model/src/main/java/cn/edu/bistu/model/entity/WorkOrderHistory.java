@@ -18,6 +18,7 @@ public class WorkOrderHistory extends BaseEntity{
     /**
      * 记录工单结束状态的位置
      */
+    //todo
     private Integer beforeFinishedStatus;
 
 

@@ -6,6 +6,9 @@ import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.imageio.spi.ServiceRegistry;
+import java.net.ServerSocket;
+
 public interface WorkOrderService extends IService<WorkOrder>{
 
     /**
@@ -19,7 +22,7 @@ public interface WorkOrderService extends IService<WorkOrder>{
 
     ServiceResult<WorkOrderVo> detail(WorkOrder workOrder);
 
-    void submitWorkOrder(WorkOrder workOrder);
+    ServiceResult submitWorkOrder(WorkOrderVo workOrderVo);
 
     /**
      * 根据筛选条件查询工单列表

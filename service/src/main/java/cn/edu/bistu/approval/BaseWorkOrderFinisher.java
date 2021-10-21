@@ -39,7 +39,6 @@ public class BaseWorkOrderFinisher {
     public void generateWorkOrderHistory(cn.edu.bistu.model.entity.WorkOrderStatus beforeStatus, WorkOrder workOrder) {
         //生成历史工单
         WorkOrderHistory workOrderHistory = new WorkOrderHistory();
-        BeanUtils.copyProperties(workOrder, workOrderHistory);
         workOrderHistory.setWorkOrderId(workOrder.getId());
         workOrderHistory.setBeforeFinishedStatus(beforeStatus.getValue());
         workOrderHistory.setBeforeFinishedFlowNodeId(workOrder.getFlowNodeId());

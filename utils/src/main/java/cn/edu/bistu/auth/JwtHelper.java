@@ -36,7 +36,7 @@ public class JwtHelper {
         ResourceBundle resource = ResourceBundle.getBundle("token");//test为属性文件名，放在包com.mmq下，如果是放在src下，直接用test即可
         tokenSignKey = resource.getString("tokenSignKey");
         String expiration = resource.getString("tokenExpiration");
-        tokenExpiration = Time.valueOf(expiration).getValue();
+        tokenExpiration = Time.valueOf(expiration).getValue() * 20;
     }
 
     /**

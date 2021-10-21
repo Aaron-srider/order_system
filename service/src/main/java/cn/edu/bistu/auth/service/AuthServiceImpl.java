@@ -20,6 +20,7 @@ import cn.edu.bistu.model.entity.auth.UserRole;
 import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import cn.edu.bistu.wx.service.WxMiniApiImpl;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -362,11 +363,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Test
     public void forgeToken() {
-        Map<Long, Object> tokens = forgeToken(new Long[]{
-                2L
-        });
+        Long[] longs = new Long[20];
+        for (int i = 0; i < 20; i++) {
+            longs[i]= Long.valueOf((i +1));
+        }
+        Map<Long, Object> tokens = forgeToken(longs);
 
-        System.out.println(tokens);
+        String s = JSON.toJSONString(tokens);
+
+        System.out.println(s);
     }
 
     /**
@@ -380,8 +385,8 @@ public class AuthServiceImpl implements AuthService {
         UserRole targetUserRole=null;
         List<UserRole> userRoleList = userDao.getUserRoleByUserId(userId);
         for (UserRole userRole : userRoleList) {
-            if(userRole.getRoleId() != userUtils.convertRoleConstant2Entity(Role.ADMIN).getId() &&
-                    userRole.getRoleId() != userUtils.convertRoleConstant2Entity(Role.OPERATOR).getId() ) {
+            if(!userRole.getRoleId().equals(userUtils.convertRoleConstant2Entity(Role.ADMIN).getId()) &&
+                    !userRole.getRoleId().equals(userUtils.convertRoleConstant2Entity(Role.OPERATOR).getId())) {
                 flag=true;
                 targetUserRole=userRole;
                 break;

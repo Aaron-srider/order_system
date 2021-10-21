@@ -6,4 +6,7 @@ import lombok.Data;
 public class Flow extends BaseEntity{
     private String description;
     private String name;
+
+    //本次更新新开字段
+    private Integer ifUserAddInfo;
 }

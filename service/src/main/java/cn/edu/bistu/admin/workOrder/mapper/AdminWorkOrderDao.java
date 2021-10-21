@@ -1,13 +1,14 @@
 package cn.edu.bistu.admin.workOrder.mapper;
 
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.workOrder.dao.WorkOrderDao;
 
 import java.util.List;
 
 /**
  * 负责后台管理工单的Dao操作
  */
-public interface AdminWorkOrderDao {
+public interface AdminWorkOrderDao extends WorkOrderDao {
 
     /**
      * 删除工单（真删除）
