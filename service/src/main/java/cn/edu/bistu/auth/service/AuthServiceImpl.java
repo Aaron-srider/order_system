@@ -209,7 +209,7 @@ public class AuthServiceImpl implements AuthService {
     @Test
     public void forgeToken() {
         Map<Long, Object> tokens = forgeToken(new Long[]{
-                3L
+                1L
         });
 
         System.out.println(tokens);
@@ -220,7 +220,6 @@ public class AuthServiceImpl implements AuthService {
         userRole.setRoleId(roleId);
         userRole.setUserId(userId);
         userDao.getUserRoleMapper().insert(userRole);
-
     }
 
     private void registerUser(String openid, String sessionkey) {
@@ -230,7 +229,6 @@ public class AuthServiceImpl implements AuthService {
         user.setInfoComplete(0);
         userDao.getUserMapper().insert(user);
         throw new UserInfoNotCompleteException("user id:" + user.getId(), ResultCodeEnum.USER_INFO_NOT_COMPLETE);
-
     }
 
 }

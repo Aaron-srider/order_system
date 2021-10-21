@@ -13,6 +13,7 @@ public class MapService extends HashMap<String, Object> {
 
     public MapService putMap(String key, Object value) {
         super.put(key, value);
+
         return this;
     }
 

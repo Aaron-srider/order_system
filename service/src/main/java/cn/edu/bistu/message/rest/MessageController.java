@@ -47,7 +47,7 @@ public class MessageController {
 
     //获取收件箱
     @PostMapping("/getReceiveMsg")
-    public ServiceResult<JSONObject> getReceiveMessage(@RequestBody PageVo pageVo,
+    public Result getReceiveMessage(@RequestBody PageVo pageVo,
                                     HttpServletRequest request){
 
         if (pageVo.getSize() == 0) {
@@ -62,7 +62,7 @@ public class MessageController {
         Long visitorId = userInfo.getVal("id", Long.class);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
         ServiceResult<JSONObject> result = messageService.getReceiveMessageById(page,visitorId);
-        return result;
+        return Result.ok(result.getServiceResult());
     }
 
     //获取发件箱
