@@ -26,7 +26,7 @@ public class Message {
     private Long receiver;
     private Integer type;
 
-    private byte[] content;
+    private byte[] attachment;
     @TableField(value = "create_time")
     private Date createTime;
     private Integer status;

@@ -45,6 +45,7 @@ public class MessageController {
     //获取收件箱
     @PostMapping("/getReceiveMsg")
     public Result getReceiveMessage(@RequestBody PageVo pageVo,
+                                    MessageVo messageVo,
                                     HttpServletRequest request){
 
         if (pageVo.getSize() == 0) {
@@ -58,14 +59,15 @@ public class MessageController {
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long visitorId = userInfo.getVal("id", Long.class);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult<JSONObject> result = messageService.getReceiveMessageById(page,visitorId);
+        ServiceResult<JSONObject> result = messageService.getReceiveMessageById(page,visitorId,messageVo.getTitle());
         return Result.ok(result.getServiceResult());
     }
 
     //获取发件箱
     @PostMapping("/getSendMsg")
     public ServiceResult<JSONObject> getSendMessage(@RequestBody PageVo pageVo,
-                                 HttpServletRequest request) {
+                                                    MessageVo messageVo,
+                                                    HttpServletRequest request) {
 
         if (pageVo.getSize() == 0) {
             pageVo.setSize(10);
@@ -78,26 +80,37 @@ public class MessageController {
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long visitorId = userInfo.getVal("id", Long.class);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult<JSONObject> result = messageService.getSendMessageById(page,visitorId);
+        ServiceResult<JSONObject> result = messageService.getSendMessageById(page,visitorId,messageVo.getTitle());
         return result;
     }
 
-    @GetMapping("/messageDetail/{messageId}")
-    public Result MessageDetail(@PathVariable("messageId") Long messageId){
+    @GetMapping("/recevieMsgDetail/{messageId}")
+    public Result receiveMessageDetail(@PathVariable("messageId") Long messageId){
 
 
-        Message message = messageService.getMessageById(messageId);
+        MessageVo message =  messageService.getReceiveMessageDetail(messageId);
         if (message == null) {
             logger.error("消息不存在");
             return Result.build(null,ResultCodeEnum.MESSAGE_NOT_EXIST);
         }
-        //先不返回附件
-        message.setContent(null);
 
         //设置消息为已读
         message.setStatus(1);
         messageService.updateMessage(message);
 
+        return Result.ok(message);
+    }
+
+    @GetMapping("/sendMsgDetail/{messageId}")
+    public Result sendMessageDetail(@PathVariable("messageId") Long messageId){
+
+        MessageVo message =  messageService.getSendMessageDetail(messageId);
+        if (message == null) {
+            logger.error("消息不存在");
+            return Result.build(null,ResultCodeEnum.MESSAGE_NOT_EXIST);
+        }
+
+        messageService.updateMessage(message);
         return Result.ok(message);
     }
 
@@ -113,7 +126,7 @@ public class MessageController {
     }
 
     @PutMapping("/upLoadAttachment/{messageId}")
-    public Result upContent(@PathVariable("messageId") Long messageId,
+    public Result upLoadAttachment(@PathVariable("messageId") Long messageId,
                             HttpServletRequest request,
                             @RequestPart("attachment") MultipartFile attachment) throws IOException {
 
@@ -131,7 +144,7 @@ public class MessageController {
 
         if (attachment.getSize() != 0 && !attachment.getOriginalFilename().equals("")) {
             byte[] bytes = attachment.getBytes();
-            message.setContent(bytes);
+            message.setAttachment(bytes);
             message.setAttachmentName(attachment.getOriginalFilename());
             messageService.updateMessage(message);
             return Result.ok();
@@ -141,7 +154,7 @@ public class MessageController {
     }
 
     @GetMapping("/downLoadAttachment/{messageId}")
-    public void downLoadContent(@PathVariable("messageId") Long messageId,
+    public void downLoadAttachment(@PathVariable("messageId") Long messageId,
                                   HttpServletResponse resp) throws ResultCodeException, IOException {
 
         //查询附件
@@ -149,7 +162,7 @@ public class MessageController {
         if (message == null) {
             throw new MessageException(null,ResultCodeEnum.MESSAGE_NOT_EXIST);
         }
-        byte[] attachmentBytes = message.getContent();
+        byte[] attachmentBytes = message.getAttachment();
 
         //log.debug("" + attachmentBytes.length);
 

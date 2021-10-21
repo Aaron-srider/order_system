@@ -19,14 +19,14 @@ public interface MessageService {
      * @param visitorId
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
-    ServiceResult<JSONObject> getReceiveMessageById(Page<MessageVo> page, Long visitorId);
+    ServiceResult<JSONObject> getReceiveMessageById(Page<MessageVo> page, Long visitorId, String title);
 
     /**
      * 根据用户id获取发件箱
      * @param visitorId
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
-    ServiceResult<JSONObject> getSendMessageById(Page<MessageVo> page, Long visitorId);
+    ServiceResult<JSONObject> getSendMessageById(Page<MessageVo> page, Long visitorId, String title);
 
     /**
      * 发送工单请求，返回插入的工单id方便上传附件
@@ -36,11 +36,18 @@ public interface MessageService {
     Long sendMessageById(Message message);
 
     /**
-     * 根据消息id获取消息
+     * 根据消息id获取收取的消息
      * @param messageId
      * @return cn.edu.bistu.model.entity.Message
      * */
-    Message getMessageById(Long messageId);
+    MessageVo getReceiveMessageDetail(Long messageId);
+
+    /**
+     * 根据消息id获取发送的消息
+     * @param messageId
+     * @return cn.edu.bistu.model.entity.Message
+     * */
+    MessageVo getSendMessageDetail(Long messageId);
 
     /**
      * 修改消息，仅用于上传附件
@@ -50,4 +57,6 @@ public interface MessageService {
     void updateMessage(Message message);
 
     void deleteMessage(Message message, boolean isSender);
+
+    Message getMessageById(Long messageId);
 }

@@ -34,9 +34,9 @@ public class MessageServiceImpl implements MessageService{
     static Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Override
-    public ServiceResult<JSONObject> getReceiveMessageById(Page<MessageVo> page, Long id) {
+    public ServiceResult<JSONObject> getReceiveMessageById(Page<MessageVo> page, Long id, String title) {
 
-        IPage<MessageVo> messages = messagemapper.getReceiveMessageById(page, id);
+        IPage<MessageVo> messages = messagemapper.getReceiveMessageById(page, id, title);
 
         logger.info("messags: ", messages);
         JSONObject jsonObject = new JSONObject();
@@ -46,9 +46,9 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public ServiceResult<JSONObject> getSendMessageById(Page<MessageVo> page,Long id) {
+    public ServiceResult<JSONObject> getSendMessageById(Page<MessageVo> page,Long id, String title) {
 
-        IPage<MessageVo> messages = messagemapper.getSendMessageById(page, id);
+        IPage<MessageVo> messages = messagemapper.getSendMessageById(page, id, title);
         logger.info("messages: ",messages);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("messages",messages);
@@ -70,10 +70,17 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public Message getMessageById(Long messageId) {
+    public MessageVo getReceiveMessageDetail(Long messageId) {
 
-        Message message = messagemapper.selectById(messageId);
-        return message;
+        MessageVo messageVo = messagemapper.getReceiveMsgAllDetail(messageId);
+        return messageVo;
+    }
+
+    @Override
+    public MessageVo getSendMessageDetail(Long messageId) {
+
+        MessageVo messageVo = messagemapper.getSendMsgAllDetail(messageId);
+        return messageVo;
     }
 
     @Override
@@ -90,5 +97,11 @@ public class MessageServiceImpl implements MessageService{
             message.setIsShowReceiver(1);
         }
         messagemapper.updateById(message);
+    }
+
+    @Override
+    public Message getMessageById(Long messageId) {
+        Message message = messagemapper.selectById(messageId);
+        return message;
     }
 }
