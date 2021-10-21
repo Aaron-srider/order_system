@@ -10,4 +10,6 @@ public interface FlowDao {
      * @param roleId
      */
     public DaoResult getFlowListByRoleId(long roleId);
+
+    public DaoResult getOneFlowNodeByNodeId(Long flowNodeId);
 }

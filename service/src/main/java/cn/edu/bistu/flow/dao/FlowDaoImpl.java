@@ -74,4 +74,9 @@ public class FlowDaoImpl implements FlowDao{
         List<FlowVo> flowListByRoleId = flowMapper.getAllFlowListByRoleId(roleId);
         return new SimpleDaoResultImpl<>().setResult(flowListByRoleId);
     }
+
+    @Override
+    public DaoResult getOneFlowNodeByNodeId(Long flowNodeId) {
+        return new SimpleDaoResultImpl<>().setResult(flowNodeMapper.selectById(flowNodeId));
+    }
 }

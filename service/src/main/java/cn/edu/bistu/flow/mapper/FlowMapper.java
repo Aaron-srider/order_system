@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface FlowMapper extends BaseMapper<Flow>{
 
-    //TODO
     public List<FlowVo> getAllFlowListByRoleId(@Param("roleId") long roleId);
 
 }

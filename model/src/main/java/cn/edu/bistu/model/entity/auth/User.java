@@ -75,4 +75,9 @@ public class User extends BaseEntity {
     @NotNull(groups = {WhenStudent.class})
     private String StudentJobId;
 
+
+    //导师id
+    @TableField("tutor_id")
+    private Long tutorId;
+
 }

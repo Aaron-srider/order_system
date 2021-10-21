@@ -2,6 +2,7 @@ package cn.edu.bistu.workOrder.service.impl;
 
 import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.approval.WorkOrderFinisherFactory;
+import cn.edu.bistu.approval.dao.ApproverLogicDao;
 import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
@@ -17,6 +18,7 @@ import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.dao.WorkOrderDao;
 import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
+import cn.edu.bistu.workOrder.service.ActualApproverFinalizer;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -27,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -58,6 +61,13 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Autowired
     WorkOrderFinisherFactory workOrderFinisherFactory;
 
+    @Autowired
+    ApproverLogicDao approverLogicDao;
+
+    @Autowired
+    ActualApproverFinalizer actualApproverFinalizer;
+
+
     @Override
     public ServiceResult listWorkOrder(WorkOrderVo workOrderVo, Page<WorkOrderVo> page) {
         DaoResult<Page<WorkOrderVo>> daoResultPage = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo, "user");
@@ -67,27 +77,32 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Override
     public void revoke(Long workOrderId, Long initiator) {
 
-        WorkOrder workOrder = ((WorkOrderDaoImpl)workOrderDao).getWorkOrderMapper().selectById(workOrderId);
+        WorkOrderVo workOrderVo = workOrderDao.getOneWorkOrderById(workOrderId).getResult();
 
         //“撤回接口”访问者与工单发起者不是同一个用户，无权操作
-        if (!workOrder.getInitiatorId().equals(initiator)) {
+        if (!workOrderVo.getInitiatorId().equals(initiator)) {
             throw new ResultCodeException("user: " + initiator + " has no right",
                     ResultCodeEnum.HAVE_NO_RIGHT);
         }
 
         //工单已经结束，撤回操作非法
-        if (workOrder.getIsFinished().equals(1)) {
+        if (workOrderVo.getIsFinished().equals(1)) {
             throw new ResultCodeException("workOrderId:" + workOrderId,
                     ResultCodeEnum.WORKORDER_BEEN_FINISHED);
         }
 
         //工单已经被审批过，撤回操作非法
-        if (workOrder.getIsExamined().equals(1)) {
+        if (workOrderVo.getIsExamined().equals(1)) {
             throw new ResultCodeException("workOrderId:" + workOrderId,
                     ResultCodeEnum.WORKORDER_BEEN_EXAMINED);
         }
 
-        approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher("notApprovalType"), workOrder, null, WorkOrderStatus.BEEN_WITHDRAWN, null);
+        approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher(
+                "notApprovalTypeV2"),
+                workOrderVo,
+                null,
+                WorkOrderStatus.BEEN_WITHDRAWN,
+                null);
     }
 
     @Override
@@ -112,20 +127,32 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     @Override
-    public void submitWorkOrder(WorkOrder workOrder) {
+    @Transactional
+    public ServiceResult submitWorkOrder(WorkOrderVo workOrderVo) {
 
+        Long flowId = workOrderVo.getFlowId();
         QueryWrapper<FlowNode> flowNodeQueryWrapper = new QueryWrapper<>();
-        Long flowId = workOrder.getFlowId();
+
         flowNodeQueryWrapper.eq("flow_id", flowId).orderByAsc("node_order");
         List<FlowNode> flowNodeList = flowDao.getFlowNodeMapper().selectList(flowNodeQueryWrapper);
 
+        FlowNode firstFlowNode = flowNodeList.get(0);
+
         //设置生成的工单的状态
-        workOrder.setFlowNodeId(flowNodeList.get(0).getId());//目前所处流程节点
-        workOrder.setStatus(0);                           //工单状态
-        workOrder.setIsExamined(0);                       //是否被审批过
-        workOrder.setIsFinished(0);                       //是否完成
+        workOrderVo.setFlowNodeId(firstFlowNode.getId());//目前所处流程节点
+
+        //动态决定工单的实际审批者
+        actualApproverFinalizer.decideActualApprover(workOrderVo, false);
+
+        workOrderVo.setStatus(0);                           //工单状态
+        workOrderVo.setIsExamined(0);                       //是否被审批过
+        workOrderVo.setIsFinished(0);                       //是否完成
         //保存工单
-        save(workOrder);
+        save(workOrderVo);
+
+        return new ServiceResultImpl(workOrderVo);
+
+
 
         //通知审批者，这步暂时不动
         //UserVo userVo = userMapper.getOneById(workOrder.getId());

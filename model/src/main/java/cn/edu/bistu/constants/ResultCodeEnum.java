@@ -34,6 +34,8 @@ public enum ResultCodeEnum {
     NOT_MULTIPART_REQUEST(120, "当前请求不是多段数据请求"),
     WORKORDER_NOT_INVALIDATED(121, "工单没有被作废"),
     USER_IS_ADMIN(122, "用户已经是管理员了"),
+    HAVE_NOT_TUTOR_YET(123, "该用户还没有导师"),
+    USER_SPECIFIED_ID_NULL(124, "该工单本应携带用户指定的id"),
 
 
     SUCCESS(200,"成功"),
@@ -51,6 +53,8 @@ public enum ResultCodeEnum {
     USER_MESSAGE_NOT_CONSISTENT(308,"用户和消息不匹配"),
 
     BACKEND_ERROR(500, "后端错误");
+
+
 
     private Integer code;
 

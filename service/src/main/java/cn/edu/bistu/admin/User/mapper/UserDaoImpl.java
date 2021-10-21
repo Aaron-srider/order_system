@@ -75,6 +75,7 @@ public class UserDaoImpl implements UserDao {
         return objectDaoResult;
     }
 
+    @Override
     public DaoResult<UserVo> getOneUserById(Long id) {
         UserVo oneUserById = userMapper.getOneUserById(id);
         return new SimpleDaoResultImpl<UserVo>().setResult(oneUserById);

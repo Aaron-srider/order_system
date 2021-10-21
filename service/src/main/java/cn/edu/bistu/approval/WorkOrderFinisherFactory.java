@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 用于获取 WorkOrderFinisher 不同的具体实现类，在 Spring 创建该工厂对象时，从 Spring 容器中取出实现类
+ * ，并按照 WorkOrderFinisher 的 getType() 方法将实现类组织到 Map 中，通过工厂方法 getFinisher() 返回
+ * 具体的实现类。
+ * @author wc
+ */
 @Component
 public class WorkOrderFinisherFactory implements InitializingBean, ApplicationContextAware {
 

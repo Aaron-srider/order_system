@@ -6,9 +6,9 @@
 
     <sql id="basicWorkOrderSelectStatementFragment">
         select
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderSelect"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.combinationWorkOrderColumns"/>
         from work_order
-            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.workOrderJoin"/>
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
     </sql>
 
     <sql id="workOrderJoin">
@@ -40,7 +40,9 @@
         work_order.attachment_name as work_order_attachment_name,
         work_order.flow_node_id as work_order_flow_node_id,
         work_order.is_finished as work_order_is_finished,
-        work_order.attachment_size as work_order_attachment_size
+        work_order.attachment_size as work_order_attachment_size,
+        work_order.user_specified_id as work_order_user_specified_id,
+        work_order.actual_approver_id as work_order_actual_approver_id
     </sql>
 
     <sql id="workOrderConditions">
@@ -88,6 +90,9 @@
         <result property="flowNodeId" column="work_order_flow_node_id"/>
         <result property="isFinished" column="work_order_is_finished"/>
         <result property="attachmentSize" column="work_order_attachment_size"/>
+        <result property="userSpecifiedId" column="work_order_user_specified_id"/>
+        <result property="actualApproverId" column="work_order_actual_approver_id"/>
+
 
         <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap"/>
 
