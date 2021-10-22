@@ -13,4 +13,6 @@ public interface FlowMapper extends BaseMapper<Flow>{
 
     public List<FlowVo> getAllFlowListByRoleId(@Param("roleId") long roleId);
 
+    public FlowVo getFullPreparedFlowByFlowId(@Param("flowId") long flowId);
+
 }

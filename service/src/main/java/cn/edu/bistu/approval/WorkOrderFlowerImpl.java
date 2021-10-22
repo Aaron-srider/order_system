@@ -1,15 +1,17 @@
 package cn.edu.bistu.approval;
 
 import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.approval.dao.ApproverLogicDao;
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
-import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ApprovalOperation;
-import cn.edu.bistu.constants.ResultCodeEnum;
+import cn.edu.bistu.constants.WorkOrderStatus;
+import cn.edu.bistu.externalApi.ExternalApiImplementationFactory;
+import cn.edu.bistu.externalApi.ExternalApiResult;
 import cn.edu.bistu.flow.dao.FlowDao;
 import cn.edu.bistu.model.entity.ApprovalRecord;
+import cn.edu.bistu.model.entity.ApproverLogic;
 import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.entity.auth.User;
-import cn.edu.bistu.model.vo.UserVo;
+import cn.edu.bistu.model.vo.FlowVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.dao.WorkOrderDao;
 import cn.edu.bistu.workOrder.service.ActualApproverFinalizer;
@@ -19,6 +21,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class WorkOrderFlowerImpl implements WorkOrderFlower {
+
+
+    @Autowired
+    ApproverLogicDao approverLogicDao;
 
     @Autowired
     FlowDao flowDao;
@@ -38,6 +44,10 @@ public class WorkOrderFlowerImpl implements WorkOrderFlower {
 
     @Autowired
     ActualApproverFinalizer actualApproverFinalizer;
+
+    @Autowired
+    ExternalApiImplementationFactory externalApiImplementationFactory;
+
 
     @Override
     public void flow(WorkOrderVo workOrderVo, ApprovalRecord approvalRecord) {
@@ -75,27 +85,52 @@ public class WorkOrderFlowerImpl implements WorkOrderFlower {
 
             WorkOrderVo workOrderVoAfterUpdate = workOrderDao.getOneWorkOrderById(workOrderVo.getId()).getResult();
 
-            if(workOrderVoAfterUpdate.getActualApproverId() < 0) {
-                //    为工单发起者（研究生）添加导师
-                UserVo initiator = userDao.getOneUserById(workOrderVoAfterUpdate.getInitiatorId()).getResult();
-                User user = new User();
-                user.setId(initiator.getId());
-                if(workOrderVoAfterUpdate.getUserSpecifiedId() == null) {
-                    throw new ResultCodeException("",
-                            ResultCodeEnum.USER_SPECIFIED_ID_NULL);
-                }
-                user.setTutorId(workOrderVoAfterUpdate.getUserSpecifiedId());
-                userDao.simpleUpdateUserById(user);
+            FlowVo fullPreparedFlow = flowDao.getFullPreparedFlowByFlowId(workOrderVoAfterUpdate.getFlowId()).getResult();
 
-                ApprovalRecord approvalRecord1 = new ApprovalRecord();
-                approvalRecord1.setOperation(ApprovalOperation.PASS.getCode());
-                approvalRecord1.setApproverId(workOrderVoAfterUpdate.getActualApproverId());
-                approvalRecord1.setFlowNodeId(workOrderVoAfterUpdate.getFlowNodeId());
-                approvalRecord1.setComment("导师已更换");
-                approvalRecord1.setWorkOrderId(workOrderVoAfterUpdate.getId());
-                flow(workOrderVoAfterUpdate, approvalRecord1);
+            Long actualApproverId = workOrderVoAfterUpdate.getActualApproverId();
+            if (actualApproverId < 0) {
+
+                ApproverLogic approverLogic = (ApproverLogic) approverLogicDao.getApproverLogicByLogicId(actualApproverId * -1).getResult();
+                ExternalApiResult externalApiResult = externalApiImplementationFactory.getImplementation(approverLogic.getText())
+                        .execute(
+                                workOrderVoAfterUpdate,
+                                fullPreparedFlow
+                        );
+
+                ApprovalOperation externalApiExcuteOperation = externalApiResult.getWorkOrderStatusOfExcution();
+
+                if (externalApiExcuteOperation.equals(ApprovalOperation.PASS)) {
+                    WorkOrderVo workOrderVoAfterUpdate2 = workOrderDao.getOneWorkOrderById(workOrderVo.getId()).getResult();
+
+                    ApprovalRecord approvalRecord1 = new ApprovalRecord();
+                    approvalRecord1.setOperation(ApprovalOperation.PASS.getCode());
+                    approvalRecord1.setApproverId(workOrderVoAfterUpdate2.getActualApproverId());
+                    approvalRecord1.setFlowNodeId(workOrderVoAfterUpdate2.getFlowNodeId());
+                    approvalRecord1.setComment(approverLogic.getName() + "已经处理完毕，工单通过");
+                    approvalRecord1.setWorkOrderId(workOrderVoAfterUpdate2.getId());
+
+                    flow(workOrderVoAfterUpdate2, approvalRecord1);
+                } else if (externalApiExcuteOperation.equals(ApprovalOperation.REJECT)) {
+                    WorkOrderVo workOrderVoAfterUpdate2 = workOrderDao.getOneWorkOrderById(workOrderVo.getId()).getResult();
+
+                    ApprovalRecord approvalRecord1 = new ApprovalRecord();
+                    approvalRecord1.setOperation(ApprovalOperation.REJECT.getCode());
+                    approvalRecord1.setApproverId(workOrderVoAfterUpdate2.getActualApproverId());
+                    approvalRecord1.setFlowNodeId(workOrderVoAfterUpdate2.getFlowNodeId());
+                    approvalRecord1.setComment(approverLogic.getName() + "已经处理完毕，工单不通过");
+                    approvalRecord1.setWorkOrderId(workOrderVoAfterUpdate2.getId());
+
+                    WorkOrderFinishWrapper workOrderFinishWrapper = new WorkOrderFinishWrapper();
+                    workOrderFinishWrapper.setFinishStatusConstant(WorkOrderStatus.NOT_APPROVED);
+                    workOrderFinishWrapper.setFullPreparedWorkOrderToBeFinished(workOrderVoAfterUpdate2);
+                    workOrderFinishWrapper.setApprovalRecord(approvalRecord1);
+
+                    workOrderFinisherFactory.getFinisher("approvalTypeV2")
+                            .finishWorkOrder(workOrderFinishWrapper);
+                }
             }
 
         }
+
     }
 }

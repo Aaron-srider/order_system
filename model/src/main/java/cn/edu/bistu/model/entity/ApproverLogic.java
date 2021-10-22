@@ -8,4 +8,5 @@ public class ApproverLogic {
     private String text;
     private Integer value;
     private String type;
+    private String name;
 }
