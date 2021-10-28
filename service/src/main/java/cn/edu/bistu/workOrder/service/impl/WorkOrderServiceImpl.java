@@ -4,6 +4,7 @@ import cn.edu.bistu.admin.User.mapper.UserDao;
 import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.dao.ApproverLogicDao;
 import cn.edu.bistu.approval.service.ApprovalService;
+import cn.edu.bistu.common.MD5Utils;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
@@ -137,6 +138,8 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         WorkOrderVo resultWorkOrderWithOutFlowInfo = daoResultPage.getResult();
         resultWorkOrderWithOutFlowInfo.setAttachment(null);
 
+
+        //完善工单信息
         FlowVo fullPreparedFlowOfResultWorkOrder = flowDao.getFullPreparedFlowByFlowId(resultWorkOrderWithOutFlowInfo.getFlowId()).getResult();
 
         for (FlowNodeVo oneFlowNodeOfResultWorkOrder : fullPreparedFlowOfResultWorkOrder.getFlowNodeList()) {
@@ -147,6 +150,19 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         }
 
         resultWorkOrderWithOutFlowInfo.setFlow(fullPreparedFlowOfResultWorkOrder);
+
+        if(resultWorkOrderWithOutFlowInfo.getAttachmentName() != null){
+            //生成附件下载id
+            String rowData = System.currentTimeMillis() + resultWorkOrderWithOutFlowInfo.getId() + resultWorkOrderWithOutFlowInfo.getAttachmentName();
+            String md5Id = MD5Utils.MD5(rowData);
+            resultWorkOrderWithOutFlowInfo.setAttachmentDownloadId(md5Id);
+            WorkOrder workOrder1 = new WorkOrder();
+            workOrder1.setId(resultWorkOrderWithOutFlowInfo.getId());
+            workOrder1.setAttachmentDownloadId(md5Id);
+            workOrderDao.updateById(workOrder1);
+            return new ServiceResultImpl<>(resultWorkOrderWithOutFlowInfo);
+        }
+
         return new ServiceResultImpl<>(resultWorkOrderWithOutFlowInfo);
     }
 
