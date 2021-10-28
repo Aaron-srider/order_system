@@ -50,7 +50,6 @@ public class AdminWorkOrderController extends BaseController {
                              Integer size,
                              WorkOrderVo workOrderVo
                              ) throws NoSuchFieldException, IllegalAccessException {
-
         PageVo pageVo = Pagination.setDefault(current, size);
         Page<WorkOrderVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
         ServiceResult serviceResult = workOrderService.getAllWorkOrders(page, workOrderVo);

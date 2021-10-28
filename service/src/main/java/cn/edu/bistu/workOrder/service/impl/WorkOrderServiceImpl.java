@@ -12,13 +12,20 @@ import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
+import cn.edu.bistu.model.entity.ApproverLogic;
 import cn.edu.bistu.model.entity.FlowNode;
+import cn.edu.bistu.model.entity.FlowNodeApprover;
 import cn.edu.bistu.model.entity.WorkOrder;
+import cn.edu.bistu.model.vo.FlowNodeVo;
+import cn.edu.bistu.model.vo.FlowVo;
+import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.dao.WorkOrderDao;
 import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
 import cn.edu.bistu.workOrder.service.ActualApproverFinalizer;
+import cn.edu.bistu.workOrder.service.FlowNodeApproverDecider;
+import cn.edu.bistu.workOrder.service.FlowNodeApproverDeciderFactory;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -66,6 +73,12 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     @Autowired
     ActualApproverFinalizer actualApproverFinalizer;
+
+    @Autowired
+    FlowNodeApproverDeciderFactory flowNodeApproverDeciderFactory;
+
+    FlowNodeApproverDecider flowNodeApproverDecider;
+
 
 
     @Override
@@ -121,9 +134,20 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         }
 
         DaoResult<WorkOrderVo> daoResultPage = workOrderDao.getOneWorkOrderById(workOrder.getId());
-        WorkOrderVo result = daoResultPage.getResult();
-        result.setAttachment(null);
-        return new ServiceResultImpl<>(result);
+        WorkOrderVo resultWorkOrderWithOutFlowInfo = daoResultPage.getResult();
+        resultWorkOrderWithOutFlowInfo.setAttachment(null);
+
+        FlowVo fullPreparedFlowOfResultWorkOrder = flowDao.getFullPreparedFlowByFlowId(resultWorkOrderWithOutFlowInfo.getFlowId()).getResult();
+
+        for (FlowNodeVo oneFlowNodeOfResultWorkOrder : fullPreparedFlowOfResultWorkOrder.getFlowNodeList()) {
+            Long approverId = oneFlowNodeOfResultWorkOrder.getApproverId();
+            flowNodeApproverDecider = flowNodeApproverDeciderFactory.getApproverDecider(approverId);
+            FlowNodeApprover flowNodeApproverOfResultWorkOrder = flowNodeApproverDecider.findAndSetFlowNodeApprover(oneFlowNodeOfResultWorkOrder);
+            oneFlowNodeOfResultWorkOrder.setFlowNodeApprover(flowNodeApproverOfResultWorkOrder);
+        }
+
+        resultWorkOrderWithOutFlowInfo.setFlow(fullPreparedFlowOfResultWorkOrder);
+        return new ServiceResultImpl<>(resultWorkOrderWithOutFlowInfo);
     }
 
     @Override
