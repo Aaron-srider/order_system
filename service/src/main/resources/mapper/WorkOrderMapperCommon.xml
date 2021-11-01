@@ -14,14 +14,10 @@
     <sql id="workOrderJoin">
         left join user on work_order.initiator_id = user.id
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"/>
-        left join flow on work_order.flow_id = flow.id
-        left join flow_node on work_order.flow_node_id=flow_node.id
     </sql>
 
     <sql id="combinationWorkOrderColumns">
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.rowWorkOrderColumns"/>,
-        <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowColumns"/>,
-        <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeColumns"/>,
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.combinationUserColumns"/>
     </sql>
 
@@ -66,7 +62,7 @@
                 and work_order.create_time &gt; #{workOrderVo.startDate}
             </if>
             <if test="workOrderVo.endDate!=null and workOrderVo.endDate!=''">
-                and work_order.create_time &lt; #{workOrderVo.startDate}
+                and work_order.create_time &lt; #{workOrderVo.endDate}
             </if>
             <if test="condition=='user'">
                 and work_order.is_finished = 0
@@ -93,16 +89,10 @@
         <result property="userSpecifiedId" column="work_order_user_specified_id"/>
         <result property="actualApproverId" column="work_order_actual_approver_id"/>
 
-
         <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap"/>
 
-        <association property="flow" javaType="cn.edu.bistu.model.entity.Flow">
-            <id property="id" column="flow_id"/>
-            <result property="description" column="flow_description"/>
-            <result property="name" column="flow_name"/>
-        </association>
+        <!--<association property="flow" column="work_order_flow_id" javaType="cn.edu.bistu.model.vo.FlowVo" select="cn.edu.bistu.flow.mapper.FlowMapper.getFullPreparedFlowByFlowId"/>-->
 
-        <association property="flowNode" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeResultMap"/>
     </resultMap>
 
 </mapper>

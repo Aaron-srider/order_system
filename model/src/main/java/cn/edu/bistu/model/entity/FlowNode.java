@@ -1,5 +1,7 @@
 package cn.edu.bistu.model.entity;
 
+import cn.edu.bistu.model.entity.auth.User;
+import cn.edu.bistu.model.vo.UserVo;
 import lombok.Data;
 
 @Data
@@ -24,6 +26,8 @@ public class FlowNode extends BaseEntity {
      * 下一个节点的Id
      */
     private Long nextId;
+
+
 
 
 

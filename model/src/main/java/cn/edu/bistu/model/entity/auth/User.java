@@ -1,23 +1,22 @@
 package cn.edu.bistu.model.entity.auth;
 
-import cn.edu.bistu.constants.Role;
 import cn.edu.bistu.model.common.validation.WhenStudent;
 import cn.edu.bistu.model.common.validation.WhenTeacher;
 import cn.edu.bistu.model.entity.BaseEntity;
+import cn.edu.bistu.model.entity.FlowNode;
+import cn.edu.bistu.model.entity.FlowNodeApprover;
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import java.util.Date;
 
 
 /**
  * 与数据库交互的对象
  */
 @Data
-public class User extends BaseEntity {
+public class User extends BaseEntity implements FlowNodeApprover {
     @TableField("open_id")
     private String openId;
 
@@ -71,10 +70,8 @@ public class User extends BaseEntity {
     private Integer isLock;
 
     @TableField("student_job_id")
-    @NotNull(groups = {WhenTeacher.class})
-    @NotNull(groups = {WhenStudent.class})
-    private String StudentJobId;
-
+    @NotNull(groups = {WhenTeacher.class, WhenStudent.class})
+    private String studentJobId;
 
     //导师id
     @TableField("tutor_id")

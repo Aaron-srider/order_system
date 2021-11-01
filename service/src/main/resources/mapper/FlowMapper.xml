@@ -10,7 +10,7 @@
         <collection property="flowNodeList" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeResultMap"/>
     </resultMap>
 
-    <resultMap id="flowNodeResultMap" type="cn.edu.bistu.model.entity.FlowNode">
+    <resultMap id="flowNodeResultMap" type="cn.edu.bistu.model.vo.FlowNodeVo">
         <id property="id" column="flow_node_id"/>
         <result property="flowId" column="flow_node_flow_id"/>
         <result property="approverId" column="flow_node_approver_id"/>
@@ -44,6 +44,16 @@
         where
             role.id=#{roleId};
         ;
+    </select>
+
+
+    <select id="getFullPreparedFlowByFlowId" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowResultMap">
+        select
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowColumns"/>,
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeColumns"/>
+        from flow
+            left join flow_node on flow.id = flow_node.flow_id
+        where flow.id = #{flowId}
     </select>
 
 </mapper>

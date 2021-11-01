@@ -56,6 +56,8 @@ public class WorkOrder extends BaseEntity{
 
     String attachmentSize;
 
+    String  attachmentDownloadId;
+
 
     //本次更新新开字段
     Long actualApproverId;

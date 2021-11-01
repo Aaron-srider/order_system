@@ -27,8 +27,8 @@
         <result property="unionId" column="user_union_id"/>
 
         <association property="major" javaType="cn.edu.bistu.model.entity.Major">
-            <id property="id" column="college_id"/>
-            <result property="name" column="college_name"/>
+            <id property="id" column="major_id"/>
+            <result property="name" column="major_name"/>
         </association>
 
         <association property="secondaryDept" javaType="cn.edu.bistu.model.entity.SecondaryDept">
@@ -53,8 +53,6 @@
     <!--用户表查询列-->
     <sql id="rowUserColumns">
         user.id as user_id,
---         user.open_id as user_open_id,
---         user.session_key as user_session_key,
         user.name as user_name,
         user.college_id as user_college_id,
         user.major_id as user_major_id,
@@ -70,7 +68,6 @@
         user.create_time as user_create_time,
         user.update_time as user_update_time,
         user.is_lock as user_is_lock
---         user.union_id as user_union_id,
     </sql>
 
     <sql id="combinationUserColumns">
@@ -81,9 +78,6 @@
         major.name as major_name,
         secondary_dept.id as secondary_dept_id,
         secondary_dept.name as secondary_dept_name
---         role.id as role_id,
---         role.name as role_name,
---         role.text as role_text
     </sql>
 
     <!--角色查询连接如下表：学院表、专业表、部门表-->
@@ -91,8 +85,6 @@
         left join college on user.college_id = college.id
         left join major on user.major_id = major.id
         left join secondary_dept on user.secondary_dept_id = secondary_dept.id
---         left join user_role on user.id = user_role.user_id
---         left join role on user_role.role_id = role.id
     </sql>
 
     <!--user表的基本查询语句片段，没有筛选语句-->
@@ -155,7 +147,7 @@
                                     where
                                         role.id in (3, 4, 5)
                                     )
-                    <if test="userVo.majorName!=null and userVo.majorName !=''">
+                    <if test="userVo.secondaryDeptName!=null and userVo.secondaryDeptName !=''">
                         and secondary_dept.name like "%" #{userVo.secondaryDeptName} "%"
                     </if>
                 </when>

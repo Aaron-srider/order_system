@@ -19,6 +19,7 @@ import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.workOrder.service.WorkOrderHistoryService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -116,9 +117,10 @@ public class WorkOrderController extends BaseController {
      *
      * @return
      */
-    @GetMapping("/workOrder/attachment/{workOrderId}")
+    @GetMapping("/workOrder/attachment/{workOrderId}/{attachmentDownloadId}")
     public void downloadAttachment(
             @PathVariable("workOrderId") @NotNull Long workOrderId,
+            @PathVariable("attachmentDownloadId") @NotNull String attachmentDownloadId,
             HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         //查询附件
@@ -127,11 +129,11 @@ public class WorkOrderController extends BaseController {
             throw new ResultCodeException("workOrderId: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
 
-        //代码级别的用户权限检测，只有工单发起者和管理员可以工单下载附件
-        Long visitorId = getVisitorId(req);
-        if (!visitorId.equals(workOrder.getInitiatorId()) && !isAdmin(req)) {
-            throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
-        }
+        ////代码级别的用户权限检测，只有工单发起者和管理员可以工单下载附件
+        //Long visitorId = getVisitorId(req);
+        //if (!visitorId.equals(workOrder.getInitiatorId()) && !isAdmin(req)) {
+        //    throw new ResultCodeException("visitor id: " + visitorId + "has not right", ResultCodeEnum.HAVE_NO_RIGHT);
+        //}
 
         byte[] attachmentBytes = workOrder.getAttachment();
 
@@ -141,21 +143,26 @@ public class WorkOrderController extends BaseController {
             throw new AttachmentNotExistsException(null, ResultCodeEnum.ATTACHMENT_NOT_EXISTS);
         }
 
-        //获取附件的MIME类型
-        String mimeType = MimeTypeUtils.getType(workOrder.getAttachmentName());
-        //设置响应的MIME类型
-        resp.setContentType(mimeType);
-        log.debug("mimeType:" + mimeType);
+        String attachmentDownloadIdFromDataBase = workOrderService.getOne(new QueryWrapper<WorkOrder>().select("attachment_download_id")
+                .eq("id", workOrder.getId())).getAttachmentDownloadId();
 
-        //让浏览器以附件形式处理响应数据
-        resp.setHeader("Content-Disposition", "downloadAttachment; fileName=" + URLEncoder.encode(workOrder.getAttachmentName(), "UTF-8"));
-        log.debug("attachmentName:" + workOrder.getAttachmentName());
+        if(attachmentDownloadId.equals(attachmentDownloadIdFromDataBase)) {
+            //获取附件的MIME类型
+            String mimeType = MimeTypeUtils.getType(workOrder.getAttachmentName());
+            //设置响应的MIME类型
+            resp.setContentType(mimeType);
+            log.debug("mimeType:" + mimeType);
 
-        resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+            //让浏览器以附件形式处理响应数据
+            resp.setHeader("Content-Disposition", "downloadAttachment; fileName=" + URLEncoder.encode(workOrder.getAttachmentName(), "UTF-8"));
+            log.debug("attachmentName:" + workOrder.getAttachmentName());
 
-        //将二进制附件写入到http响应体中
-        ServletOutputStream out = resp.getOutputStream();
-        out.write(attachmentBytes, 0, attachmentBytes.length);
+            resp.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+
+            //将二进制附件写入到http响应体中
+            ServletOutputStream out = resp.getOutputStream();
+            out.write(attachmentBytes, 0, attachmentBytes.length);
+        }
     }
 
     /**

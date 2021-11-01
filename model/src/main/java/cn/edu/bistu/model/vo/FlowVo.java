@@ -8,5 +8,5 @@ import java.util.List;
 
 @Data
 public class FlowVo extends Flow {
-    List<FlowNode> flowNodeList;
+    List<FlowNodeVo> flowNodeList;
 }
