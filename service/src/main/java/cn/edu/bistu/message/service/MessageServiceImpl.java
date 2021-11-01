@@ -57,11 +57,10 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public Long sendMessageById(Message message) {
+    public Long sendMessage(Message message) {
 
         message.setType(1);
         message.setStatus(0);
-        message.setCreateTime(new Date());
 
         messagemapper.insert(message);
         Long id = message.getId();
@@ -101,6 +100,12 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     public Message getMessageById(Long messageId) {
+        Message message = messagemapper.getMessageById(messageId);
+        return message;
+    }
+
+    @Override
+    public Message getAttachment(Long messageId) {
         Message message = messagemapper.selectById(messageId);
         return message;
     }

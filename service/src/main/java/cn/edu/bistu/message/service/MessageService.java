@@ -33,7 +33,7 @@ public interface MessageService {
      * @param message
      * @return java.lang.Integer
      * */
-    Long sendMessageById(Message message);
+    Long sendMessage(Message message);
 
     /**
      * 根据消息id获取收取的消息
@@ -59,4 +59,6 @@ public interface MessageService {
     void deleteMessage(Message message, boolean isSender);
 
     Message getMessageById(Long messageId);
+
+    Message getAttachment(Long messageId);
 }

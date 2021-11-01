@@ -14,6 +14,5 @@ public class DateFormat {
         dateFormat.applyPattern("yyyy-MM-dd HH:mm:ss");
         String format = dateFormat.format(date);
         return format;
-
     }
 }

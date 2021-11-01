@@ -36,17 +36,24 @@
 
     <select id="getReceiveMsgAllDetail" resultMap="messageResultMap">
         <include refid="basicReceiveMsgStatement"></include>
-        where message.id = #{id}
+        where message.id = #{id} and is_show_receiver=0
     </select>
 
     <select id="getSendMsgAllDetail" resultMap="messageResultMap">
         <include refid="basicSendMsgStatement"></include>
-        where message.id = #{id}
+        where message.id = #{id} and is_show_sender=0
+    </select>
+
+    <select id="getMessageById" resultMap="messageResultMap">
+        select
+            <include refid="msgBasicFiled"></include>
+        from message
+        where message.id=#{id}
     </select>
 
     <sql id="basicSendMsgStatement">
         SELECT
-            <include refid="combinationMsgAndUser"></include>
+            <include refid="msgBasicFiled"></include>
         FROM message
         LEFT JOIN user ON user.id=message.receiver
             <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
@@ -69,7 +76,9 @@
         message.title,
         message.description,
         message.create_time,
-        message.attachment_name
+        message.attachment_name,
+        message.is_show_sender,
+        message.is_show_receiver
     </sql>
 
     <sql id="combinationMsgAndUser" >

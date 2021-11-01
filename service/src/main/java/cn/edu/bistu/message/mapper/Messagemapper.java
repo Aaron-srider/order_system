@@ -45,4 +45,7 @@ public interface Messagemapper extends BaseMapper<Message> {
      * */
     MessageVo getSendMsgAllDetail(Long id);
 
+    Message getMessageById(Long messageId);
+
+
 }

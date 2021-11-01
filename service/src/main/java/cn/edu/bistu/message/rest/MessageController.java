@@ -65,7 +65,7 @@ public class MessageController {
 
     //获取发件箱
     @PostMapping("/getSendMsg")
-    public ServiceResult<JSONObject> getSendMessage(@RequestBody PageVo pageVo,
+    public Result getSendMessage(@RequestBody PageVo pageVo,
                                                     MessageVo messageVo,
                                                     HttpServletRequest request) {
 
@@ -81,7 +81,7 @@ public class MessageController {
         Long visitorId = userInfo.getVal("id", Long.class);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
         ServiceResult<JSONObject> result = messageService.getSendMessageById(page,visitorId,messageVo.getTitle());
-        return result;
+        return Result.ok(result.getServiceResult());
     }
 
     @GetMapping("/recevieMsgDetail/{messageId}")
@@ -124,7 +124,7 @@ public class MessageController {
             return Result.build(null,ResultCodeEnum.SENDER_IS_RECEIVER);
         }
         message.setSender(sender);
-        Long id = messageService.sendMessageById(message);
+        Long id = messageService.sendMessage(message);
         return Result.ok(id);
     }
 
@@ -161,7 +161,7 @@ public class MessageController {
                                   HttpServletResponse resp) throws ResultCodeException, IOException {
 
         //查询附件
-        Message message = messageService.getMessageById(messageId);
+        Message message = messageService.getAttachment(messageId);
         if (message == null) {
             throw new MessageException(null,ResultCodeEnum.MESSAGE_NOT_EXIST);
         }
