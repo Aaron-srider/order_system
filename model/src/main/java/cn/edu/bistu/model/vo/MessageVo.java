@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 public class MessageVo extends Message {
 
-    //消息拥有者
+    //消息发送者
     private UserVo initiator;
 }

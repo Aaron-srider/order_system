@@ -1,5 +1,6 @@
 package cn.edu.bistu.message.rest;
 
+import cn.edu.bistu.admin.User.Service.UserService;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
@@ -10,6 +11,7 @@ import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.Message;
 
+import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.MessageVo;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
@@ -40,6 +42,7 @@ public class MessageController {
     @Autowired
     MessageService messageService;
 
+
     Logger logger =  LoggerFactory.getLogger(MessageController.class);
 
     //获取收件箱
@@ -59,7 +62,7 @@ public class MessageController {
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long visitorId = userInfo.getVal("id", Long.class);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult<JSONObject> result = messageService.getReceiveMessageById(page,visitorId,messageVo.getTitle());
+        ServiceResult<JSONObject> result = messageService.getReceiveMessages(page,visitorId,messageVo.getTitle());
         return Result.ok(result.getServiceResult());
     }
 
@@ -80,45 +83,42 @@ public class MessageController {
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long visitorId = userInfo.getVal("id", Long.class);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult<JSONObject> result = messageService.getSendMessageById(page,visitorId,messageVo.getTitle());
+        ServiceResult<JSONObject> result = messageService.getSendMessages(page,visitorId,messageVo.getTitle());
         return Result.ok(result.getServiceResult());
     }
 
-    @GetMapping("/recevieMsgDetail/{messageId}")
-    public Result receiveMessageDetail(@PathVariable("messageId") Long messageId){
+    @GetMapping("/messageDetail/{messageId}")
+    public Result messageDetail(@PathVariable("messageId") Long messageId, HttpServletRequest request){
 
-
-        MessageVo message =  messageService.getReceiveMessageDetail(messageId);
-        if (message == null) {
-            logger.error("消息不存在");
-            return Result.build(null,ResultCodeEnum.MESSAGE_NOT_EXIST);
+        Message message =  messageService.getMessageById(messageId);
+        //判断获取的是发送消息详情  或者是收到的消息详情
+        MapService userInfo = (MapService) request.getAttribute("userInfo");
+        Long userId = userInfo.getVal("id", Long.class);
+        boolean userIsSender;
+        if (userId == message.getSender()) { //如果获取的是发送消息的详情，需要获取收件人信息
+            userIsSender = true;
+            userId = message.getReceiver();
+        } else if (userId == message.getReceiver()) {//如果获取的是收到的消息的详情，需要获取发件人信息
+            userIsSender = false;
+            userId = message.getSender();
+        } else {
+            //后端逻辑错误，返回给用户的消息不属于用户
+            return Result.build(null,ResultCodeEnum.BACKEND_ERROR);
         }
-
-        //设置消息为已读
-        message.setStatus(1);
-        messageService.updateMessage(message);
-
-        return Result.ok(message);
+        MessageVo messageVo = messageService.messageDetail(messageId, userId);
+        if (!userIsSender) { //如果获取的是收取消息的详情，那么设置消息为已读
+            message.setStatus(1);
+            messageService.updateMessage(message);
+        }
+        return Result.ok(messageVo);
     }
 
-    @GetMapping("/sendMsgDetail/{messageId}")
-    public Result sendMessageDetail(@PathVariable("messageId") Long messageId){
-
-        MessageVo message =  messageService.getSendMessageDetail(messageId);
-        if (message == null) {
-            logger.error("消息不存在");
-            return Result.build(null,ResultCodeEnum.MESSAGE_NOT_EXIST);
-        }
-
-        messageService.updateMessage(message);
-        return Result.ok(message);
-    }
 
     @PostMapping("/sendMessage")
     public Result sendMessage(@Validated @RequestBody Message message, HttpServletRequest request) {
 
-
         MapService userInfo = (MapService) request.getAttribute("userInfo");
+
         Long sender = userInfo.getVal("id", Long.class);
         if (sender == message.getReceiver()) {
             return Result.build(null,ResultCodeEnum.SENDER_IS_RECEIVER);
@@ -130,8 +130,9 @@ public class MessageController {
 
     @PutMapping("/upLoadAttachment/{messageId}")
     public Result upLoadAttachment(@PathVariable("messageId") Long messageId,
-                            HttpServletRequest request,
-                            @RequestPart("attachment") MultipartFile attachment) throws IOException {
+
+                                    HttpServletRequest request,
+                                    @RequestPart("attachment") MultipartFile attachment) throws IOException {
 
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long userId = (Long) userInfo.get("id");
@@ -156,8 +157,9 @@ public class MessageController {
         }
     }
 
-    @GetMapping("/downLoadAttachment/{messageId}")
+    @GetMapping("/downLoadAttachment/{messageId}/{attachmentDownloadId}")
     public void downLoadAttachment(@PathVariable("messageId") Long messageId,
+                                   @PathVariable("attachmentDownloadId") String attachmentDownloadId,
                                   HttpServletResponse resp) throws ResultCodeException, IOException {
 
         //查询附件
@@ -173,21 +175,24 @@ public class MessageController {
             throw new AttachmentNotExistsException(null, ResultCodeEnum.ATTACHMENT_NOT_EXISTS);
         }
 
-        //获取附件的MIME类型
-        String mimeType = MimeTypeUtils.getType(message.getAttachmentName());
-        //设置响应的MIME类型
-        resp.setContentType(mimeType);
+        if (message.getAttachmentDownloadId() != null &&
+                message.getAttachmentDownloadId().equals(attachmentDownloadId)) {
+            //获取附件的MIME类型
+            String mimeType = MimeTypeUtils.getType(message.getAttachmentName());
+            //设置响应的MIME类型
+            resp.setContentType(mimeType);
 
-        logger.debug("mimeType:" + mimeType);
+            logger.debug("mimeType:" + mimeType);
 
-        //让浏览器以附件形式处理响应数据
-        resp.setHeader("Content-Disposition", "downloadAttachment; fileName=" + URLEncoder.encode(message.getAttachmentName(), "UTF-8"));
+            //让浏览器以附件形式处理响应数据
+            resp.setHeader("Content-Disposition", "downloadAttachment; fileName=" + URLEncoder.encode(message.getAttachmentName(), "UTF-8"));
 
-        logger.debug("attachmentName:" + message.getAttachmentName());
+            logger.debug("attachmentName:" + message.getAttachmentName());
 
-        //将二进制附件写入到http响应体中
-        ServletOutputStream out = resp.getOutputStream();
-        out.write(attachmentBytes, 0, attachmentBytes.length);
+            //将二进制附件写入到http响应体中
+            ServletOutputStream out = resp.getOutputStream();
+            out.write(attachmentBytes, 0, attachmentBytes.length);
+        }
     }
 
     @PutMapping("/deleteMsg/{messageId}")

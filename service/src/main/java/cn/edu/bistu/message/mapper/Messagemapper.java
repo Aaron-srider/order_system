@@ -22,14 +22,14 @@ public interface Messagemapper extends BaseMapper<Message> {
      * @param id
      * @return java.util.List<cn.edu.bistu.model.vo.MessageVo>
      * */
-    IPage<MessageVo> getReceiveMessageById(Page<MessageVo> page, @Param("id") Long id, @Param("title") String title);
+    IPage<MessageVo> getReceiveMessages(Page<MessageVo> page, @Param("id") Long id, @Param("title") String title);
 
     /**
      * 获取发件箱
      * @param id
      * @return java.util.List<cn.edu.bistu.model.vo.MessageVo>
      * */
-    IPage<MessageVo> getSendMessageById(Page<MessageVo> page,@Param("id") Long id, @Param("title") String title);
+    IPage<MessageVo> getSendMessages(Page<MessageVo> page,@Param("id") Long id, @Param("title") String title);
 
     /**
      * 获取收取信息的详情

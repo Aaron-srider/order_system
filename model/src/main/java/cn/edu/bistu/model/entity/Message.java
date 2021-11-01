@@ -40,5 +40,7 @@ public class Message {
     private Integer isShowSender;
     @TableField(value = "is_show_receiver")
     private Integer isShowReceiver;
+    @TableField(value = "attachment_download_id")
+    private String attachmentDownloadId;
 
 }

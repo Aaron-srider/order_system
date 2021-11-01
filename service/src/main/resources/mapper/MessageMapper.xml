@@ -18,30 +18,21 @@
         <result property="attachmentName" column="attachment_name"></result>
         <result property="isShowSender" column="is_show_sender"></result>
         <result property="isShowReceiver" column="is_show_receiver"></result>
+        <result property="attachmentDownloadId" column="attachment_download_id"></result>
 
         <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap"/>
     </resultMap>
     
-    <select id="getReceiveMessageById" resultMap="messageResultMap">
+    <select id="getReceiveMessages" resultMap="messageResultMap">
         <include refid="basicReceiveMsgStatement"></include>
         WHERE message.receiver = #{id} and message.is_show_receiver=0
             <include refid="msgSelectCondition"></include>
     </select>
 
-    <select id="getSendMessageById" resultMap="messageResultMap">
+    <select id="getSendMessages" resultMap="messageResultMap">
         <include refid="basicSendMsgStatement"></include>
         WHERE message.sender = #{id} and message.is_show_sender=0
             <include refid="msgSelectCondition"></include>
-    </select>
-
-    <select id="getReceiveMsgAllDetail" resultMap="messageResultMap">
-        <include refid="basicReceiveMsgStatement"></include>
-        where message.id = #{id} and is_show_receiver=0
-    </select>
-
-    <select id="getSendMsgAllDetail" resultMap="messageResultMap">
-        <include refid="basicSendMsgStatement"></include>
-        where message.id = #{id} and is_show_sender=0
     </select>
 
     <select id="getMessageById" resultMap="messageResultMap">
@@ -53,7 +44,7 @@
 
     <sql id="basicSendMsgStatement">
         SELECT
-            <include refid="msgBasicFiled"></include>
+            <include refid="combinationMsgAndUser"></include>
         FROM message
         LEFT JOIN user ON user.id=message.receiver
             <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
@@ -78,7 +69,8 @@
         message.create_time,
         message.attachment_name,
         message.is_show_sender,
-        message.is_show_receiver
+        message.is_show_receiver,
+        message.attachment_download_id
     </sql>
 
     <sql id="combinationMsgAndUser" >

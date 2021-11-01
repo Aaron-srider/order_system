@@ -1,11 +1,13 @@
 package cn.edu.bistu.message.service;
 
 import cn.edu.bistu.auth.mapper.UserMapper;
+import cn.edu.bistu.common.MD5Utils;
 import cn.edu.bistu.message.mapper.Messagemapper;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.Message;
 import cn.edu.bistu.model.vo.MessageVo;
+import cn.edu.bistu.model.vo.UserVo;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -34,9 +36,9 @@ public class MessageServiceImpl implements MessageService{
     static Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Override
-    public ServiceResult<JSONObject> getReceiveMessageById(Page<MessageVo> page, Long id, String title) {
+    public ServiceResult<JSONObject> getReceiveMessages(Page<MessageVo> page, Long id, String title) {
 
-        IPage<MessageVo> messages = messagemapper.getReceiveMessageById(page, id, title);
+        IPage<MessageVo> messages = messagemapper.getReceiveMessages(page, id, title);
 
         logger.info("messags: ", messages);
         JSONObject jsonObject = new JSONObject();
@@ -46,9 +48,9 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public ServiceResult<JSONObject> getSendMessageById(Page<MessageVo> page,Long id, String title) {
+    public ServiceResult<JSONObject> getSendMessages(Page<MessageVo> page,Long id, String title) {
 
-        IPage<MessageVo> messages = messagemapper.getSendMessageById(page, id, title);
+        IPage<MessageVo> messages = messagemapper.getSendMessages(page, id, title);
         logger.info("messages: ",messages);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("messages",messages);
@@ -69,17 +71,28 @@ public class MessageServiceImpl implements MessageService{
     }
 
     @Override
-    public MessageVo getReceiveMessageDetail(Long messageId) {
+    public MessageVo messageDetail(Long messageId, Long userId) {
 
-        MessageVo messageVo = messagemapper.getReceiveMsgAllDetail(messageId);
+        UserVo userVo = userMapper.getOneUserById(userId);
+        MessageVo messageVo = (MessageVo) messagemapper.getMessageById(messageId);
+        messageVo.setInitiator(userVo);
+        //设置attachment_download_id
+        setAttachmentDownloadId(messageVo);
         return messageVo;
     }
 
-    @Override
-    public MessageVo getSendMessageDetail(Long messageId) {
-
-        MessageVo messageVo = messagemapper.getSendMsgAllDetail(messageId);
-        return messageVo;
+    private void setAttachmentDownloadId(Message message){
+        //生成下载附件的attachment_download_id
+        //由于一条消息可以被两个人看到，所以attachment_download_id需要保证只有一个
+        if(message.getAttachmentName() != null && message.getAttachmentName().length() != 0
+            && message.getAttachmentDownloadId() == null) {
+            String rowData = System.currentTimeMillis() + message.getId() + message.getAttachmentName();
+            String attachmentDownloadId = MD5Utils.MD5(rowData);
+            logger.info("attachment_download_id: ",attachmentDownloadId);
+            //设置并更新数据库
+            message.setAttachmentDownloadId(attachmentDownloadId);
+            messagemapper.updateById(message);
+        }
     }
 
     @Override
@@ -100,6 +113,7 @@ public class MessageServiceImpl implements MessageService{
 
     @Override
     public Message getMessageById(Long messageId) {
+        //由于不想每次查询的时候都把附件从数据库中查询出来，所以自定义了sql，查询除了attachment的其他所有字段
         Message message = messagemapper.getMessageById(messageId);
         return message;
     }
