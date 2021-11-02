@@ -1,9 +1,6 @@
 package cn.edu.bistu.model.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
@@ -16,9 +13,10 @@ import java.util.Date;
  * @create: 2021-09-08 22:27
  **/
 @Data
+@TableName("message")
 public class Message {
 
-    @TableId(type = IdType.AUTO)
+    @TableId(value = "id",type = IdType.AUTO)
     private Long id;
 
     private Long sender;
@@ -26,9 +24,9 @@ public class Message {
     private Long receiver;
     private Integer type;
 
-    private byte[] content;
+    private byte[] attachment;
     @TableField(value = "create_time")
-    private Date createTime;
+    private String createTime;
     private Integer status;
 
     @NotNull
@@ -42,5 +40,7 @@ public class Message {
     private Integer isShowSender;
     @TableField(value = "is_show_receiver")
     private Integer isShowReceiver;
+    @TableField(value = "attachment_download_id")
+    private String attachmentDownloadId;
 
 }

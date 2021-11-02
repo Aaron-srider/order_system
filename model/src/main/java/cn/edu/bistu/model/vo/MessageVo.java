@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 public class MessageVo extends Message {
 
-    String userName;
-    String className;
+    //消息发送者
+    private UserVo initiator;
 }
