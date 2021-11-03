@@ -1,6 +1,6 @@
-package cn.edu.bistu.admin.User.Service;
+package cn.edu.bistu.user.Service;
 
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.UserUtils;
@@ -78,8 +78,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         List<Role> roleList = oneUserById.getResult().getRoleList();
         for (Role role : roleList) {
-            if(role.equals(userUtils.convertRoleConstant2Entity(cn.edu.bistu.constants.Role.ADMIN))) {
-                throw new ResultCodeException("user id: " + userId , ResultCodeEnum.USER_IS_ADMIN);
+            if (role.equals(userUtils.convertRoleConstant2Entity(cn.edu.bistu.constants.Role.ADMIN))) {
+                throw new ResultCodeException("user id: " + userId, ResultCodeEnum.USER_IS_ADMIN);
             }
         }
 
@@ -89,6 +89,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void demote(Long userId) {
         userDao.demoteUserFromAdmin(userId);
+    }
+
+    @Override
+    public ServiceResult<UserVo> searchOneUserByStudentJobId(String studentJobId) {
+        UserVo resultUser = userDao.getOneUserByStudentJobId(studentJobId).getResult();
+        return new ServiceResultImpl<>(resultUser);
     }
 
 }

@@ -1,11 +1,13 @@
 package cn.edu.bistu.workOrder.rest;
 
 import cn.edu.bistu.approval.service.ApprovalService;
+import cn.edu.bistu.common.MD5Utils;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.ServiceResult;
+import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.common.validation.Insert;
 import cn.edu.bistu.model.entity.WorkOrderHistory;
 import cn.edu.bistu.model.vo.PageVo;
@@ -87,12 +89,12 @@ public class WorkOrderController extends BaseController {
      */
     @GetMapping("/workOrder/histories")
     public Result history(PageVo pageVo,
-                          WorkOrderHistoryVo workOrderHistoryVo ,
-                          HttpServletRequest req)  {
+                          WorkOrderHistoryVo workOrderHistoryVo,
+                          HttpServletRequest req) {
 
         pageVo = Pagination.setDefault(pageVo.getCurrent(), pageVo.getSize());
 
-        if(workOrderHistoryVo.getWorkOrderVo() == null) {
+        if (workOrderHistoryVo.getWorkOrderVo() == null) {
             workOrderHistoryVo.setWorkOrderVo(new WorkOrderVo());
         }
 
@@ -146,7 +148,7 @@ public class WorkOrderController extends BaseController {
         String attachmentDownloadIdFromDataBase = workOrderService.getOne(new QueryWrapper<WorkOrder>().select("attachment_download_id")
                 .eq("id", workOrder.getId())).getAttachmentDownloadId();
 
-        if(attachmentDownloadId.equals(attachmentDownloadIdFromDataBase)) {
+        if (attachmentDownloadId.equals(attachmentDownloadIdFromDataBase)) {
             //获取附件的MIME类型
             String mimeType = MimeTypeUtils.getType(workOrder.getAttachmentName());
             //设置响应的MIME类型
@@ -202,6 +204,10 @@ public class WorkOrderController extends BaseController {
             workOrder.setAttachment(bytes);
             workOrder.setAttachmentName(attachment.getOriginalFilename());
             workOrder.setAttachmentSize(String.format("%.2f", attachment.getSize() / 1024.0));
+            //生成附件下载id
+            String rowDownloadId = System.currentTimeMillis() + workOrder.getId() + workOrder.getAttachmentName();
+            String md5DownloadId = MD5Utils.MD5(rowDownloadId);
+            workOrder.setAttachmentDownloadId(md5DownloadId);
             workOrderService.updateById(workOrder);
             return Result.ok();
         } else {
@@ -232,6 +238,7 @@ public class WorkOrderController extends BaseController {
      * <p>
      *
      * @param req
+     *
      * @return 如果工单未被审批，或撤回者不是工单发起者，都返回错误代码；否则撤回成功
      */
     @PutMapping("/workOrder/revoke")

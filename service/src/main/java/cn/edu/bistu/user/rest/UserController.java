@@ -1,6 +1,6 @@
-package cn.edu.bistu.admin.User.rest;
+package cn.edu.bistu.user.rest;
 
-import cn.edu.bistu.admin.User.Service.UserService;
+import cn.edu.bistu.user.Service.UserService;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.model.common.result.Result;
@@ -9,7 +9,6 @@ import cn.edu.bistu.model.common.validation.ConditionQuery;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +70,14 @@ public class UserController extends BaseController{
             @NotNull @PathVariable(name="userId") Long userId) {
         userService.demote(userId);
         return Result.ok();
+    }
+
+
+    @GetMapping("/user/{studentJobId}")
+    public Result searchByStudentJobId(
+            @NotNull @PathVariable(name="studentJobId") String studentJobId) {
+        UserVo serviceResult = userService.searchOneUserByStudentJobId(studentJobId).getServiceResult();
+        return Result.ok(serviceResult);
     }
 
 

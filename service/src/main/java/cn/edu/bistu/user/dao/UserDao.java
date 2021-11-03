@@ -1,4 +1,4 @@
-package cn.edu.bistu.admin.User.mapper;
+package cn.edu.bistu.user.dao;
 
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.entity.auth.User;
@@ -38,4 +38,6 @@ public interface UserDao {
     public void insertUserRole(UserRole userRole);
 
     public void insertUser(User user);
+
+    public DaoResult<UserVo> getOneUserByStudentJobId(String studentJobId);
 }

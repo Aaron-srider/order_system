@@ -1,8 +1,6 @@
 package cn.edu.bistu.workOrder.service;
 
-import cn.edu.bistu.admin.User.mapper.UserDao;
-import cn.edu.bistu.approval.dao.ApproverLogicDao;
-import cn.edu.bistu.model.entity.ApproverLogic;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.model.entity.FlowNodeApprover;
 import cn.edu.bistu.model.vo.FlowNodeVo;
 import cn.edu.bistu.model.vo.UserVo;

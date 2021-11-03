@@ -1,4 +1,4 @@
-package cn.edu.bistu.admin.User.mapper;
+package cn.edu.bistu.user.dao;
 
 import cn.edu.bistu.auth.mapper.RoleMapper;
 import cn.edu.bistu.auth.mapper.UserMapper;
@@ -61,6 +61,12 @@ public class UserDaoImpl implements UserDao {
         userMapper.insert(user);
     }
 
+    @Override
+    public DaoResult<UserVo> getOneUserByStudentJobId(String studentJobId) {
+        UserVo resultUserVo = userMapper.getOneUserByStudentJobId(studentJobId);
+        return new SimpleDaoResultImpl<UserVo>().setResult(resultUserVo);
+    }
+
     public void demoteUserFromAdmin(Long userId) {
         userRoleMapper.deleteAdminUserRoleByRoleId(userId);
     }
@@ -111,6 +117,7 @@ public class UserDaoImpl implements UserDao {
     public void simpleUpdateUserById(User user) {
         userMapper.updateById(user);
     }
+
 
 
 }

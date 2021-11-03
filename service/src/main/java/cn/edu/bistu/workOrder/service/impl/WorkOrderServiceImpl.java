@@ -1,6 +1,6 @@
 package cn.edu.bistu.workOrder.service.impl;
 
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.dao.ApproverLogicDao;
 import cn.edu.bistu.approval.service.ApprovalService;
@@ -13,13 +13,11 @@ import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
-import cn.edu.bistu.model.entity.ApproverLogic;
 import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.FlowNodeApprover;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.FlowNodeVo;
 import cn.edu.bistu.model.vo.FlowVo;
-import cn.edu.bistu.model.vo.UserVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.dao.WorkOrderDao;
 import cn.edu.bistu.workOrder.dao.WorkOrderDaoImpl;
@@ -81,7 +79,6 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     FlowNodeApproverDecider flowNodeApproverDecider;
 
 
-
     @Override
     public ServiceResult listWorkOrder(WorkOrderVo workOrderVo, Page<WorkOrderVo> page) {
         DaoResult<Page<WorkOrderVo>> daoResultPage = workOrderDao.getWorkOrderPageByConditions(page, workOrderVo, "user");
@@ -112,7 +109,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         }
 
         approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher(
-                "notApprovalTypeV2"),
+                        "notApprovalTypeV2"),
                 workOrderVo,
                 null,
                 WorkOrderStatus.BEEN_WITHDRAWN,
@@ -129,15 +126,16 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
             throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
 
-        //来访者不是工单的属主
+        //来访者不是工单的属主也不是审批者，不予查看
         if (!inspectWorkOrder.getInitiatorId().equals(workOrder.getInitiatorId())) {
-            throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.HAVE_NO_RIGHT);
+            if (inspectWorkOrder.getActualApproverId() != null && !inspectWorkOrder.getActualApproverId().equals(workOrder.getInitiatorId())) {
+                throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.HAVE_NO_RIGHT);
+            }
         }
 
         DaoResult<WorkOrderVo> daoResultPage = workOrderDao.getOneWorkOrderById(workOrder.getId());
         WorkOrderVo resultWorkOrderWithOutFlowInfo = daoResultPage.getResult();
         resultWorkOrderWithOutFlowInfo.setAttachment(null);
-
 
         //完善工单信息
         FlowVo fullPreparedFlowOfResultWorkOrder = flowDao.getFullPreparedFlowByFlowId(resultWorkOrderWithOutFlowInfo.getFlowId()).getResult();
@@ -150,18 +148,6 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         }
 
         resultWorkOrderWithOutFlowInfo.setFlow(fullPreparedFlowOfResultWorkOrder);
-
-        if(resultWorkOrderWithOutFlowInfo.getAttachmentName() != null){
-            //生成附件下载id
-            String rowData = System.currentTimeMillis() + resultWorkOrderWithOutFlowInfo.getId() + resultWorkOrderWithOutFlowInfo.getAttachmentName();
-            String md5Id = MD5Utils.MD5(rowData);
-            resultWorkOrderWithOutFlowInfo.setAttachmentDownloadId(md5Id);
-            WorkOrder workOrder1 = new WorkOrder();
-            workOrder1.setId(resultWorkOrderWithOutFlowInfo.getId());
-            workOrder1.setAttachmentDownloadId(md5Id);
-            workOrderDao.updateById(workOrder1);
-            return new ServiceResultImpl<>(resultWorkOrderWithOutFlowInfo);
-        }
 
         return new ServiceResultImpl<>(resultWorkOrderWithOutFlowInfo);
     }
@@ -193,7 +179,6 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         return new ServiceResultImpl(workOrderVo);
 
 
-
         //通知审批者，这步暂时不动
         //UserVo userVo = userMapper.getOneById(workOrder.getId());
         //String openId = userVo.getOpenId();
@@ -209,7 +194,7 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     @Override
     public void deleteAttachmentByWorkOrderId(Long workOrderId) {
-        ((WorkOrderDaoImpl)workOrderDao).deleteWorkOrderAttachment(workOrderId);
+        ((WorkOrderDaoImpl) workOrderDao).deleteWorkOrderAttachment(workOrderId);
     }
 
 }

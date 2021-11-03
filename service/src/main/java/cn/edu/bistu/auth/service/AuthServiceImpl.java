@@ -1,7 +1,7 @@
 package cn.edu.bistu.auth.service;
 
-import cn.edu.bistu.admin.User.Service.UserService;
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.Service.UserService;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.auth.exception.Jscode2sessionException;
 import cn.edu.bistu.auth.mapper.AuthMapper;
@@ -22,7 +22,6 @@ import cn.edu.bistu.wx.service.WxMiniApi;
 import cn.edu.bistu.wx.service.WxMiniApiImpl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

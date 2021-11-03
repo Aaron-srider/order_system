@@ -4,7 +4,6 @@ import cn.edu.bistu.approval.service.ApprovalService;
 import cn.edu.bistu.common.BeanUtils;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.common.utils.Pagination;
-import cn.edu.bistu.constants.ApprovalOperation;
 import cn.edu.bistu.flow.service.FlowNodeService;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
@@ -63,7 +62,7 @@ public class ApprovalController extends BaseController {
 
         Page<WorkOrderVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
 
-        ServiceResult<Page<WorkOrderVo>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), page);
+        ServiceResult<Page<WorkOrderVo>> serviceResult = approvalService.listWorkOrderToBeApproved(getVisitorId(req), page,  workOrderVo);
         return Result.ok(serviceResult.getServiceResult());
     }
 

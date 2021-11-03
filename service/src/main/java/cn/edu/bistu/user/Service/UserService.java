@@ -1,13 +1,10 @@
-package cn.edu.bistu.admin.User.Service;
+package cn.edu.bistu.user.Service;
 
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import java.util.List;
 
 public interface UserService extends IService<User>{
     /**
@@ -39,7 +36,6 @@ public interface UserService extends IService<User>{
 
     public ServiceResult<UserVo> updateUser(UserVo userVo);
 
-
     /**
      * 判断user是否是管理员(管理员或操作员)
      * @param id 用户id
@@ -50,4 +46,6 @@ public interface UserService extends IService<User>{
     public void promote(Long userId);
 
     public void demote(Long userId);
+
+    public ServiceResult<UserVo> searchOneUserByStudentJobId(String studentJobId);
 }

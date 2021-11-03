@@ -1,6 +1,6 @@
 package cn.edu.bistu.workOrder.service;
 
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.WorkOrderFlower;
 import cn.edu.bistu.approval.dao.ApproverLogicDao;

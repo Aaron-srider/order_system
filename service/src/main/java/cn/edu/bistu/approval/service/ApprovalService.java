@@ -54,5 +54,5 @@ public interface ApprovalService {
     void reject(ApprovalRecord approvalRecord);
 
 
-    ServiceResult<Page<WorkOrderVo>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrderVo> page) throws NoSuchFieldException, IllegalAccessException;
+    ServiceResult<Page<WorkOrderVo>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrderVo> page, WorkOrderVo workOrderVo) ;
 }

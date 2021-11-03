@@ -1,6 +1,5 @@
 package cn.edu.bistu.message.rest;
 
-import cn.edu.bistu.admin.User.Service.UserService;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.MimeTypeUtils;
@@ -11,7 +10,6 @@ import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.Message;
 
-import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.MessageVo;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;

@@ -82,18 +82,6 @@ public class WorkOrderHistoryServiceImpl extends ServiceImpl<WorkOrderHistoryMap
                 flowNodeApproverDecider.findAndSetFlowNodeApprover(oneFlowNodeOfResultWorkOrder);
             }
             workOrderVoOfResultHistory.setFlow(fullPreparedFlowOfResultWorkOrder);
-
-
-            if(workOrderVoOfResultHistory.getAttachmentName() != null){
-                //生成附件下载id
-                String rowData = System.currentTimeMillis() + workOrderVoOfResultHistory.getId() + workOrderVoOfResultHistory.getAttachmentName();
-                String md5Id = MD5Utils.MD5(rowData);
-                workOrderVoOfResultHistory.setAttachmentDownloadId(md5Id);
-                WorkOrder workOrder1 = new WorkOrder();
-                workOrder1.setId(workOrderVoOfResultHistory.getId());
-                workOrder1.setAttachmentDownloadId(md5Id);
-                workOrderDao.updateById(workOrder1);
-            }
         }
         
         

@@ -1,16 +1,21 @@
 package cn.edu.bistu.test.rest;
 
 import cn.edu.bistu.Entity;
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.auth.mapper.AuthDao;
+import cn.edu.bistu.flow.dao.FlowDao;
 import cn.edu.bistu.model.common.result.Result;
+import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.vo.UserVo;
+import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.test.Testtb;
 import cn.edu.bistu.test.mapper.TestdbDao;
+import cn.edu.bistu.workOrder.dao.WorkOrderDao;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +38,23 @@ public class TestController {
     @Autowired
     AuthDao authDao;
 
+    @Qualifier("workOrderDaoImpl")
+    @Autowired
+    WorkOrderDao workOrderDao;
+
+    @Autowired
+    FlowDao flowDao;
+
+    @GetMapping("/test1")
+    public Result test1() {
+       WorkOrderVo workOrderVo =
+                workOrderDao.getOneWorkOrderById(1L).getResult();
+
+        FlowNode flowNode = (FlowNode)flowDao.getOneFlowNodeByNodeId(workOrderVo.getFlowNodeId()).getResult();
+
+        workOrderVo.setFlowNode(flowNode);
+        return Result.ok(workOrderVo);
+    }
 
     @GetMapping("/testNewGetAllUsers")
     public Result testNewGetAllUsers() {
