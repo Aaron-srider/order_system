@@ -39,5 +39,5 @@ public interface UserDao {
 
     public void insertUser(User user);
 
-    public DaoResult<UserVo> getOneUserByStudentJobId(String studentJobId);
+    public DaoResult<List<UserVo>> getOneUserByStudentJobId(String studentJobId);
 }

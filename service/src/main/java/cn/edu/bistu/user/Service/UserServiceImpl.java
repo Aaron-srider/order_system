@@ -92,9 +92,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public ServiceResult<UserVo> searchOneUserByStudentJobId(String studentJobId) {
-        UserVo resultUser = userDao.getOneUserByStudentJobId(studentJobId).getResult();
-        return new ServiceResultImpl<>(resultUser);
+    public ServiceResult searchOneUserByStudentJobId(String studentJobId) {
+        return new ServiceResultImpl<>(userDao.getOneUserByStudentJobId(studentJobId).getResult());
     }
 
 }

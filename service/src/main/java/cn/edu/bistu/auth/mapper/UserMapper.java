@@ -101,7 +101,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     UserVo getOneUserByOpenId(String openId);
 
-    UserVo getOneUserByStudentJobId(String studentJobId);
+    List<UserVo> getOneUserByStudentJobId(String studentJobId);
 
     UserVo getOneUserByUnionId(String unionId);
 

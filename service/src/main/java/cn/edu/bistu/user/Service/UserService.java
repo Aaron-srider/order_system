@@ -47,5 +47,5 @@ public interface UserService extends IService<User>{
 
     public void demote(Long userId);
 
-    public ServiceResult<UserVo> searchOneUserByStudentJobId(String studentJobId);
+    public ServiceResult searchOneUserByStudentJobId(String studentJobId);
 }

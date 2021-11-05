@@ -76,8 +76,7 @@ public class UserController extends BaseController{
     @GetMapping("/user/{studentJobId}")
     public Result searchByStudentJobId(
             @NotNull @PathVariable(name="studentJobId") String studentJobId) {
-        UserVo serviceResult = userService.searchOneUserByStudentJobId(studentJobId).getServiceResult();
-        return Result.ok(serviceResult);
+        return Result.ok(userService.searchOneUserByStudentJobId(studentJobId).getServiceResult());
     }
 
 

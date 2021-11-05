@@ -62,9 +62,9 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public DaoResult<UserVo> getOneUserByStudentJobId(String studentJobId) {
-        UserVo resultUserVo = userMapper.getOneUserByStudentJobId(studentJobId);
-        return new SimpleDaoResultImpl<UserVo>().setResult(resultUserVo);
+    public DaoResult<List<UserVo>> getOneUserByStudentJobId(String studentJobId) {
+        List<UserVo> resultUserVo = userMapper.getOneUserByStudentJobId(studentJobId);
+        return new SimpleDaoResultImpl<List<UserVo>>().setResult(resultUserVo);
     }
 
     public void demoteUserFromAdmin(Long userId) {
