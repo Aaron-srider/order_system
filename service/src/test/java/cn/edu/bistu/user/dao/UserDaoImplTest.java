@@ -1,6 +1,5 @@
-package cn.edu.bistu.User.mapper;
+package cn.edu.bistu.user.dao;
 
-import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 

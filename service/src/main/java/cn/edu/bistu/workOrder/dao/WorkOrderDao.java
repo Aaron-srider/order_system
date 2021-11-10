@@ -34,9 +34,10 @@ public interface WorkOrderDao {
      *                    size：要获取的页数大小
      *                    current：要获取的页数
      * @param approverId  审批者id
+     * @param workOrderVo
      * @return
      */
-    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId);
+    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo);
 
 
     public void updateById(WorkOrder workOrder);

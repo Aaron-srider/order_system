@@ -38,7 +38,8 @@
         work_order.is_finished as work_order_is_finished,
         work_order.attachment_size as work_order_attachment_size,
         work_order.user_specified_id as work_order_user_specified_id,
-        work_order.actual_approver_id as work_order_actual_approver_id
+        work_order.actual_approver_id as work_order_actual_approver_id,
+        work_order.attachment_download_id as work_order_attachment_download_id
     </sql>
 
     <sql id="workOrderConditions">
@@ -70,13 +71,15 @@
         </where>
     </sql>
 
+
+
     <resultMap id="workOrderResultMap" type="cn.edu.bistu.model.vo.WorkOrderVo">
         <id property="id" column="work_order_id"/>
         <result property="isExamined" column="work_order_is_examined"/>
         <result property="initiatorId" column="work_order_initiator_id"/>
         <result property="flowId" column="work_order_flow_id"/>
         <result property="createTime" column="work_order_create_time"/>
-        <result property="updateTime" column="work_order_update_time"/>
+        <!--<result property="updateTime" column="work_order_update_time"/>-->
         <!--<result property="attachment" column="work_order_attachment"/>-->
         <result property="status" column="work_order_status"/>
         <result property="content" column="work_order_content"/>
@@ -88,10 +91,12 @@
         <result property="attachmentSize" column="work_order_attachment_size"/>
         <result property="userSpecifiedId" column="work_order_user_specified_id"/>
         <result property="actualApproverId" column="work_order_actual_approver_id"/>
+        <result property="attachmentDownloadId" column="work_order_attachment_download_id"/>
 
         <association property="initiator" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap"/>
 
-        <!--<association property="flow" column="work_order_flow_id" javaType="cn.edu.bistu.model.vo.FlowVo" select="cn.edu.bistu.flow.mapper.FlowMapper.getFullPreparedFlowByFlowId"/>-->
+        <!--<association property="flowNode" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowNodeResultMap"/>-->
+        <association property="flow" resultMap="cn.edu.bistu.flow.mapper.FlowMapper.flowResultMap"/>
 
     </resultMap>
 

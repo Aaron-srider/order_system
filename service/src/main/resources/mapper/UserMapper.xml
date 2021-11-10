@@ -33,6 +33,12 @@
         ;
     </select>
 
+    <select id="getOneUserByStudentJobId" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
+        where user.student_job_id like "%" #{studentJobId} "%"
+        ;
+    </select>
+
     <select id="getUserListByConditions" resultMap="cn.edu.bistu.auth.mapper.UserMapper.Common.userResultMap">
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.basicUserSelectStatementFragment"/>
         <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userConditions"/>

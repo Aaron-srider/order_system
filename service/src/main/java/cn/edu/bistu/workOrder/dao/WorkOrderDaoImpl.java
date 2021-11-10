@@ -1,12 +1,13 @@
 package cn.edu.bistu.workOrder.dao;
 
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.dao.FlowDaoImpl;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;
 import cn.edu.bistu.model.common.result.SimpleDaoResultImpl;
 import cn.edu.bistu.model.entity.*;
+import cn.edu.bistu.model.vo.FlowVo;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.mapper.WorkOrderHistoryMapper;
 import cn.edu.bistu.workOrder.mapper.WorkOrderMapper;
@@ -28,7 +29,7 @@ import java.util.List;
 @Data
 @Slf4j
 @Repository
-public class WorkOrderDaoImpl implements WorkOrderDao{
+public class WorkOrderDaoImpl implements WorkOrderDao {
     @Autowired
     WorkOrderStatusMapper workOrderStatusMapper;
 
@@ -44,10 +45,10 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
     @Autowired
     WorkOrderHistoryMapper workOrderHistoryMapper;
 
-    public DaoResult<JSONObject> getAllWorkOrderStatus(){
+    public DaoResult<JSONObject> getAllWorkOrderStatus() {
         List<WorkOrderStatus> workOrderStatusList = workOrderStatusMapper.selectList(null);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("workOrderStatusList",  workOrderStatusList);
+        jsonObject.put("workOrderStatusList", workOrderStatusList);
         DaoResult<JSONObject> objectDaoResult = new DaoResultImpl<>();
         objectDaoResult.setResult(jsonObject);
         return objectDaoResult;
@@ -66,17 +67,26 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
      * 返回指定工单，基于方法getOneWorkOrderByWrapper进行封装，指定查询条件为id。
      *
      * @param id 工单id
+     *
      * @return 返回指定工单
      */
     @Override
     public DaoResult<WorkOrderVo> getOneWorkOrderById(Long id) {
-        WorkOrderVo oneWorkOrderById = workOrderMapper.getOneWorkOrderById(id);
-        return new SimpleDaoResultImpl<WorkOrderVo>().setResult(oneWorkOrderById);
+        WorkOrderVo resultWorkOrderVo = workOrderMapper.getOneWorkOrderById(id);
+        if (resultWorkOrderVo.getFlowId() != null) {
+            FlowNode flowNodeInfo = (FlowNode) flowDao.getOneFlowNodeByNodeId(resultWorkOrderVo.getFlowNodeId()).getResult();
+            resultWorkOrderVo.setFlowNode(flowNodeInfo);
+        }
+        if (resultWorkOrderVo.getFlowId() != null) {
+            FlowVo fullPreparedFlow = flowDao.getFullPreparedFlowByFlowId(resultWorkOrderVo.getFlowId()).getResult();
+            resultWorkOrderVo.setFlow(fullPreparedFlow);
+        }
+        return new SimpleDaoResultImpl<WorkOrderVo>().setResult(resultWorkOrderVo);
     }
 
     @Override
-    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId) {
-        List<WorkOrderVo> workOrderVoList = workOrderMapper.getApprovalWorkOrderPageByApproverId(Pagination.getSkip(page), page.getSize(), approverId);
+    public DaoResult<Page<WorkOrderVo>> getApprovalWorkOrderPage(Page<WorkOrderVo> page, Long approverId, WorkOrderVo workOrderVo) {
+        List<WorkOrderVo> workOrderVoList = workOrderMapper.getApprovalWorkOrderPageByApproverId(Pagination.getSkip(page), page.getSize(), approverId, workOrderVo);
         page.setRecords(workOrderVoList);
         long workOrderCount = workOrderMapper.getApprovalWorkOrderPageCountByApproverId(approverId);
         page.setTotal(workOrderCount);
@@ -95,6 +105,7 @@ public class WorkOrderDaoImpl implements WorkOrderDao{
                 .set("attachment", null)
                 .set("attachment_name", null)
                 .set("attachment_size", null)
+                .set("attachment_download_id", null)
                 .eq("id", workOrderId));
 
     }

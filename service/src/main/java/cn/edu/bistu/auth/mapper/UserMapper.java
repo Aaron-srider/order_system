@@ -101,6 +101,8 @@ public interface UserMapper extends BaseMapper<User> {
 
     UserVo getOneUserByOpenId(String openId);
 
+    List<UserVo> getOneUserByStudentJobId(String studentJobId);
+
     UserVo getOneUserByUnionId(String unionId);
 
     List<UserVo> getUserListByConditions(@Param("skip") Long skip, @Param("size")Long size, @Param("userVo")UserVo userVo);

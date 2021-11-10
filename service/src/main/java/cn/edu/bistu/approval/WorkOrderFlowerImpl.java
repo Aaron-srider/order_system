@@ -1,6 +1,6 @@
 package cn.edu.bistu.approval;
 
-import cn.edu.bistu.admin.User.mapper.UserDao;
+import cn.edu.bistu.user.dao.UserDao;
 import cn.edu.bistu.approval.dao.ApproverLogicDao;
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.constants.ApprovalOperation;

@@ -14,6 +14,7 @@ import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.ApprovalRecord;
+import cn.edu.bistu.model.entity.FlowNode;
 import cn.edu.bistu.model.entity.WorkOrder;
 import cn.edu.bistu.model.vo.WorkOrderVo;
 import cn.edu.bistu.workOrder.dao.WorkOrderDao;
@@ -91,6 +92,10 @@ public class ApprovalServiceImpl implements ApprovalService {
         //检查工单是否已经结束
         checkIfWorkOrderHasFinished(workOrderVo);
 
+        FlowNode flowNode = (FlowNode)flowDao.getOneFlowNodeByNodeId(workOrderVo.getFlowNodeId()).getResult();
+
+        workOrderVo.setFlowNode(flowNode);
+
         //流转
         workOrderFlower.flow(workOrderVo, approvalRecord);
     }
@@ -121,8 +126,8 @@ public class ApprovalServiceImpl implements ApprovalService {
 
 
     @Override
-    public ServiceResult<Page<WorkOrderVo>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrderVo> page) {
-        DaoResult<Page<WorkOrderVo>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId);
+    public ServiceResult<Page<WorkOrderVo>> listWorkOrderToBeApproved(Long visitorId, Page<WorkOrderVo> page, WorkOrderVo workOrderVo) {
+        DaoResult<Page<WorkOrderVo>> pageData = workOrderDao.getApprovalWorkOrderPage(page, visitorId, workOrderVo);
         return new ServiceResultImpl<>(pageData.getResult());
     }
 

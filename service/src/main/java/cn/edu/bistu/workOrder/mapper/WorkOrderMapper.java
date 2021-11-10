@@ -55,7 +55,7 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder>{
     //public long getApprovalWorkOrderCountByApproverId(@Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
 
 
-    public List<WorkOrderVo> getApprovalWorkOrderPageByApproverId(@Param("skip") long skip, @Param("size") long size, @Param("approverId") long approverId);
+    public List<WorkOrderVo> getApprovalWorkOrderPageByApproverId(@Param("skip") long skip, @Param("size") long size, @Param("approverId") long approverId, @Param("workOrderVo") WorkOrderVo workOrderVo);
 
     public long getApprovalWorkOrderPageCountByApproverId(@Param("approverId") long approverId);
 }

@@ -9,7 +9,13 @@
     </delete>
 
     <select id="getWorkOrderPageByConditions" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
-        <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
+        <!--<include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>-->
+        select
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.combinationWorkOrderColumns"/>,
+            <include refid="cn.edu.bistu.flow.mapper.FlowMapper.flowColumns"/>
+        from work_order
+            <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderJoin"/>
+            left join flow on flow.id = work_order.flow_id
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderConditions"/>
         <include refid="cn.edu.bistu.mapper.Common.page"/>
         ;
@@ -32,7 +38,9 @@
     <select id="getApprovalWorkOrderPageByApproverId" resultMap="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.workOrderResultMap">
         <include refid="cn.edu.bistu.workOrder.mapper.WorkOrderMapper.Common.basicWorkOrderSelectStatementFragment"/>
         where
-            work_order.actual_approver_id=#{approverId} and work_order.is_finished=0
+            work_order.actual_approver_id=#{approverId}
+            and work_order.is_finished=0
+            and work_order.title like "%" #{workOrderVo.title} "%"
         <include refid="cn.edu.bistu.mapper.Common.page"/>
     </select>
 
