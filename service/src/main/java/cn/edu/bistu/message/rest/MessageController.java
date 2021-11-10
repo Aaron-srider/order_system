@@ -16,6 +16,7 @@ import cn.edu.bistu.model.vo.MessageVo;
 import cn.edu.bistu.model.vo.PageVo;
 import cn.edu.bistu.workOrder.exception.AttachmentNotExistsException;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,32 +47,27 @@ public class MessageController {
     Logger logger =  LoggerFactory.getLogger(MessageController.class);
 
     //获取收件箱
-    @PostMapping("/getReceiveMsg")
-    public Result getReceiveMessage(@RequestBody PageVo pageVo,
-                                    MessageVo messageVo,
+    @GetMapping("/getReceiveMsg")
+    public Result getReceiveMessage(PageVo pageVo,
+                                    Message message,
                                     HttpServletRequest request){
 
-        if (pageVo.getSize() == 0) {
-            pageVo.setSize(10);
-        }
-
-        if (pageVo.getCurrent() == 0) {
-            pageVo.setCurrent(1);
-        }
-
-        MapService userInfo = (MapService) request.getAttribute("userInfo");
-        Long visitorId = userInfo.getVal("id", Long.class);
-        Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult<JSONObject> result = messageService.getReceiveMessages(page,visitorId,messageVo.getTitle());
-        return Result.ok(result.getServiceResult());
+        Page<MessageVo> page = getMsgCommon(pageVo, message, request);
+        IPage<MessageVo> receiveMessages = messageService.getReceiveMessages(page, message);
+        return Result.ok(receiveMessages);
     }
 
     //获取发件箱
-    @PostMapping("/getSendMsg")
-    public Result getSendMessage(@RequestBody PageVo pageVo,
-                                                    MessageVo messageVo,
+    @GetMapping("/getSendMsg")
+    public Result getSendMessage(PageVo pageVo, Message message,
                                                     HttpServletRequest request) {
 
+        Page<MessageVo> page = getMsgCommon(pageVo, message, request);
+        IPage<MessageVo> sendMessages = messageService.getSendMessages(page, message);
+        return Result.ok(sendMessages);
+    }
+
+    public Page<MessageVo> getMsgCommon(PageVo pageVo, Message message, HttpServletRequest request) {
         if (pageVo.getSize() == 0) {
             pageVo.setSize(10);
         }
@@ -82,9 +78,10 @@ public class MessageController {
 
         MapService userInfo = (MapService) request.getAttribute("userInfo");
         Long visitorId = userInfo.getVal("id", Long.class);
+        //将用户id设置到message中，xml中直接使用这个id作为sender或者是receiver进行where过滤
+        message.setId(visitorId);
         Page<MessageVo> page = new Page<>(pageVo.getCurrent(), pageVo.getSize());
-        ServiceResult<JSONObject> result = messageService.getSendMessages(page,visitorId,messageVo.getTitle());
-        return Result.ok(result.getServiceResult());
+        return page;
     }
 
     @GetMapping("/messageDetail/{messageId}")

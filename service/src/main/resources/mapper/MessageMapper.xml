@@ -24,38 +24,54 @@
     </resultMap>
     
     <select id="getReceiveMessages" resultMap="messageResultMap">
-        <include refid="basicReceiveMsgStatement"></include>
-        WHERE message.receiver = #{id} and message.is_show_receiver=0
-            <include refid="msgSelectCondition"></include>
+        select
+        <include refid="combinationMsgAndUser"></include>
+        form message
+        <include refid="receiveMsgJoin"></include>
+        WHERE message.receiver = #{message.id} and message.is_show_receiver=0<!--将用户id封装到了message中-->
+        <include refid="msgSelectCondition"></include>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
     </select>
 
     <select id="getSendMessages" resultMap="messageResultMap">
-        <include refid="basicSendMsgStatement"></include>
-        WHERE message.sender = #{id} and message.is_show_sender=0
-            <include refid="msgSelectCondition"></include>
+        select
+        <include refid="combinationMsgAndUser"></include>
+        FROM message
+        <include refid="sendMsgJoin"></include>
+        WHERE message.sender = #{message.id} and message.is_show_sender=0<!--将用户id封装到了message中-->
+        <include refid="msgSelectCondition"></include>
+        <include refid="cn.edu.bistu.mapper.Common.page"/>
     </select>
 
     <select id="getMessageById" resultMap="messageResultMap">
         select
-            <include refid="msgBasicFiled"></include>
+        <include refid="msgBasicFiled"></include>
         from message
         where message.id=#{id}
     </select>
 
-    <sql id="basicSendMsgStatement">
-        SELECT
-            <include refid="combinationMsgAndUser"></include>
-        FROM message
+    <select id="getReceiveMsgCount" resultType="java.lang.Long">
+        SELECT count(message.id)
+        from message
+        WHERE message.receiver = #{message.id} and message.is_show_receiver=0
+        <include refid="msgSelectCondition"></include>
+    </select>
+
+    <select id="getSendMsgCount" resultType="java.lang.Long">
+        SELECT count(message.id)
+        from message
+        WHERE message.sender = #{message.id} and message.is_show_sender=0
+        <include refid="msgSelectCondition"></include>
+    </select>
+
+    <sql id="sendMsgJoin">
         LEFT JOIN user ON user.id=message.receiver
-            <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
     </sql>
 
-    <sql id="basicReceiveMsgStatement">
-        select
-            <include refid="combinationMsgAndUser"></include>
-        from message
+    <sql id="receiveMsgJoin">
         LEFT JOIN user ON user.id=message.sender
-            <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
+        <include refid="cn.edu.bistu.auth.mapper.UserMapper.Common.userJoin"></include>
     </sql>
 
     <sql id="msgBasicFiled">
@@ -80,11 +96,9 @@
 
 
     <sql id="msgSelectCondition">
-        <where>
-            <if test=" title != null and title != '' ">
-                and message.title like "%" #{title} "%"
-            </if>
-        </where>
+        <if test=" message.title != null and message.title != '' ">
+            and message.title like "%" #{message.title} "%"
+        </if>
         ORDER BY message.create_time DESC
     </sql>
 

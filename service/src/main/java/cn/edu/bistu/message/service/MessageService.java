@@ -4,6 +4,7 @@ import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.Message;
 import cn.edu.bistu.model.vo.MessageVo;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
@@ -16,20 +17,18 @@ public interface MessageService {
 
     /**
      * 根据用户id获取收件箱
-     * @param visitorId
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
-    ServiceResult<JSONObject> getReceiveMessages(Page<MessageVo> page, Long visitorId, String title);
+    IPage<MessageVo> getReceiveMessages(Page<MessageVo> page, Message message);
 
     /**
      * 根据用户id获取发件箱
-     * @param visitorId
      * @return java.util.List<cn.edu.bistu.model.entity.Message>
      * */
-    ServiceResult<JSONObject> getSendMessages(Page<MessageVo> page, Long visitorId, String title);
+    IPage<MessageVo> getSendMessages(Page<MessageVo> page, Message message);
 
     /**
-     * 发送工单请求，返回插入的工单id方便上传附件
+     * 发送消息请求，返回插入的消息id方便上传附件
      * @param message
      * @return java.lang.Integer
      * */
