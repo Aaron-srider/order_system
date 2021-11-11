@@ -2,13 +2,11 @@ package cn.edu.bistu.message.service;
 
 import cn.edu.bistu.auth.mapper.UserMapper;
 import cn.edu.bistu.common.MD5Utils;
+import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.message.mapper.Messagemapper;
-import cn.edu.bistu.model.common.result.ServiceResult;
-import cn.edu.bistu.model.common.result.ServiceResultImpl;
 import cn.edu.bistu.model.entity.Message;
 import cn.edu.bistu.model.vo.MessageVo;
 import cn.edu.bistu.model.vo.UserVo;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * @author: Mr.Yu
@@ -36,26 +34,26 @@ public class MessageServiceImpl implements MessageService{
     static Logger logger = LoggerFactory.getLogger(MessageService.class);
 
     @Override
-    public ServiceResult<JSONObject> getReceiveMessages(Page<MessageVo> page, Long id, String title) {
+    public IPage<MessageVo> getReceiveMessages(Page<MessageVo> page, Message message) {
 
-        IPage<MessageVo> messages = messagemapper.getReceiveMessages(page, id, title);
-
-        logger.info("messags: ", messages);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("messages", messages);
-        ServiceResult<JSONObject> result = new ServiceResultImpl<>(jsonObject);
-        return result;
+        List<MessageVo> messages = messagemapper.getReceiveMessages(Pagination.getSkip(page),page.getSize(), message);
+        long receiveMsgCount = messagemapper.getReceiveMsgCount(message);
+        return retCommon(page,messages,receiveMsgCount);
     }
 
     @Override
-    public ServiceResult<JSONObject> getSendMessages(Page<MessageVo> page,Long id, String title) {
+    public IPage<MessageVo> getSendMessages(Page<MessageVo> page, Message message) {
 
-        IPage<MessageVo> messages = messagemapper.getSendMessages(page, id, title);
-        logger.info("messages: ",messages);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("messages",messages);
-        ServiceResult<JSONObject> result = new ServiceResultImpl<>(jsonObject);
-        return result;
+        List<MessageVo> messages = messagemapper.getSendMessages(Pagination.getSkip(page),page.getSize(), message);
+        long sendMsgCount = messagemapper.getSendMsgCount(message);
+        return retCommon(page,messages,sendMsgCount);
+    }
+
+    public IPage<MessageVo> retCommon(IPage<MessageVo> page, List<MessageVo> messages, long msgCount){
+
+        page.setRecords(messages);
+        page.setTotal(msgCount);
+        return page;
     }
 
     @Override
@@ -123,4 +121,5 @@ public class MessageServiceImpl implements MessageService{
         Message message = messagemapper.selectById(messageId);
         return message;
     }
+
 }

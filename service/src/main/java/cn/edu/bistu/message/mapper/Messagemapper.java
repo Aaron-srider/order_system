@@ -19,33 +19,34 @@ public interface Messagemapper extends BaseMapper<Message> {
 
     /**
      * 获取收件箱
-     * @param id
      * @return java.util.List<cn.edu.bistu.model.vo.MessageVo>
      * */
-    IPage<MessageVo> getReceiveMessages(Page<MessageVo> page, @Param("id") Long id, @Param("title") String title);
+    List<MessageVo> getReceiveMessages(@Param("skip") long skip, @Param("size") long size,@Param("message") Message message);
 
     /**
      * 获取发件箱
-     * @param id
      * @return java.util.List<cn.edu.bistu.model.vo.MessageVo>
      * */
-    IPage<MessageVo> getSendMessages(Page<MessageVo> page,@Param("id") Long id, @Param("title") String title);
+    List<MessageVo> getSendMessages(@Param("skip") long skip, @Param("size") long size,@Param("message") Message message);
 
     /**
-     * 获取收取信息的详情
-     * @param id
-     * @return cn.edu.bistu.model.vo.MessageVo
+     * 获取消息的除附件的所有字段
+     * @param messageId
+     * @return cn.edu.bistu.model.entity.Message
      * */
-    MessageVo getReceiveMsgAllDetail(Long id);
-
-    /**
-     * 获取发送信息的详情
-     * @param id
-     * @return cn.edu.bistu.model.vo.MessageVo
-     * */
-    MessageVo getSendMsgAllDetail(Long id);
-
     Message getMessageById(Long messageId);
 
+    /**
+     * 获取收件箱消息数量
+     * @param
+     * @return long
+     * */
+    long getReceiveMsgCount(@Param("message") Message message);
+    /**
+     * 获取发件箱消息数量
+     * @param
+     * @return long
+     * */
+    long getSendMsgCount(@Param("message") Message message);
 
 }
