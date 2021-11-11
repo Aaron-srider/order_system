@@ -46,7 +46,7 @@
         <where>
             <if test="workOrderVo.flowNode!=null and workOrderVo.flowNode.approverId!=null and workOrderVo.flowNode.approverId!=''">
                 and flow_node.approver_id=#{workOrderVo.flowNode.approverId}
-            </if>basicWorkOrderSelectStatementFragment
+            </if>
             <if test="workOrderVo.id!=null">
                 and work_order.id=#{workOrderVo.id}
             </if>
