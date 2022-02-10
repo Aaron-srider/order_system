@@ -1,6 +1,6 @@
 package cn.edu.bistu.common.utils;
 
-import cn.edu.bistu.user.dao.UserDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.entity.auth.Role;
 import com.alibaba.fastjson.JSONObject;

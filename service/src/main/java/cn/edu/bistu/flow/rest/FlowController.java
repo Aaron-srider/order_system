@@ -19,6 +19,11 @@ public class FlowController {
     @Autowired
     FlowService flowService;
 
+    /**
+     * 获取一个角色能获取的所有流程信息
+     * @param roleId 角色ID
+     * @return 角色对应的所有流程信息
+     */
     @GetMapping("/flows")
     public Result getFlowByRoleId(@NotNull Long roleId) {
         ServiceResult flowListByRoleId = flowService.getFlowListByRoleId(roleId);

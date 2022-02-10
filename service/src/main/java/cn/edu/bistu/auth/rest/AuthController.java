@@ -22,27 +22,40 @@ public class AuthController {
     @Autowired
     AuthService authService;
 
-    @PostMapping("/vue-admin-template/user/login")
-    public Result vue_login(@RequestBody JSONObject jsonObject) {
-        UserVo userVo = new UserVo();
-        userVo.setToken("0293i89jg89yghe893hefuhap");
-        return Result.ok(userVo);
-    }
+    //@PostMapping("/vue-admin-template/user/login")
+    //public Result vue_login(@RequestBody JSONObject jsonObject) {
+    //    UserVo userVo = new UserVo();
+    //    userVo.setToken("0293i89jg89yghe893hefuhap");
+    //    return Result.ok(userVo);
+    //}
+    //
+    //@GetMapping("/vue-admin-template/user/info")
+    //public Result vue_info() {
+    //    JSONObject jsonObject = new JSONObject();
+    //    jsonObject.put("name", "wc");
+    //    jsonObject.put("avatar", "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic3.zhimg.com%2F50%2Fv2-5095f9e4ef2c7eea1b768b5647eebb42_hd.jpg&refer=http%3A%2F%2Fpic3.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1634889232&t=948fe5d799523fc824fefa8d1f055893");
+    //    return Result.ok(jsonObject);
+    //}
 
-    @GetMapping("/vue-admin-template/user/info")
-    public Result vue_info() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "wc");
-        jsonObject.put("avatar", "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic3.zhimg.com%2F50%2Fv2-5095f9e4ef2c7eea1b768b5647eebb42_hd.jpg&refer=http%3A%2F%2Fpic3.zhimg.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1634889232&t=948fe5d799523fc824fefa8d1f055893");
-        return Result.ok(jsonObject);
-    }
-
+    /**
+     * 小程序登录接口
+     *
+     * @param code 临时登录码
+     * @return 返回包含token的用户信息
+     */
     @GetMapping("/auth/login")
-    public Result login(@NotNull String code) {
+    public Result login(
+            @NotNull String code
+    ) {
         ServiceResult result = authService.authentication(code);
         return Result.ok(result.getServiceResult());
     }
 
+    /**
+     * 小程序完善用户信息的接口
+     *
+     * @param userVo 包含待完善的用户信息
+     */
     @PutMapping("/auth/userInfoCompletion")
     public Result completeUserInfo(
             @RequestBody @Validated UserVo userVo) {
@@ -50,6 +63,12 @@ public class AuthController {
         return Result.ok(serviceResult.getServiceResult());
     }
 
+    /**
+     * 管理端登录接口
+     *
+     * @param code 临时登录码
+     * @return 返回包含token的用户信息
+     */
     @GetMapping("/admin/login")
     public Result adminLogin(
             @NotNull String code) {
@@ -57,7 +76,6 @@ public class AuthController {
         ServiceResult serviceResult = authService.adminSystemAuthentication(code);
         return Result.ok(serviceResult.getServiceResult());
     }
-
 
 
 }

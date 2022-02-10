@@ -12,7 +12,7 @@ import cn.edu.bistu.model.vo.WorkOrderVo;
 public interface WorkOrderFlower {
 
     /**
-     * 流转工单到下一个节点，一般来说，流转应该包含以下几个逻辑：
+     * 审批操作出发该方法。流转工单到下一个节点，一般来说，流转应该包含以下几个逻辑：
      *              判断工单是否处于最后一个节点，
      *                  若是，则委托 * WorkOrderFinisher * 将工单结束
      *                  否则，将工单流转到下一个节点：

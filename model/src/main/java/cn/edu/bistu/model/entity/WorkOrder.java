@@ -51,6 +51,9 @@ public class WorkOrder extends BaseEntity{
     @Null(groups = {Insert.class})
     Long flowNodeId;
 
+    public static final Integer WORKORDER_FINISHED = 1;
+    public static final Integer WORKORDER_NOT_FINISHED = 0;
+
     @Null(groups = {Insert.class})
     Integer isFinished;
 
@@ -63,4 +66,10 @@ public class WorkOrder extends BaseEntity{
     Long actualApproverId;
     Long userSpecifiedId;
 
+    public WorkOrder() {
+    }
+
+    public WorkOrder(Long id) {
+        setId(id);
+    }
 }

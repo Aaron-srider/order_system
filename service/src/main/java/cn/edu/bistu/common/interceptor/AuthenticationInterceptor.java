@@ -1,6 +1,6 @@
 package cn.edu.bistu.common.interceptor;
 
-import cn.edu.bistu.user.dao.UserDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
 import cn.edu.bistu.auth.JwtHelper;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.ResponseHelper;

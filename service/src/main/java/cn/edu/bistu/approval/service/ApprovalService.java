@@ -1,7 +1,7 @@
 package cn.edu.bistu.approval.service;
 
 import cn.edu.bistu.approval.WorkOrderFinisher;
-import cn.edu.bistu.constants.ApprovalOperation;
+import cn.edu.bistu.constants.ApprovalOperationEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.ApprovalRecord;
@@ -26,7 +26,7 @@ public interface ApprovalService {
      * @param approvalOperation 审批操作
      */
     public void workOrderFinish(WorkOrderFinisher workOrderFinisher, WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus,
-                                ApprovalOperation approvalOperation);
+                                ApprovalOperationEnum approvalOperation);
 
     /**
      * 工单审批通过逻辑，若工单处于最后一个节点，触发工单结束逻辑；否则，触发工单流转逻辑。

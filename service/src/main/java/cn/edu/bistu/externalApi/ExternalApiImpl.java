@@ -1,9 +1,9 @@
 package cn.edu.bistu.externalApi;
 
-import cn.edu.bistu.user.dao.UserDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
 import cn.edu.bistu.approval.WorkOrderFlower;
 import cn.edu.bistu.common.exception.ResultCodeException;
-import cn.edu.bistu.constants.ApprovalOperation;
+import cn.edu.bistu.constants.ApprovalOperationEnum;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.model.entity.auth.User;
 import cn.edu.bistu.model.vo.FlowVo;
@@ -37,7 +37,7 @@ public class ExternalApiImpl implements ExternalApi {
         user.setTutorId(fullPreparedWorkOrder.getUserSpecifiedId());
         userDao.simpleUpdateUserById(user);
         ExternalApiResultImpl externalApiResult = new ExternalApiResultImpl();
-        externalApiResult.setApprovalOperation(ApprovalOperation.PASS);
+        externalApiResult.setApprovalOperation(ApprovalOperationEnum.PASS);
         return externalApiResult;
     }
 }

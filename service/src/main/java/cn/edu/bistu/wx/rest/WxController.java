@@ -1,7 +1,6 @@
 package cn.edu.bistu.wx.rest;
 
-import cn.edu.bistu.auth.service.AuthService;
-import cn.edu.bistu.auth.service.AuthServiceImpl;
+import cn.edu.bistu.utils.auth.service.AuthService;
 import cn.edu.bistu.model.wx.JsonMiniTemplateMessageNotification;
 import cn.edu.bistu.wx.service.WxMiniApi;
 import com.alibaba.fastjson.JSONObject;

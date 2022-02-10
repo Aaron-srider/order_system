@@ -30,8 +30,6 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
     @Autowired
     WorkOrderFinisherFactory workOrderFinisherFactory;
 
-
-
     @Override
     @Transactional
     public void deleteWorkOrdersByWorkOrderIdList(List<Long> workOrderIdList) {
@@ -61,9 +59,10 @@ public class AdminWorkOrderServiceImpl implements AdminWorkOrderService {
                 throw new ResultCodeException("workOrder id:" + workOrderVo.getId(), ResultCodeEnum.WORKORDER_BEEN_FINISHED);
             }
 
-            approvalService.workOrderFinish(workOrderFinisherFactory.getFinisher(
-                    "notApprovalTypeV2"),
-                    workOrderVo, null,
+            approvalService.workOrderFinish(
+                    workOrderFinisherFactory.getFinisher("notApprovalTypeV2"),
+                    workOrderVo,
+                    null,
                     cn.edu.bistu.constants.WorkOrderStatus.INVALIDATION,
                     null);
         }

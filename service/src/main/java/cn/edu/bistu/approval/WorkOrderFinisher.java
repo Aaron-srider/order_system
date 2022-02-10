@@ -21,5 +21,5 @@ public interface WorkOrderFinisher {
      * 结束工单的具体算法
      * @param workOrderFinishWrap 包含了结束工单所具备的参数，详见 WorkOrderFinishWrap 类
      */
-    public void finishWorkOrder(WorkOrderFinishWrapper workOrderFinishWrap);
+    public void finishWorkOrder(WorkOrderFinishContext workOrderFinishWrap);
 }

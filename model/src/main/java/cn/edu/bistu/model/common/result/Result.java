@@ -4,9 +4,7 @@ import cn.edu.bistu.constants.ResultCodeEnum;
 import lombok.Data;
 
 /**
- * 全局统一返回结果类
- *
- * @author qy
+ * 后端返回结果类
  */
 @Data
 //@ApiModel(value = "全局统一返回结果")
@@ -70,7 +68,6 @@ public class Result<T> {
      * @return
      */
     public static<T> Result<T> fail(T data){
-        Result<T> result = build(data);
         return build(data, ResultCodeEnum.FAIL);
     }
 

@@ -1,6 +1,6 @@
-package cn.edu.bistu.user.rest;
+package cn.edu.bistu.admin.user.rest;
 
-import cn.edu.bistu.user.Service.UserService;
+import cn.edu.bistu.admin.user.Service.UserService;
 import cn.edu.bistu.common.rest.BaseController;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.model.common.result.Result;
@@ -15,18 +15,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+/**
+ * 管理员管理用户信息接口
+ */
 @RestController
 @Slf4j
 @CrossOrigin
-public class UserController extends BaseController{
+public class AdminUserController extends BaseController{
 
     @Autowired
     UserService userService;
 
+    /**
+     * 返回所有用户的信息
+     * @param pageVo 分页数据
+     * @param userVo 筛选信息，用户角色为必填信息（roleCategory）
+     * @return 符合条件的所有角色
+     */
     @GetMapping("/users")
     public Result getAllUsers(PageVo pageVo,
                               @Validated({ConditionQuery.class}) UserVo userVo) {
@@ -37,11 +45,17 @@ public class UserController extends BaseController{
         return Result.ok(serviceResult.getServiceResult());
     }
 
+
+    /**
+     * 锁定/解锁用户，之后该用户无法登录
+     * @param id 用户id
+     * @param status 1表示锁定，0表示解锁
+     */
     @PutMapping("/lock/{id}/{status}")
     public Result lock(
             @PathVariable("id") @NotNull Long id,
-            @PathVariable("status") @Pattern(regexp = "[0|1]") Integer status,
-            HttpServletResponse resp) {
+            @PathVariable("status") @Pattern(regexp = "[0|1]") Integer status
+            ) {
 
         User user = new User();
         user.setIsLock(status);
@@ -51,6 +65,10 @@ public class UserController extends BaseController{
         return Result.ok();
     }
 
+    /**
+     * 更新用户信息，要求参数见文档
+     * @param userVo 包含了更新用户所要求的的所有参数
+     */
     @PutMapping("/users")
     public Result update(
            @RequestBody @Validated UserVo userVo) {
@@ -65,6 +83,10 @@ public class UserController extends BaseController{
         return Result.ok();
     }
 
+    /**
+     * 将管理员用户降级为普通用户
+     * @param userId 用户id
+     */
     @DeleteMapping("/admin/user/demote/{userId}")
     public Result demote(
             @NotNull @PathVariable(name="userId") Long userId) {
@@ -73,6 +95,11 @@ public class UserController extends BaseController{
     }
 
 
+    /**
+     * 根据用户工号查询用户信息
+     * @param studentJobId 用户工号
+     * @return 查询到的用户信息
+     */
     @GetMapping("/user/{studentJobId}")
     public Result searchByStudentJobId(
             @NotNull @PathVariable(name="studentJobId") String studentJobId) {

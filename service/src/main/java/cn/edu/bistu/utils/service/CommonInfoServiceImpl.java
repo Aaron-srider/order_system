@@ -1,6 +1,6 @@
 package cn.edu.bistu.utils.service;
 
-import cn.edu.bistu.user.dao.UserDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
 import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.ServiceResult;

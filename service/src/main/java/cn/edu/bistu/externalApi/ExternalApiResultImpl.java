@@ -1,15 +1,15 @@
 package cn.edu.bistu.externalApi;
 
-import cn.edu.bistu.constants.ApprovalOperation;
+import cn.edu.bistu.constants.ApprovalOperationEnum;
 import lombok.Data;
 
 @Data
 public class ExternalApiResultImpl implements ExternalApiResult {
 
-    ApprovalOperation approvalOperation;
+    ApprovalOperationEnum approvalOperation;
 
     @Override
-    public ApprovalOperation getWorkOrderStatusOfExcution() {
+    public ApprovalOperationEnum getWorkOrderStatusOfExcution() {
         return approvalOperation;
     }
 }

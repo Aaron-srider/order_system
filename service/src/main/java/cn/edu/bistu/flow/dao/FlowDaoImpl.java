@@ -19,8 +19,10 @@ import java.util.List;
 @Data
 @Repository
 public class FlowDaoImpl implements FlowDao{
+
     @Autowired
     FlowNodeMapper flowNodeMapper;
+
     @Autowired
     FlowMapper flowMapper;
 

@@ -17,6 +17,9 @@ import java.util.Date;
 public class ApprovalRecord extends BaseEntity
 {
 
+    public static final Integer REJECT = 1;
+    public static final Integer PASS = 0;
+
     /**
      * 审批操作，0通过，1不通过
      */
@@ -49,4 +52,17 @@ public class ApprovalRecord extends BaseEntity
      * 审批对应的审批人id
      */
     private Long approverId;
+
+    public ApprovalRecord(Integer operation, String approvalDatetime, String comment, Long workOrderId, Long flowNodeId, Long approverId) {
+        this.operation = operation;
+        this.approvalDatetime = approvalDatetime;
+        this.comment = comment;
+        this.workOrderId = workOrderId;
+        this.flowNodeId = flowNodeId;
+        this.approverId = approverId;
+    }
+
+    public static ApprovalRecord getFullInstance(Integer operation, String approvalDatetime, String comment, Long workOrderId, Long flowNodeId, Long approverId) {
+        return new ApprovalRecord(operation, approvalDatetime, comment, workOrderId, flowNodeId, approverId);
+    }
 }

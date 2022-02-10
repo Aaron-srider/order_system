@@ -1,6 +1,6 @@
 package cn.edu.bistu.workOrder.service.impl;
 
-import cn.edu.bistu.auth.mapper.UserMapper;
+import cn.edu.bistu.utils.auth.mapper.UserMapper;
 import cn.edu.bistu.common.MD5Utils;
 import cn.edu.bistu.flow.dao.FlowDao;
 import cn.edu.bistu.flow.mapper.FlowMapper;

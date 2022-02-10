@@ -1,9 +1,5 @@
 package cn.edu.bistu.approval;
 
-import cn.edu.bistu.constants.ApprovalOperation;
-import cn.edu.bistu.constants.WorkOrderStatus;
-import cn.edu.bistu.model.entity.WorkOrder;
-import cn.edu.bistu.model.entity.WorkOrderHistory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,18 +15,9 @@ public class NotApprovalWorkOrderFinisherV2 extends BaseWorkOrderFinisher implem
     }
 
     @Override
-    public void finishWorkOrder(WorkOrderFinishWrapper workOrderFinishWrap) {
-
-        WorkOrder workOrder1 = new WorkOrder();
-        workOrder1.setId(workOrderFinishWrap.fullPreparedWorkOrderToBeFinished.getId());
-        workOrder1.setIsFinished(1);
-        workOrder1.setIsExamined(1);
-        workOrder1.setStatus(workOrderDao.constantToEntity(workOrderFinishWrap.finishStatusConstant).getValue());
-        workOrderDao.updateById(workOrder1);
-
-        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
-        workOrderHistory.setWorkOrderId(workOrderFinishWrap.fullPreparedWorkOrderToBeFinished.getId());
-        workOrderHistory.setBeforeFinishedStatus(workOrderFinishWrap.fullPreparedWorkOrderToBeFinished.getStatus());
-        workOrderHistoryDao.insertOne(workOrderHistory);
+    public void finishWorkOrder(WorkOrderFinishContext workOrderFinishWrap) {
+        finishWorkOrder0(workOrderFinishWrap);
     }
+
+
 }

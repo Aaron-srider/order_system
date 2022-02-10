@@ -1,6 +1,6 @@
 package cn.edu.bistu.workOrder.dao;
 
-import cn.edu.bistu.user.dao.UserDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.flow.dao.FlowDaoImpl;
 import cn.edu.bistu.model.common.result.DaoResult;

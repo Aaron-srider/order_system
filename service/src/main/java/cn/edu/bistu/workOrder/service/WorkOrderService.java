@@ -6,9 +6,6 @@ import cn.edu.bistu.model.vo.WorkOrderVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import javax.imageio.spi.ServiceRegistry;
-import java.net.ServerSocket;
-
 public interface WorkOrderService extends IService<WorkOrder>{
 
     /**
@@ -20,7 +17,7 @@ public interface WorkOrderService extends IService<WorkOrder>{
 
     void revoke(Long workOrderId, Long initiator);
 
-    ServiceResult<WorkOrderVo> detail(WorkOrder workOrder);
+    ServiceResult<WorkOrderVo> detail(Long workOrderId, Long visitorId);
 
     ServiceResult submitWorkOrder(WorkOrderVo workOrderVo);
 

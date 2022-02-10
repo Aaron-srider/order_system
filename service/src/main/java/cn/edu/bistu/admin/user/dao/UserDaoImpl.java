@@ -1,8 +1,8 @@
-package cn.edu.bistu.user.dao;
+package cn.edu.bistu.admin.user.dao;
 
-import cn.edu.bistu.auth.mapper.RoleMapper;
-import cn.edu.bistu.auth.mapper.UserMapper;
-import cn.edu.bistu.auth.mapper.UserRoleMapper;
+import cn.edu.bistu.utils.auth.mapper.RoleMapper;
+import cn.edu.bistu.utils.auth.mapper.UserMapper;
+import cn.edu.bistu.utils.auth.mapper.UserRoleMapper;
 import cn.edu.bistu.dept.mapper.DeptDao;
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.common.result.DaoResultImpl;

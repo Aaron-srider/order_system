@@ -1,4 +1,4 @@
-package cn.edu.bistu.user.Service;
+package cn.edu.bistu.admin.user.Service;
 
 import cn.edu.bistu.model.common.result.ServiceResult;
 import cn.edu.bistu.model.entity.auth.User;

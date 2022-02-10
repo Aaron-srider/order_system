@@ -1,7 +1,7 @@
-package cn.edu.bistu.user.Service;
+package cn.edu.bistu.admin.user.Service;
 
-import cn.edu.bistu.user.dao.UserDao;
-import cn.edu.bistu.auth.mapper.UserMapper;
+import cn.edu.bistu.admin.user.dao.UserDao;
+import cn.edu.bistu.utils.auth.mapper.UserMapper;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.common.utils.UserUtils;
 import cn.edu.bistu.constants.ResultCodeEnum;

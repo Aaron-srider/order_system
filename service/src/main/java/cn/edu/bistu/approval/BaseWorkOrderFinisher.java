@@ -1,8 +1,7 @@
 package cn.edu.bistu.approval;
 
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
-import cn.edu.bistu.common.BeanUtils;
-import cn.edu.bistu.constants.ApprovalOperation;
+import cn.edu.bistu.constants.ApprovalOperationEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
 import cn.edu.bistu.model.entity.ApprovalRecord;
 import cn.edu.bistu.model.entity.WorkOrder;
@@ -27,7 +26,40 @@ public class BaseWorkOrderFinisher {
     @Autowired
     WorkOrderHistoryDao workOrderHistoryDao;
 
-    public void prepareApprovalRecord(ApprovalRecord approvalRecord, Long flowNodeId, ApprovalOperation approvalOperation) {
+    protected void finishWorkOrder0(WorkOrderFinishContext workOrderFinishWrap) {
+        WorkOrder fullPreparedWorkOrderToBeFinished = workOrderFinishWrap.fullPreparedWorkOrderToBeFinished;
+        WorkOrderStatus finishStatusConstant = workOrderFinishWrap.finishStatusConstant;
+        Long workOrderId = fullPreparedWorkOrderToBeFinished.getId();
+
+        //设置结束工单状态
+        WorkOrder workOrder = populateWorkOrder2BeFinished(workOrderId, finishStatusConstant);
+        workOrderDao.updateById(workOrder);
+
+        //插入工单历史
+        WorkOrderHistory workOrderHistory =
+                generateWorkOrderHistory(
+                        workOrderId,
+                        fullPreparedWorkOrderToBeFinished.getStatus());
+        workOrderHistoryDao.insertOne(workOrderHistory);
+    }
+
+    protected WorkOrder populateWorkOrder2BeFinished(Long workOrderId, WorkOrderStatus workOrderStatus) {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setId(workOrderId);
+        workOrder.setIsFinished(1);
+        workOrder.setIsExamined(1);
+        workOrder.setStatus(workOrderDao.constantToEntity(workOrderStatus).getValue());
+        return workOrder;
+    }
+
+    protected WorkOrderHistory generateWorkOrderHistory(Long workOrderId, Integer WorkOrderStatus) {
+        WorkOrderHistory workOrderHistory = new WorkOrderHistory();
+        workOrderHistory.setWorkOrderId(workOrderId);
+        workOrderHistory.setBeforeFinishedStatus(WorkOrderStatus);
+        return workOrderHistory;
+    }
+
+    public void prepareApprovalRecord(ApprovalRecord approvalRecord, Long flowNodeId, ApprovalOperationEnum approvalOperation) {
         approvalRecord.setFlowNodeId(flowNodeId);
         approvalRecord.setOperation(approvalOperation.getCode());
     }

@@ -1,4 +1,4 @@
-package cn.edu.bistu.user.dao;
+package cn.edu.bistu.admin.user.dao;
 
 import cn.edu.bistu.model.common.result.DaoResult;
 import cn.edu.bistu.model.entity.auth.User;

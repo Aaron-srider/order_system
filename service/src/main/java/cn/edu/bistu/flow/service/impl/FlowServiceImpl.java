@@ -20,6 +20,6 @@ public class FlowServiceImpl extends ServiceImpl<FlowMapper, Flow> implements Fl
     @Override
     public ServiceResult getFlowListByRoleId(long roleId) {
         DaoResult flowListByRoleId = flowDao.getFlowListByRoleId(roleId);
-        return new ServiceResultImpl<>(flowListByRoleId.getResult());
+        return new ServiceResultImpl(flowListByRoleId.getResult());
     }
 }

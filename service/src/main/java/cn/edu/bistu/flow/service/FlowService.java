@@ -10,7 +10,8 @@ import java.util.List;
 public interface FlowService extends IService<Flow> {
 
     /**
-     * @param roleId
+     * 获取角色能获取的所有工单申请流程
+     * @param roleId 角色ID
      */
     public ServiceResult getFlowListByRoleId(long roleId);
 

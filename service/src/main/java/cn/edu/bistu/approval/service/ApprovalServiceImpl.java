@@ -1,12 +1,12 @@
 package cn.edu.bistu.approval.service;
 
-import cn.edu.bistu.approval.WorkOrderFinishWrapper;
+import cn.edu.bistu.approval.WorkOrderFinishContext;
 import cn.edu.bistu.approval.WorkOrderFinisher;
 import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.WorkOrderFlower;
 import cn.edu.bistu.approval.mapper.ApprovalRecordMapper;
 import cn.edu.bistu.common.exception.ResultCodeException;
-import cn.edu.bistu.constants.ApprovalOperation;
+import cn.edu.bistu.constants.ApprovalOperationEnum;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
 import cn.edu.bistu.flow.dao.FlowDaoImpl;
@@ -83,6 +83,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         WorkOrderVo workOrderVo = workOrderDao.getOneWorkOrderById(workOrderId).getResult();
 
         if (workOrderVo == null) {
+            log.info("工单号为："+workOrderId+"的工单不存在");
             throw new ResultCodeException("workOrder id: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
 
@@ -151,7 +152,7 @@ public class ApprovalServiceImpl implements ApprovalService {
         checkIfWorkOrderHasFinished(workOrderVo);
 
         //将 full prepared 工单和 full prepared 审批记录交由 finisher 处理，将工单结束。
-        workOrderFinish(workOrderFinisherFactory.getFinisher("approvalTypeV2"), workOrderVo, approvalRecord, WorkOrderStatus.NOT_APPROVED, ApprovalOperation.REJECT);
+        workOrderFinish(workOrderFinisherFactory.getFinisher("approvalTypeV2"), workOrderVo, approvalRecord, WorkOrderStatus.NOT_APPROVED, ApprovalOperationEnum.REJECT);
 
     }
 
@@ -165,6 +166,7 @@ public class ApprovalServiceImpl implements ApprovalService {
     private void checkApprovalRightOfUser(WorkOrderVo workOrderVo, Long userId) {
 
         if (!workOrderVo.getActualApproverId().equals(userId)) {
+            log.info("来访者："+userId+"无权查看该工单");
             throw new ResultCodeException("user id:" + userId,
                     ResultCodeEnum.HAVE_NO_RIGHT);
         }
@@ -179,8 +181,8 @@ public class ApprovalServiceImpl implements ApprovalService {
      */
     private void checkIfWorkOrderHasFinished(WorkOrderVo workOrderVo) {
 
-        //若工单已结束，审批操作非法
-        if (workOrderVo.getIsFinished().equals(1)) {
+        if (workOrderVo.getIsFinished().equals(WorkOrderVo.WORKORDER_FINISHED)) {
+            log.info("若工单已结束，审批操作非法");
             throw new ResultCodeException(workOrderVo,
                     ResultCodeEnum.WORKORDER_BEEN_FINISHED);
         }
@@ -199,17 +201,18 @@ public class ApprovalServiceImpl implements ApprovalService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void workOrderFinish(WorkOrderFinisher workOrderFinisher, WorkOrder workOrder, ApprovalRecord approvalRecord, WorkOrderStatus finishStatus,
-                                ApprovalOperation approvalOperation) {
+                                ApprovalOperationEnum approvalOperation) {
 
-        WorkOrderFinishWrapper workOrderFinishWrapper = new WorkOrderFinishWrapper();
-        workOrderFinishWrapper.setApprovalRecord(approvalRecord);
-        workOrderFinishWrapper.setFullPreparedWorkOrderToBeFinished(workOrder);
-        workOrderFinishWrapper.setFinishStatusConstant(finishStatus);
-        workOrderFinisher.finishWorkOrder(workOrderFinishWrapper);
+        WorkOrderFinishContext workOrderFinishContext = WorkOrderFinishContext.getFullInstance(
+                workOrder,
+                approvalRecord,
+                finishStatus
+        );
+        workOrderFinisher.finishWorkOrder(workOrderFinishContext);
 
     }
 
-    public void prepareApprovalRecord(ApprovalRecord approvalRecord, Long flowNodeId, ApprovalOperation approvalOperation) {
+    public void prepareApprovalRecord(ApprovalRecord approvalRecord, Long flowNodeId, ApprovalOperationEnum approvalOperation) {
         approvalRecord.setFlowNodeId(flowNodeId);
         approvalRecord.setOperation(approvalOperation.getCode());
     }

@@ -1,10 +1,9 @@
 package cn.edu.bistu.externalApi;
 
-import cn.edu.bistu.constants.ApprovalOperation;
-import cn.edu.bistu.constants.WorkOrderStatus;
+import cn.edu.bistu.constants.ApprovalOperationEnum;
 
 public interface ExternalApiResult {
 
-    public ApprovalOperation getWorkOrderStatusOfExcution();
+    public ApprovalOperationEnum getWorkOrderStatusOfExcution();
 
 }

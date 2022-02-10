@@ -1,6 +1,6 @@
 package cn.edu.bistu.message.service;
 
-import cn.edu.bistu.auth.mapper.UserMapper;
+import cn.edu.bistu.utils.auth.mapper.UserMapper;
 import cn.edu.bistu.common.MD5Utils;
 import cn.edu.bistu.common.utils.Pagination;
 import cn.edu.bistu.message.mapper.Messagemapper;

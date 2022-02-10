@@ -1,6 +1,6 @@
 package cn.edu.bistu.common.rest;
 
-import cn.edu.bistu.user.Service.UserService;
+import cn.edu.bistu.admin.user.Service.UserService;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.workOrder.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ public class BaseController {
 
     @Autowired
     WorkOrderService workOrderService;
-
 
     @Autowired
     UserService userService;
@@ -28,8 +27,7 @@ public class BaseController {
         resp.setHeader("Access-Control-Allow-Method", "*");
     }
 
-    public boolean isAdmin(HttpServletRequest req) {
-        Long visitorId = getVisitorId(req);
+    public boolean isAdmin(Long visitorId) {
         return userService.isAdmin(visitorId);
     }
 }

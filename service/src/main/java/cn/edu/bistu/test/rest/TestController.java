@@ -1,8 +1,8 @@
 package cn.edu.bistu.test.rest;
 
 import cn.edu.bistu.Entity;
-import cn.edu.bistu.user.dao.UserDao;
-import cn.edu.bistu.auth.mapper.AuthDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
+import cn.edu.bistu.utils.auth.mapper.AuthDao;
 import cn.edu.bistu.flow.dao.FlowDao;
 import cn.edu.bistu.model.common.result.Result;
 import cn.edu.bistu.model.entity.FlowNode;

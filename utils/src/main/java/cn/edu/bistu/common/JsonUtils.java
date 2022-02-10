@@ -2,7 +2,7 @@ package cn.edu.bistu.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.corba.se.impl.ior.OldJIDLObjectKeyTemplate;
+//import com.sun.corba.se.impl.ior.OldJIDLObjectKeyTemplate;
 
 import java.util.Set;
 

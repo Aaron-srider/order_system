@@ -14,6 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * 返回有关部门、班级等常量信息
+ */
 @Repository
 @Getter
 public class DeptDao {
@@ -28,7 +31,6 @@ public class DeptDao {
     SecondaryDeptMapper secondaryDeptMapper;
 
     public DaoResult<JSONObject> getAllCollegeMajorDept() {
-
         List<Major> majorList = getMajorMapper().selectList(null);
         List<SecondaryDept> secondaryDeptList = getSecondaryDeptMapper().selectList(null);
         List<College> collegeList = getCollegeMapper().selectList(null);

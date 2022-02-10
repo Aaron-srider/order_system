@@ -1,10 +1,9 @@
 package cn.edu.bistu.workOrder.service.impl;
 
-import cn.edu.bistu.user.dao.UserDao;
+import cn.edu.bistu.admin.user.dao.UserDao;
 import cn.edu.bistu.approval.WorkOrderFinisherFactory;
 import cn.edu.bistu.approval.dao.ApproverLogicDao;
 import cn.edu.bistu.approval.service.ApprovalService;
-import cn.edu.bistu.common.MD5Utils;
 import cn.edu.bistu.common.exception.ResultCodeException;
 import cn.edu.bistu.constants.ResultCodeEnum;
 import cn.edu.bistu.constants.WorkOrderStatus;
@@ -33,7 +32,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,9 +49,6 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
 
     @Autowired
     FlowDaoImpl flowDao;
-
-    @Value("${attachmentDownloadApi}")
-    String attachmentDownloadApi;
 
     @Autowired
     FlowNodeService flowNodeService;
@@ -117,39 +112,53 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     @Override
-    public ServiceResult<WorkOrderVo> detail(WorkOrder workOrder) {
+    public ServiceResult<WorkOrderVo> detail(Long workOrderId, Long visitorId) {
 
-        WorkOrder inspectWorkOrder = ((WorkOrderDaoImpl) workOrderDao).getWorkOrderMapper().selectOne(new QueryWrapper<WorkOrder>().select("id", "initiator_id").eq("id", workOrder.getId()));
+        WorkOrder dbWorkOrder = ((WorkOrderDaoImpl) workOrderDao).getWorkOrderMapper()
+                        .selectOne(new QueryWrapper<WorkOrder>()
+                        .select("id", "initiator_id")
+                        .eq("id", workOrderId));
 
         //工单不存在
-        if (inspectWorkOrder == null) {
-            throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.WORKORDER_NOT_EXISTS);
+        if (dbWorkOrder == null) {
+            log.info("工单号为：\""+workOrderId+"\"的工单不存在");
+            throw new ResultCodeException("workOrder id: " + workOrderId, ResultCodeEnum.WORKORDER_NOT_EXISTS);
         }
 
         //来访者不是工单的属主也不是审批者，不予查看
-        if (!inspectWorkOrder.getInitiatorId().equals(workOrder.getInitiatorId())) {
-            if (inspectWorkOrder.getActualApproverId() != null && !inspectWorkOrder.getActualApproverId().equals(workOrder.getInitiatorId())) {
-                throw new ResultCodeException("workOrder id: " + workOrder.getId(), ResultCodeEnum.HAVE_NO_RIGHT);
+        if (!dbWorkOrder.getInitiatorId().equals(visitorId)) {
+            if (dbWorkOrder.getActualApproverId() != null
+                    && !dbWorkOrder.getActualApproverId().equals(visitorId)) {
+                log.info("来访者无权查看工单号为：\""+workOrderId+"\"的工单");
+                throw new ResultCodeException("workOrder id: " + workOrderId, ResultCodeEnum.HAVE_NO_RIGHT);
             }
         }
 
-        DaoResult<WorkOrderVo> daoResultPage = workOrderDao.getOneWorkOrderById(workOrder.getId());
-        WorkOrderVo resultWorkOrderWithOutFlowInfo = daoResultPage.getResult();
+        WorkOrderVo resultWorkOrderWithOutFlowInfo = workOrderDao.getOneWorkOrderById(workOrderId).getResult();
         resultWorkOrderWithOutFlowInfo.setAttachment(null);
 
-        //完善工单信息
-        FlowVo fullPreparedFlowOfResultWorkOrder = flowDao.getFullPreparedFlowByFlowId(resultWorkOrderWithOutFlowInfo.getFlowId()).getResult();
-
-        for (FlowNodeVo oneFlowNodeOfResultWorkOrder : fullPreparedFlowOfResultWorkOrder.getFlowNodeList()) {
-            Long approverId = oneFlowNodeOfResultWorkOrder.getApproverId();
-            flowNodeApproverDecider = flowNodeApproverDeciderFactory.getApproverDecider(approverId);
-            FlowNodeApprover flowNodeApproverOfResultWorkOrder = flowNodeApproverDecider.findAndSetFlowNodeApprover(oneFlowNodeOfResultWorkOrder);
-            oneFlowNodeOfResultWorkOrder.setFlowNodeApprover(flowNodeApproverOfResultWorkOrder);
-        }
-
-        resultWorkOrderWithOutFlowInfo.setFlow(fullPreparedFlowOfResultWorkOrder);
+        //完善工单的审批流程信息
+        resultWorkOrderWithOutFlowInfo.setFlow(getFullPreparedFlowInfo(resultWorkOrderWithOutFlowInfo.getFlowId()));
 
         return new ServiceResultImpl<>(resultWorkOrderWithOutFlowInfo);
+    }
+
+    private FlowVo getFullPreparedFlowInfo(Long flowId) {
+        FlowVo resultFlow = flowDao.getFullPreparedFlowByFlowId(flowId)
+                .getResult();
+
+        for (FlowNodeVo oneFlow : resultFlow.getFlowNodeList()) {
+            decideFlowNodeApprover(oneFlow);
+        }
+        return resultFlow;
+    }
+
+    private void decideFlowNodeApprover(FlowNodeVo flowNodeVo) {
+        Long approverId = flowNodeVo.getApproverId();
+        flowNodeApproverDecider = flowNodeApproverDeciderFactory.getApproverDecider(approverId);
+        FlowNodeApprover flowNodeApproverOfResultWorkOrder = flowNodeApproverDecider.findAndSetFlowNodeApprover(flowNodeVo);
+        flowNodeVo.setFlowNodeApprover(flowNodeApproverOfResultWorkOrder);
+
     }
 
     @Override

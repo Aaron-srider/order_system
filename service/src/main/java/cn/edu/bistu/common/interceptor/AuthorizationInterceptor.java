@@ -1,7 +1,7 @@
 package cn.edu.bistu.common.interceptor;
 
 import cn.edu.bistu.auth.JwtHelper;
-import cn.edu.bistu.auth.service.AuthService;
+import cn.edu.bistu.utils.auth.service.AuthService;
 import cn.edu.bistu.common.MapService;
 import cn.edu.bistu.common.ResponseHelper;
 import cn.edu.bistu.constants.ResultCodeEnum;
