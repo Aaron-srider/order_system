@@ -60,6 +60,9 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/utils/**")
                     //关于流程的查询不需要权限和登录
                     .excludePathPatterns("/flows/**")
+
+                    // Gpu 管理系统访问不拦截
+                    .excludePathPatterns("/gpu/api/message")
             ;
 
             //用户授权
@@ -76,6 +79,9 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
                     .excludePathPatterns("/utils/**")
                     //关于流程的查询不需要权限和登录
                     .excludePathPatterns("/flows/**")
+
+                    // Gpu 管理系统访问不拦截
+                    .excludePathPatterns("/gpu/api/message")
 
              ;
         }
