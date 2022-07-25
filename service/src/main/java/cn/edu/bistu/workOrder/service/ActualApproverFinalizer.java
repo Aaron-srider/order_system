@@ -89,7 +89,7 @@ public class ActualApproverFinalizer {
                             ResultCodeEnum.USER_SPECIFIED_ID_NULL);
                 }
                 workOrderVo.setActualApproverId(workOrderVo.getUserSpecifiedId());
-            } else if (approverLogic.getText().equals("THIS_SYSTEM")) {
+            } else{
 
                 workOrderVo.setActualApproverId(approverId);
 
